@@ -1,5 +1,5 @@
 {
-  "npmScope": "distributed-task-queue",
+  "npmScope": "build-iq",
   "affected": {
     "defaultBase": "main"
   },

@@ -2,7 +2,7 @@
   "projectType": "application",
   "root": "apps/frontend",
   "sourceRoot": "apps/frontend/src",
-  "prefix": "distributed-task-queue",
+  "prefix": "build-iq",
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",

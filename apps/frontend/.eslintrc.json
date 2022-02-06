@@ -21,7 +21,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "distributed-task-queue",
+            "prefix": "build-iq",
             "style": "kebab-case"
           }
         ]
