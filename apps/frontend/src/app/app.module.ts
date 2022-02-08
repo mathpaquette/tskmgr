@@ -7,10 +7,7 @@ import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [AppComponent, NxWelcomeComponent],
-  imports: [
-    BrowserModule,
-    RouterModule.forRoot([], { initialNavigation: 'enabledBlocking' }),
-  ],
+  imports: [BrowserModule, RouterModule.forRoot([], { initialNavigation: 'enabledBlocking' })],
   providers: [],
   bootstrap: [AppComponent],
 })
