@@ -28,16 +28,12 @@ describe('Builds', () => {
 
   beforeEach(() => {
     createBuildDto = {
-      name: `test-${uuid()}`,
-      type: 'test',
-      pullRequestId: 'test-pr-100',
+      name: `test-project-${uuid()}`,
+      type: 'test-type',
+      pullRequestId: `test-pr-${uuid()}`,
     };
     createTasksDto = {
-      tasks: [
-        { name: 'test-app', command: 'nx', type: 'lint' },
-        // { name: 'test-app', command: 'nx', type: 'test' },
-        // { name: 'test-app', command: 'nx', type: 'build' },
-      ],
+      tasks: [{ name: 'test-app', command: 'nx', type: 'lint' }],
     };
     startTaskDto = { runnerId: '1' };
   });
@@ -60,11 +56,11 @@ describe('Builds', () => {
     // arrange
     const build: Build = (await createBuild(app, createBuildDto)).body;
     // act
-    const res = await createTasks(app, build._id, createTasksDto);
-    const data: Task[] = res.body;
+    const tasks: Task[] = (await createTasks(app, build._id, createTasksDto).expect(201)).body;
     // assert
-    expect(res.status).toEqual(201);
-    expect(data.length).toBe(1);
+    expect(tasks.length).toBe(1);
+    expect(tasks[0].status).toEqual(TaskStatus.Pending);
+    expect(tasks[0].createdAt).toBeTruthy();
   });
 
   it('should start task', async () => {

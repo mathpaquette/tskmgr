@@ -13,6 +13,13 @@ export enum BuildStatus {
   Completed = 'COMPLETED', // all tasks completed successfully
 }
 
+export enum TaskPriority {
+  Fifo = 'FIFO',
+  Lifo = 'LIFO',
+  Longest = 'LONGEST',
+  Shortest = 'SHORTEST',
+}
+
 @Schema()
 export class Build extends Document {
   @Prop({ type: MongooseSchema.Types.ObjectId, auto: true })
@@ -38,6 +45,9 @@ export class Build extends Document {
 
   @Prop()
   duration: number;
+
+  @Prop({ default: TaskPriority.Longest })
+  priority: TaskPriority;
 
   close: () => Build;
 

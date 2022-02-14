@@ -9,7 +9,6 @@ import { StartTaskResponseDto } from '../builds/dto/start-task-response.dto';
 import { BuildsService } from '../builds/builds.service';
 import { Util } from '../common/util';
 import { PullRequest } from '../builds/schemas/pull-request.schema';
-import { StartTaskDto } from '../builds/dto/start-task.dto';
 import { CompleteTaskDto } from './dto/complete-task.dto';
 
 @Injectable()
@@ -154,7 +153,7 @@ export class TasksService {
       .findOne({
         build: { _id: buildId },
         status: TaskStatus.Pending,
-        $or: [{ runnerId: { $ne: runnerId } }, { runnerId: { $exists: true } }],
+        runnerId: { $ne: runnerId },
       })
       .sort({ avgDuration: -1 }) // prioritize task with >> average duration first.
       .exec();

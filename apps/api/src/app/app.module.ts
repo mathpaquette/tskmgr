@@ -10,10 +10,11 @@ import { BuildsController } from './builds/builds.controller';
 import { BuildsService } from './builds/builds.service';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
+import { environment } from '../environments/environment';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/build-iq_dev', { autoIndex: true }),
+    MongooseModule.forRoot(environment.mongodb, { autoIndex: true }),
     MongooseModule.forFeature([{ name: Build.name, schema: BuildSchema }]),
     MongooseModule.forFeature([{ name: PullRequest.name, schema: PullRequestSchema }]),
     MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
