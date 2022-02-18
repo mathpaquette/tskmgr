@@ -14,7 +14,7 @@ import { environment } from '../environments/environment';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(environment.mongodb, { autoIndex: true }),
+    MongooseModule.forRoot(environment.mongodbUri, { autoIndex: true }),
     MongooseModule.forFeature([{ name: Build.name, schema: BuildSchema }]),
     MongooseModule.forFeature([{ name: PullRequest.name, schema: PullRequestSchema }]),
     MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
