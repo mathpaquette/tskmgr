@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'build-iq-root',
+  selector: 'tskmgr-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })

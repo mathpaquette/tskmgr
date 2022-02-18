@@ -10,7 +10,7 @@
           "error",
           {
             "type": "attribute",
-            "prefix": "distributedTaskQueue",
+            "prefix": "tskmgr",
             "style": "camelCase"
           }
         ],
@@ -18,7 +18,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "build-iq",
+            "prefix": "tskmgr",
             "style": "kebab-case"
           }
         ]
