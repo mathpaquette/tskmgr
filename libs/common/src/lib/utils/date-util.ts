@@ -1,4 +1,4 @@
-export class Util {
+export class DateUtil {
   /**
    * Get duration in seconds between 2 dates
    * @param startDate

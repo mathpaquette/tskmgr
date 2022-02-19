@@ -2,18 +2,15 @@ import * as request from 'supertest';
 import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from './app.module';
-import { CreateBuildDto } from './builds/dto/create-build.dto';
 import { v4 as uuid } from 'uuid';
-import { Build, BuildStatus } from './builds/schemas/build.schema';
-import { CreateTasksDto } from './tasks/dto/create-tasks.dto';
-import { Task, TaskStatus } from './tasks/schemas/task.schema';
-import { StartTaskResponseDto } from './builds/dto/start-task-response.dto';
-import { StartTaskDto } from './builds/dto/start-task.dto';
+import { Build } from './builds/schemas/build.schema';
+import { Task } from './tasks/schemas/task.schema';
+import { ApiUrl, BuildStatus, CreateBuildRequestDto, CreateTasksDto, StartTaskDto, StartTaskResponseDto, TaskStatus } from '@tskmgr/common';
 
 describe('Builds', () => {
   let app: INestApplication;
 
-  let createBuildDto: CreateBuildDto;
+  let createBuildDto: CreateBuildRequestDto;
   let createTasksDto: CreateTasksDto;
   let startTaskDto: StartTaskDto;
 
@@ -171,26 +168,26 @@ describe('Builds', () => {
   });
 });
 
-function createBuild(app: INestApplication, data: CreateBuildDto): request.Test {
-  return request(app.getHttpServer()).post('/builds').send(data);
+function createBuild(app: INestApplication, data: CreateBuildRequestDto): request.Test {
+  return request(app.getHttpServer()).post(ApiUrl.createNoPrefix().createBuildUrl()).send(data);
 }
 
 function closeBuild(app: INestApplication, buildId: any): request.Test {
-  return request(app.getHttpServer()).put(`/builds/${buildId}/close`);
+  return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().closeBuildUrl(buildId));
 }
 
 function createTasks(app: INestApplication, buildId: any, data: CreateTasksDto): request.Test {
-  return request(app.getHttpServer()).post(`/builds/${buildId}/tasks`).send(data);
+  return request(app.getHttpServer()).post(ApiUrl.createNoPrefix().createTasksUrl(buildId)).send(data);
 }
 
 function startTask(app: INestApplication, buildId: any, data: StartTaskDto): request.Test {
-  return request(app.getHttpServer()).put(`/builds/${buildId}/tasks/start`).send(data);
+  return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().startTaskUrl(buildId)).send(data);
 }
 
 function completeTask(app: INestApplication, taskId: any): request.Test {
-  return request(app.getHttpServer()).put(`/tasks/${taskId}/complete`);
+  return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().completeTaskUrl(taskId));
 }
 
 function failTask(app: INestApplication, taskId: any): request.Test {
-  return request(app.getHttpServer()).put(`/tasks/${taskId}/error`);
+  return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().failTaskUrl(taskId));
 }

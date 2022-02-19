@@ -2,18 +2,12 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Build } from '../../builds/schemas/build.schema';
 import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 import { PullRequest } from '../../builds/schemas/pull-request.schema';
+import { Task as Task_, TaskStatus } from '@tskmgr/common';
 
 export type TaskDocument = Task & Document;
 
-export enum TaskStatus {
-  Pending = 'PENDING', // waiting to be executed
-  Started = 'STARTED', // started
-  Failed = 'FAILED', // failed
-  Completed = 'COMPLETED', // completed
-}
-
 @Schema()
-export class Task {
+export class Task implements Task_ {
   @Prop({ type: MongooseSchema.Types.ObjectId, auto: true })
   _id: ObjectId;
 

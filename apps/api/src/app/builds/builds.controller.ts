@@ -1,12 +1,9 @@
 import { Body, Controller, Get, Param, Post, Put, Headers } from '@nestjs/common';
-import { CreateBuildDto } from './dto/create-build.dto';
+import { CreateBuildRequestDto, CreateTasksDto, StartTaskDto, StartTaskResponseDto } from '@tskmgr/common';
 import { BuildsService } from './builds.service';
 import { Build } from './schemas/build.schema';
-import { StartTaskResponseDto } from './dto/start-task-response.dto';
-import { CreateTasksDto } from '../tasks/dto/create-tasks.dto';
 import { Task } from '../tasks/schemas/task.schema';
 import { TasksService } from '../tasks/tasks.service';
-import { StartTaskDto } from './dto/start-task.dto';
 
 @Controller('builds')
 export class BuildsController {
@@ -16,7 +13,7 @@ export class BuildsController {
   ) {}
 
   @Post()
-  createBuild(@Body() createBuildDto: CreateBuildDto): Promise<Build> {
+  createBuild(@Body() createBuildDto: CreateBuildRequestDto): Promise<Build> {
     return this.buildsService.create(createBuildDto);
   }
 

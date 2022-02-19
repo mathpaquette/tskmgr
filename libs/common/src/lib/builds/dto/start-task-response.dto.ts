@@ -1,4 +1,4 @@
-import { Task } from '../../tasks/schemas/task.schema';
+import { Task } from '../../tasks/task';
 
 export class StartTaskResponseDto {
   readonly continue: boolean;

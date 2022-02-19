@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 import { Build } from './build.schema';
+import { PullRequest as PullRequest_ } from '@tskmgr/common';
 
 export type PullRequestDocument = PullRequest & Document;
 
 @Schema()
-export class PullRequest {
+export class PullRequest implements PullRequest_ {
   @Prop({ type: MongooseSchema.Types.ObjectId, auto: true })
   _id: ObjectId;
 

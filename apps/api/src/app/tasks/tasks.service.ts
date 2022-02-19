@@ -1,15 +1,11 @@
 import { Injectable, NotImplementedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Task, TaskDocument, TaskStatus } from './schemas/task.schema';
-import { Build, BuildDocument, BuildStatus } from '../builds/schemas/build.schema';
-import { CreateTasksDto } from './dto/create-tasks.dto';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { StartTaskResponseDto } from '../builds/dto/start-task-response.dto';
+import { Task, TaskDocument } from './schemas/task.schema';
+import { Build, BuildDocument } from '../builds/schemas/build.schema';
 import { BuildsService } from '../builds/builds.service';
-import { Util } from '../common/util';
 import { PullRequest } from '../builds/schemas/pull-request.schema';
-import { CompleteTaskDto } from './dto/complete-task.dto';
+import { BuildStatus, CompleteTaskDto, CreateTaskDto, CreateTasksDto, DateUtil, StartTaskResponseDto, TaskStatus } from '@tskmgr/common';
 
 @Injectable()
 export class TasksService {
@@ -107,7 +103,7 @@ export class TasksService {
     const endedAt = new Date();
     task.endedAt = endedAt;
     task.status = TaskStatus.Completed;
-    task.duration = Util.getDuration(task.startedAt, endedAt);
+    task.duration = DateUtil.getDuration(task.startedAt, endedAt);
     task.cached = cached;
     await task.save();
 
@@ -131,7 +127,7 @@ export class TasksService {
     const endedAt = new Date();
     task.endedAt = endedAt;
     task.status = TaskStatus.Failed;
-    task.duration = Util.getDuration(task.startedAt, endedAt);
+    task.duration = DateUtil.getDuration(task.startedAt, endedAt);
 
     await task.build.abort().save();
     return task.save();

@@ -1,27 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 import { PullRequest } from './pull-request.schema';
-import { Util } from '../../common/util';
+import { BuildStatus, TaskPriority, Build as Build_, DateUtil } from '@tskmgr/common';
 
 export type BuildDocument = Build & Document;
 
-export enum BuildStatus {
-  Created = 'CREATED', // newly created build without tasks
-  Started = 'STARTED', // tasks have been added, ready to pick up
-  Closed = 'CLOSED', // all tasks created, waiting for completion
-  Aborted = 'ABORTED', // one task failed
-  Completed = 'COMPLETED', // all tasks completed successfully
-}
-
-export enum TaskPriority {
-  Fifo = 'FIFO',
-  Lifo = 'LIFO',
-  Longest = 'LONGEST',
-  Shortest = 'SHORTEST',
-}
-
 @Schema()
-export class Build extends Document {
+export class Build implements Build_ {
   @Prop({ type: MongooseSchema.Types.ObjectId, auto: true })
   _id: ObjectId;
 
@@ -46,19 +31,24 @@ export class Build extends Document {
   @Prop()
   duration: number;
 
-  @Prop({ default: TaskPriority.Longest })
-  priority: TaskPriority;
+  @Prop({ enum: TaskPriority, default: TaskPriority.Longest })
+  priority: string;
 
-  close: () => Build;
+  close: (hasAllTasksCompleted: boolean) => BuildDocument;
 
-  complete: () => Build;
+  complete: () => BuildDocument;
 
-  abort: () => Build;
+  abort: () => BuildDocument;
 }
 
 export const BuildSchema = SchemaFactory.createForClass(Build);
 
-BuildSchema.methods.close = function (): Build {
+BuildSchema.methods.close = function (hasAllTasksCompleted: boolean): BuildDocument {
+  if (hasAllTasksCompleted) {
+    this.complete();
+    return this;
+  }
+
   if (this.status === BuildStatus.Created || this.status === BuildStatus.Started) {
     this.status = BuildStatus.Closed;
     return this;
@@ -66,18 +56,18 @@ BuildSchema.methods.close = function (): Build {
   throw new Error(`Build with ${this.status} status can't move to ${BuildStatus.Closed}`);
 };
 
-BuildSchema.methods.complete = function (): Build {
+BuildSchema.methods.complete = function (): BuildDocument {
   const endedAt = new Date();
   this.status = BuildStatus.Completed;
-  this.duration = Util.getDuration(this.createdAt, endedAt);
+  this.duration = DateUtil.getDuration(this.createdAt, endedAt);
   this.endedAt = endedAt;
   return this;
 };
 
-BuildSchema.methods.abort = function (): Build {
+BuildSchema.methods.abort = function (): BuildDocument {
   const endedAt = new Date();
   this.status = BuildStatus.Aborted;
-  this.duration = Util.getDuration(this.createdAt, endedAt);
+  this.duration = DateUtil.getDuration(this.createdAt, endedAt);
   this.endedAt = endedAt;
   return this;
 };

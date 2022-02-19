@@ -1,3 +1,7 @@
+export class CreateTasksDto {
+  readonly tasks: CreateTaskDto[];
+}
+
 export class CreateTaskDto {
   readonly name: string;
   readonly type: string;
