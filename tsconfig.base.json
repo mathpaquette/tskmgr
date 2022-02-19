@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@tskmgr/client": ["libs/client/src/index.ts"]
+      "@tskmgr/client": ["libs/client/src/index.ts"],
+      "@tskmgr/common": ["libs/common/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

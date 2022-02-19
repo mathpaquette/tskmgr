@@ -3,6 +3,7 @@
   "projects": {
     "api": "apps/api",
     "client": "libs/client",
+    "common": "libs/common",
     "frontend": "apps/frontend",
     "frontend-e2e": "apps/frontend-e2e"
   }
