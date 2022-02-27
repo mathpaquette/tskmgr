@@ -1,7 +1,7 @@
 {
   "npmScope": "tskmgr",
   "affected": {
-    "defaultBase": "main"
+    "defaultBase": "master"
   },
   "cli": {
     "defaultCollection": "@nrwl/nest"
