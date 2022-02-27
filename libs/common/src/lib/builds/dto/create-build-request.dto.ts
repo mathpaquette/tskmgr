@@ -1,4 +1,4 @@
-import { TaskPriority } from '@tskmgr/common';
+import { TaskPriority } from '../../tasks/task-priority';
 
 export class CreateBuildRequestDto {
   readonly name: string;

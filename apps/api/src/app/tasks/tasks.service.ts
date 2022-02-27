@@ -76,13 +76,14 @@ export class TasksService {
       return { continue: false, task: null };
     }
 
-    const pendingTask = (await this.getPendingTaskP1(buildId, runnerId)) || (await this.getPendingTaskP2(buildId, runnerId));
-    if (!pendingTask) {
+    const startedTask =
+      (await this.getPendingTaskP1(buildId, runnerId, runnerHost)) || (await this.getPendingTaskP2(buildId, runnerId, runnerHost));
+
+    if (!startedTask) {
       const canTakeNewTask = !(build.status === BuildStatus.Closed);
       return { continue: canTakeNewTask, task: null };
     }
 
-    const startedTask = await this.startPendingTask(pendingTask, runnerId, runnerHost);
     return { continue: true, task: startedTask };
   }
 
@@ -133,34 +134,34 @@ export class TasksService {
     return task.save();
   }
 
-  private async getPendingTaskP1(buildId: string, runnerId: string): Promise<Task> {
+  private async getPendingTaskP1(buildId: string, runnerId: string, runnerHost: string): Promise<Task> {
     return this.taskModel
-      .findOne({
-        build: { _id: buildId },
-        status: TaskStatus.Pending,
-        $or: [{ runnerId: runnerId }, { runnerId: { $exists: false } }],
-      })
+      .findOneAndUpdate(
+        {
+          build: { _id: buildId },
+          status: TaskStatus.Pending,
+          $or: [{ runnerId: runnerId }, { runnerId: { $exists: false } }],
+        },
+        { $set: { startedAt: new Date(), status: TaskStatus.Started, runnerId: runnerId, runnerHost: runnerHost } },
+        { new: true }
+      )
       .sort({ avgDuration: -1 }) // prioritize task with >> average duration first.
       .exec();
   }
 
-  private async getPendingTaskP2(buildId: string, runnerId: string): Promise<Task> {
+  private async getPendingTaskP2(buildId: string, runnerId: string, runnerHost: string): Promise<Task> {
     return this.taskModel
-      .findOne({
-        build: { _id: buildId },
-        status: TaskStatus.Pending,
-        runnerId: { $ne: runnerId },
-      })
+      .findOneAndUpdate(
+        {
+          build: { _id: buildId },
+          status: TaskStatus.Pending,
+          runnerId: { $ne: runnerId },
+        },
+        { $set: { startedAt: new Date(), status: TaskStatus.Started, runnerId: runnerId, runnerHost: runnerHost } },
+        { new: true }
+      )
       .sort({ avgDuration: -1 }) // prioritize task with >> average duration first.
       .exec();
-  }
-
-  private async startPendingTask(task: Task, runnerId: string, runnerHost: string): Promise<Task> {
-    return this.taskModel.findByIdAndUpdate(
-      task._id,
-      { $set: { startedAt: new Date(), status: TaskStatus.Started, runnerId: runnerId, runnerHost: runnerHost } },
-      { new: true }
-    );
   }
 
   private async getAvgDuration(createTaskDto: CreateTaskDto): Promise<number> {

@@ -11,7 +11,7 @@ import { v4 as uuid } from 'uuid';
 
 delete process.env.TS_NODE_PROJECT;
 
-const client = ClientFactory.createNew('http://localhost:3333', '1', 1, dataCallback, errorCallback);
+const client = ClientFactory.createNew('http://localhost:3333', '1', 4, dataCallback, errorCallback);
 
 (async () => {
   try {
@@ -23,9 +23,9 @@ const client = ClientFactory.createNew('http://localhost:3333', '1', 1, dataCall
     printAffectedO.projects
       .filter((x) => !x.includes('-e2e'))
       .forEach((project) => {
-        tasks.push({ name: project, type: 'lint', command: `nx lint api --skip-nx-cache`, options: { shell: true } });
-        tasks.push({ name: project, type: 'test', command: `nx test api --skip-nx-cache`, options: { shell: true } });
-        tasks.push({ name: project, type: 'build', command: `nx build api --skip-nx-cache`, options: { shell: true } });
+        tasks.push({ name: project, type: 'lint', command: `nx lint ${project} --skip-nx-cache`, options: { shell: true } });
+        tasks.push({ name: project, type: 'test', command: `nx test ${project} --skip-nx-cache`, options: { shell: true } });
+        tasks.push({ name: project, type: 'build', command: `nx build ${project} --skip-nx-cache`, options: { shell: true } });
       });
 
     const newBuild = await client.createBuild({ name: uuid(), type: '123', pullRequestId: '123' });
