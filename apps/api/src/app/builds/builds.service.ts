@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Build, BuildDocument } from './schemas/build.schema';
 import { Model } from 'mongoose';
 import { CreateBuildRequestDto, TaskStatus } from '@tskmgr/common';
-import { PullRequest, PullRequestDocument } from './schemas/pull-request.schema';
+import { PullRequest, PullRequestDocument } from '../pull-requests/schemas/pull-request.schema';
 import { Task, TaskDocument } from '../tasks/schemas/task.schema';
 
 @Injectable()

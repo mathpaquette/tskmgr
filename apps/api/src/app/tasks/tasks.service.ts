@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Task, TaskDocument } from './schemas/task.schema';
 import { Build, BuildDocument } from '../builds/schemas/build.schema';
 import { BuildsService } from '../builds/builds.service';
-import { PullRequest } from '../builds/schemas/pull-request.schema';
+import { PullRequest } from '../pull-requests/schemas/pull-request.schema';
 import { BuildStatus, CompleteTaskDto, CreateTaskDto, CreateTasksDto, DateUtil, StartTaskResponseDto, TaskStatus } from '@tskmgr/common';
 
 @Injectable()

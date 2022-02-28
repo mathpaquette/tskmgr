@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Build } from '../../builds/schemas/build.schema';
 import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
-import { PullRequest } from '../../builds/schemas/pull-request.schema';
+import { PullRequest } from '../../pull-requests/schemas/pull-request.schema';
 import { Task as Task_, TaskStatus } from '@tskmgr/common';
 
 export type TaskDocument = Task & Document;

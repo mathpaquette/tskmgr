@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
-import { PullRequest } from './pull-request.schema';
+import { PullRequest } from '../../pull-requests/schemas/pull-request.schema';
 import { BuildStatus, TaskPriority, Build as Build_, DateUtil } from '@tskmgr/common';
 
 export type BuildDocument = Build & Document;
