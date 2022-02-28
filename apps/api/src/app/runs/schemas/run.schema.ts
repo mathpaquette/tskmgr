@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 import { PullRequest } from '../../pull-requests/schemas/pull-request.schema';
-import { BuildStatus, TaskPriority, Build as Build_, DateUtil } from '@tskmgr/common';
+import { RunStatus, TaskPriority, Run as Run_, DateUtil } from '@tskmgr/common';
 
-export type BuildDocument = Build & Document;
+export type RunDocument = Run & Document;
 
 @Schema()
-export class Build implements Build_ {
+export class Run implements Run_ {
   @Prop({ type: MongooseSchema.Types.ObjectId, auto: true })
   _id: ObjectId;
 
@@ -19,7 +19,7 @@ export class Build implements Build_ {
   @Prop()
   type: string;
 
-  @Prop({ enum: BuildStatus, default: BuildStatus.Created })
+  @Prop({ enum: RunStatus, default: RunStatus.Created })
   status: string;
 
   @Prop({ default: () => new Date() })
@@ -34,39 +34,39 @@ export class Build implements Build_ {
   @Prop({ enum: TaskPriority, default: TaskPriority.Longest })
   priority: string;
 
-  close: (hasAllTasksCompleted: boolean) => BuildDocument;
+  close: (hasAllTasksCompleted: boolean) => RunDocument;
 
-  complete: () => BuildDocument;
+  complete: () => RunDocument;
 
-  abort: () => BuildDocument;
+  abort: () => RunDocument;
 }
 
-export const BuildSchema = SchemaFactory.createForClass(Build);
+export const RunSchema = SchemaFactory.createForClass(Run);
 
-BuildSchema.methods.close = function (hasAllTasksCompleted: boolean): BuildDocument {
+RunSchema.methods.close = function (hasAllTasksCompleted: boolean): RunDocument {
   if (hasAllTasksCompleted) {
     this.complete();
     return this;
   }
 
-  if (this.status === BuildStatus.Created || this.status === BuildStatus.Started) {
-    this.status = BuildStatus.Closed;
+  if (this.status === RunStatus.Created || this.status === RunStatus.Started) {
+    this.status = RunStatus.Closed;
     return this;
   }
-  throw new Error(`Build with ${this.status} status can't move to ${BuildStatus.Closed}`);
+  throw new Error(`Run with ${this.status} status can't move to ${RunStatus.Closed}`);
 };
 
-BuildSchema.methods.complete = function (): BuildDocument {
+RunSchema.methods.complete = function (): RunDocument {
   const endedAt = new Date();
-  this.status = BuildStatus.Completed;
+  this.status = RunStatus.Completed;
   this.duration = DateUtil.getDuration(this.createdAt, endedAt);
   this.endedAt = endedAt;
   return this;
 };
 
-BuildSchema.methods.abort = function (): BuildDocument {
+RunSchema.methods.abort = function (): RunDocument {
   const endedAt = new Date();
-  this.status = BuildStatus.Aborted;
+  this.status = RunStatus.Aborted;
   this.duration = DateUtil.getDuration(this.createdAt, endedAt);
   this.endedAt = endedAt;
   return this;

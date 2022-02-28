@@ -1,9 +1,9 @@
-import { Build } from '../builds/build';
+import { Run } from '../runs/run';
 import { PullRequest } from '../pull-requests/pull-request';
 
 export interface Task {
   _id: string | any;
-  build: Build;
+  run: Run;
   pullRequest: PullRequest;
   name: string;
   type: string;

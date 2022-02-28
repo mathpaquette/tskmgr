@@ -9,10 +9,10 @@ export class ApiUrl {
     return new ApiUrl(null, null);
   }
 
-  createBuildUrl = () => this.getUrl(`/builds`);
-  closeBuildUrl = (id: string) => this.getUrl(`/builds/${id}/close`);
-  createTasksUrl = (id: string) => this.getUrl(`/builds/${id}/tasks`);
-  startTaskUrl = (id: string) => this.getUrl(`/builds/${id}/tasks/start`);
+  createRunUrl = () => this.getUrl(`/runs`);
+  closeRunUrl = (id: string) => this.getUrl(`/runs/${id}/close`);
+  createTasksUrl = (id: string) => this.getUrl(`/runs/${id}/tasks`);
+  startTaskUrl = (id: string) => this.getUrl(`/runs/${id}/tasks/start`);
   completeTaskUrl = (id: string) => this.getUrl(`/tasks/${id}/complete`);
   failTaskUrl = (id: string) => this.getUrl(`/tasks/${id}/fail`);
 

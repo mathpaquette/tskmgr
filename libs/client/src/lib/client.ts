@@ -1,9 +1,9 @@
 import { ChildProcess, spawn, SpawnOptionsWithoutStdio } from 'child_process';
 import {
   ApiUrl,
-  Build,
+  Run,
   CompleteTaskDto,
-  CreateBuildRequestDto,
+  CreateRunRequestDto,
   CreateTasksDto,
   StartTaskDto,
   StartTaskResponseDto,
@@ -23,8 +23,8 @@ export class Client {
     private readonly retryCount
   ) {}
 
-  public async createBuild(params: CreateBuildRequestDto): Promise<Build> {
-    const res = await fetch(this.apiUrl.createBuildUrl(), {
+  public async createRun(params: CreateRunRequestDto): Promise<Run> {
+    const res = await fetch(this.apiUrl.createRunUrl(), {
       method: 'POST',
       body: JSON.stringify(params),
       headers: { 'Content-Type': 'application/json' },
@@ -33,8 +33,8 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async closeBuild(id: string): Promise<Build> {
-    const res = await fetch(this.apiUrl.closeBuildUrl(id), {
+  public async closeRun(id: string): Promise<Run> {
+    const res = await fetch(this.apiUrl.closeRunUrl(id), {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
     });

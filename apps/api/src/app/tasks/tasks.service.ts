@@ -2,39 +2,39 @@ import { Injectable, NotImplementedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task, TaskDocument } from './schemas/task.schema';
-import { Build, BuildDocument } from '../builds/schemas/build.schema';
-import { BuildsService } from '../builds/builds.service';
+import { Run, RunDocument } from '../runs/schemas/run.schema';
+import { RunsService } from '../runs/runs.service';
 import { PullRequest } from '../pull-requests/schemas/pull-request.schema';
-import { BuildStatus, CompleteTaskDto, CreateTaskDto, CreateTasksDto, DateUtil, StartTaskResponseDto, TaskStatus } from '@tskmgr/common';
+import { RunStatus, CompleteTaskDto, CreateTaskDto, CreateTasksDto, DateUtil, StartTaskResponseDto, TaskStatus } from '@tskmgr/common';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<TaskDocument>,
-    @InjectModel(Build.name) private readonly buildModel: Model<BuildDocument>,
-    private readonly buildsService: BuildsService
+    @InjectModel(Run.name) private readonly runModel: Model<RunDocument>,
+    private readonly runsService: RunsService
   ) {}
 
   /**
    * Create new tasks in bulk
-   * @param buildId
+   * @param runId
    * @param createTasksDto
    */
-  async createTasks(buildId: string, createTasksDto: CreateTasksDto): Promise<Task[]> {
-    const build = await this.buildModel.findById(buildId).populate('pullRequest').exec();
-    if (!build) throw new Error(`Build id: ${buildId} can't be found.`);
+  async createTasks(runId: string, createTasksDto: CreateTasksDto): Promise<Task[]> {
+    const run = await this.runModel.findById(runId).populate('pullRequest').exec();
+    if (!run) throw new Error(`Run id: ${runId} can't be found.`);
 
-    if (build.status === BuildStatus.Closed || build.endedAt) {
-      throw new Error(`Build with ${build.status} status can't accept new tasks`);
+    if (run.status === RunStatus.Closed || run.endedAt) {
+      throw new Error(`Run with ${run.status} status can't accept new tasks`);
     }
 
     const tasks: Promise<Task>[] = [];
     for (const createTaskDto of createTasksDto.tasks) {
       const avgDuration = await this.getAvgDuration(createTaskDto);
-      const runnerId = await this.getPreviousRunnerId(build.pullRequest, createTaskDto);
+      const runnerId = await this.getPreviousRunnerId(run.pullRequest, createTaskDto);
       const task: Partial<Task> = {
-        build: build._id,
-        pullRequest: build.pullRequest,
+        run: run._id,
+        pullRequest: run.pullRequest,
         avgDuration: avgDuration,
         runnerId: runnerId,
         name: createTaskDto.name,
@@ -46,17 +46,17 @@ export class TasksService {
       tasks.push(this.taskModel.create(task));
     }
 
-    if (build.status === BuildStatus.Created) {
-      build.status = BuildStatus.Started;
-      await build.save();
+    if (run.status === RunStatus.Created) {
+      run.status = RunStatus.Started;
+      await run.save();
     }
 
     return Promise.all(tasks);
   }
 
-  async findByBuildId(buildId: string): Promise<Task[]> {
+  async findByRunId(runId: string): Promise<Task[]> {
     return this.taskModel
-      .find({ build: { _id: buildId } })
+      .find({ run: { _id: runId } })
       .sort({ createdAt: -1 })
       .limit(500)
       .exec();
@@ -64,23 +64,23 @@ export class TasksService {
 
   /**
    * Get and start one pending task
-   * @param buildId
+   * @param runId
    * @param runnerId
    * @param hostname
    */
-  async findOnePendingTask(buildId: string, runnerId: string, runnerHost: string): Promise<StartTaskResponseDto> {
-    const build = await this.buildModel.findById(buildId).exec();
-    if (!build) throw new Error(`Build id: ${buildId} can't be found.`);
+  async findOnePendingTask(runId: string, runnerId: string, runnerHost: string): Promise<StartTaskResponseDto> {
+    const run = await this.runModel.findById(runId).exec();
+    if (!run) throw new Error(`Run id: ${runId} can't be found.`);
 
-    if (build.endedAt) {
+    if (run.endedAt) {
       return { continue: false, task: null };
     }
 
     const startedTask =
-      (await this.getPendingTaskP1(buildId, runnerId, runnerHost)) || (await this.getPendingTaskP2(buildId, runnerId, runnerHost));
+      (await this.getPendingTaskP1(runId, runnerId, runnerHost)) || (await this.getPendingTaskP2(runId, runnerId, runnerHost));
 
     if (!startedTask) {
-      const canTakeNewTask = !(build.status === BuildStatus.Closed);
+      const canTakeNewTask = !(run.status === RunStatus.Closed);
       return { continue: canTakeNewTask, task: null };
     }
 
@@ -94,7 +94,7 @@ export class TasksService {
    */
   async complete(taskId: string, completeTaskDto: CompleteTaskDto): Promise<Task> {
     const { cached } = completeTaskDto;
-    const task = await this.taskModel.findOne({ _id: taskId }).populate('build').exec();
+    const task = await this.taskModel.findOne({ _id: taskId }).populate('run').exec();
     if (!task) throw new Error(`Task id: ${taskId} can't be found.`);
 
     if (!task.startedAt || task.endedAt) {
@@ -108,9 +108,9 @@ export class TasksService {
     task.cached = cached;
     await task.save();
 
-    if (task.build.status === BuildStatus.Closed) {
-      if (await this.buildsService.hasAllTasksCompleted(task.build)) {
-        await task.build.complete().save();
+    if (task.run.status === RunStatus.Closed) {
+      if (await this.runsService.hasAllTasksCompleted(task.run)) {
+        await task.run.complete().save();
       }
     }
 
@@ -118,7 +118,7 @@ export class TasksService {
   }
 
   async fail(taskId: string): Promise<Task> {
-    const task = await this.taskModel.findOne({ _id: taskId }).populate('build').exec();
+    const task = await this.taskModel.findOne({ _id: taskId }).populate('run').exec();
     if (!task) throw new Error(`Task id: ${taskId} can't be found.`);
 
     if (!task.startedAt || task.endedAt) {
@@ -130,15 +130,15 @@ export class TasksService {
     task.status = TaskStatus.Failed;
     task.duration = DateUtil.getDuration(task.startedAt, endedAt);
 
-    await task.build.abort().save();
+    await task.run.abort().save();
     return task.save();
   }
 
-  private async getPendingTaskP1(buildId: string, runnerId: string, runnerHost: string): Promise<Task> {
+  private async getPendingTaskP1(runId: string, runnerId: string, runnerHost: string): Promise<Task> {
     return this.taskModel
       .findOneAndUpdate(
         {
-          build: { _id: buildId },
+          run: { _id: runId },
           status: TaskStatus.Pending,
           $or: [{ runnerId: runnerId }, { runnerId: { $exists: false } }],
         },
@@ -149,11 +149,11 @@ export class TasksService {
       .exec();
   }
 
-  private async getPendingTaskP2(buildId: string, runnerId: string, runnerHost: string): Promise<Task> {
+  private async getPendingTaskP2(runId: string, runnerId: string, runnerHost: string): Promise<Task> {
     return this.taskModel
       .findOneAndUpdate(
         {
-          build: { _id: buildId },
+          run: { _id: runId },
           status: TaskStatus.Pending,
           runnerId: { $ne: runnerId },
         },

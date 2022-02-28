@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
-import { Build } from '../../builds/schemas/build.schema';
+import { Run } from '../../runs/schemas/run.schema';
 import { PullRequest as PullRequest_ } from '@tskmgr/common';
 
 export type PullRequestDocument = PullRequest & Document;
@@ -13,8 +13,8 @@ export class PullRequest implements PullRequest_ {
   @Prop({ required: true, unique: true })
   name: string;
 
-  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Build' }] })
-  builds: Build[];
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Run' }] })
+  runs: Run[];
 
   @Prop({ default: () => new Date() })
   createdAt: Date;

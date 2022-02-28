@@ -1,8 +1,8 @@
-import { Build } from '../builds/build';
+import { Run } from '../runs/run';
 
 export interface PullRequest {
   _id: string | any;
   name: string;
-  builds: Build[];
+  runs: Run[];
   createdAt: Date;
 }

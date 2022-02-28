@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Build } from '../../builds/schemas/build.schema';
+import { Run } from '../../runs/schemas/run.schema';
 import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 import { PullRequest } from '../../pull-requests/schemas/pull-request.schema';
 import { Task as Task_, TaskStatus } from '@tskmgr/common';
@@ -11,8 +11,8 @@ export class Task implements Task_ {
   @Prop({ type: MongooseSchema.Types.ObjectId, auto: true })
   _id: ObjectId;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Build', required: true })
-  build: Build;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Run', required: true })
+  run: Run;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'PullRequest', required: true })
   pullRequest: PullRequest;

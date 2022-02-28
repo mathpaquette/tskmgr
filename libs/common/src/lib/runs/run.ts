@@ -1,6 +1,6 @@
 import { PullRequest } from '../pull-requests/pull-request';
 
-export interface Build {
+export interface Run {
   _id: string | any;
   pullRequest: PullRequest;
   name: string;

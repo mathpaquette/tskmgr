@@ -1,12 +1,12 @@
 export * from './lib/common';
 export * from './lib/api-url';
 
-// builds
-export * from './lib/builds/build';
-export * from './lib/builds/dto/create-build-request.dto';
-export * from './lib/builds/dto/start-task.dto';
-export * from './lib/builds/dto/start-task-response.dto';
-export * from './lib/builds/build-status';
+// runs
+export * from './lib/runs/run';
+export * from './lib/runs/dto/create-run-request.dto';
+export * from './lib/runs/dto/start-task.dto';
+export * from './lib/runs/dto/start-task-response.dto';
+export * from './lib/runs/run-status';
 
 // tasks
 export * from './lib/tasks/task';

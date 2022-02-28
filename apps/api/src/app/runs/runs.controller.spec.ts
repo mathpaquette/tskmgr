@@ -1,21 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BuildsController } from './builds.controller';
-import { BuildsService } from './builds.service';
+import { RunsController } from './runs.controller';
+import { RunsService } from './runs.service';
 import { TasksService } from '../tasks/tasks.service';
 
-describe('BuildsController', () => {
-  let controller: BuildsController;
+describe('RunsController', () => {
+  let controller: RunsController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [BuildsController],
+      controllers: [RunsController],
       providers: [
-        { provide: BuildsService, useValue: jest.fn() },
+        { provide: RunsService, useValue: jest.fn() },
         { provide: TasksService, useValue: jest.fn() },
       ],
     }).compile();
 
-    controller = module.get<BuildsController>(BuildsController);
+    controller = module.get<RunsController>(RunsController);
   });
 
   it('should be defined', () => {

@@ -28,16 +28,16 @@ const client = ClientFactory.createNew('http://localhost:3333', '1', 4, dataCall
         tasks.push({ name: project, type: 'build', command: `nx build ${project} --skip-nx-cache`, options: { shell: true } });
       });
 
-    const newBuild = await client.createBuild({ name: uuid(), type: '123', pullRequestId: '123' });
-    console.log(newBuild);
+    const newRun = await client.createRun({ name: uuid(), type: '123', pullRequestId: '123' });
+    console.log(newRun);
 
-    const createdTasks = await client.createTasks(newBuild._id, { tasks });
+    const createdTasks = await client.createTasks(newRun._id, { tasks });
     console.log(createdTasks);
 
-    const closeBuild = await client.closeBuild(newBuild._id);
-    console.log(closeBuild);
+    const closeRun = await client.closeRun(newRun._id);
+    console.log(closeRun);
 
-    await client.runTasks(newBuild._id);
+    await client.runTasks(newRun._id);
   } catch (e) {
     console.log(e);
     process.exit(1);
