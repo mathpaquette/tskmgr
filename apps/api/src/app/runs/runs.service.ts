@@ -36,7 +36,11 @@ export class RunsService {
   }
 
   async findAll(): Promise<Run[]> {
-    return this.runModel.find().exec();
+    return this.runModel
+      .find() //
+      .sort({ updatedAt: -1 })
+      .limit(100)
+      .exec();
   }
 
   async hasAllTasksCompleted(run: Run): Promise<boolean> {

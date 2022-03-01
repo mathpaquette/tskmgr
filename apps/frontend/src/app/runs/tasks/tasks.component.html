@@ -1,0 +1,51 @@
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>id</th>
+      <th>name</th>
+      <th>type</th>
+
+      <th>command</th>
+      <th>arguments</th>
+      <th>options</th>
+
+      <th>runner id</th>
+      <th>runner host</th>
+
+      <th>created at</th>
+      <th>started at</th>
+      <th>updated at</th>
+      <th>ended at</th>
+
+      <th>duration</th>
+      <th>avg duration</th>
+
+      <th>status</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let task of tasks$ | async">
+      <td>{{ task._id }}</td>
+      <td>{{ task.name }}</td>
+      <td>{{ task.type }}</td>
+
+      <td>{{ task.command }}</td>
+      <td>{{ task.arguments | json }}</td>
+      <td>{{ task.options | json }}</td>
+
+      <td>{{ task.runnerId }}</td>
+      <td>{{ task.runnerHost }}</td>
+
+      <td>{{ task.createdAt }}</td>
+      <td>{{ task.startedAt }}</td>
+      <td>{{ task.updatedAt }}</td>
+      <td>{{ task.endedAt }}</td>
+
+      <td>{{ task.duration }}</td>
+      <td>{{ task.avgDuration }}</td>
+
+      <td>{{ task.status }}</td>
+    </tr>
+  </tbody>
+</table>

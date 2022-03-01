@@ -57,8 +57,7 @@ export class TasksService {
   async findByRunId(runId: string): Promise<Task[]> {
     return this.taskModel
       .find({ run: { _id: runId } })
-      .sort({ createdAt: -1 })
-      .limit(500)
+      .sort({ updatedAt: -1 })
       .exec();
   }
 

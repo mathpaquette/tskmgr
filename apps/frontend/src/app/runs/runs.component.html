@@ -1,1 +1,29 @@
-<p>runs works!</p>
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>id</th>
+      <th>name</th>
+      <th>type</th>
+      <th>status</th>
+      <th>created at</th>
+      <th>updated at</th>
+      <th>ended at</th>
+      <th>duration</th>
+      <th>tasks</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr [class.highlight]="id === run._id" *ngFor="let run of runs$ | async" (click)="onRowClick(run)">
+      <td>{{ run._id }}</td>
+      <td>{{ run.name }}</td>
+      <td>{{ run.type }}</td>
+      <td>{{ run.status }}</td>
+      <td>{{ run.createdAt }}</td>
+      <td>{{ run.updatedAt }}</td>
+      <td>{{ run.endedAt }}</td>
+      <td>{{ run.duration }}</td>
+      <td><a routerLink="/runs/{{ run._id }}/tasks">tasks</a></td>
+    </tr>
+  </tbody>
+</table>

@@ -2,7 +2,10 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'tskmgr-root',
-  template: `<router-outlet></router-outlet>`,
+  template: `
+    <tskmgr-header></tskmgr-header>
+    <router-outlet></router-outlet>
+  `,
   styles: [``],
 })
 export class AppComponent {
