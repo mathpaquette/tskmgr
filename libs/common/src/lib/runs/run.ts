@@ -7,6 +7,7 @@ export interface Run {
   type: string;
   status: string;
   createdAt: Date;
+  updatedAt: Date;
   endedAt: Date;
   duration: number;
   priority: string;

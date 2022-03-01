@@ -14,6 +14,7 @@ export interface Task {
   runnerHost: string;
   status: string;
   createdAt: Date;
+  updatedAt: Date;
   startedAt: Date;
   endedAt: Date;
   cached: boolean;

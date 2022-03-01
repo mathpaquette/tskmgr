@@ -1,1 +1,27 @@
-<p>pull-requests works!</p>
+<table class="table">
+  <thead>
+    <tr>
+      <th>id</th>
+      <th>name</th>
+      <th>created at</th>
+      <th>updated at</th>
+      <th>runs</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let pullRequest of pullRequests$ | async">
+      <td>{{ pullRequest._id }}</td>
+      <td>{{ pullRequest.name }}</td>
+      <td>{{ pullRequest.createdAt }}</td>
+      <td>{{ pullRequest.updatedAt }}</td>
+      <td>
+        <ul>
+          <li *ngFor="let run of pullRequest.runs">
+            <a [routerLink]="run._id">{{ run.name }}</a>
+          </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>

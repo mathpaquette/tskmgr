@@ -5,4 +5,5 @@ export interface PullRequest {
   name: string;
   runs: Run[];
   createdAt: Date;
+  updatedAt: Date;
 }

@@ -5,7 +5,7 @@ import { RunStatus, TaskPriority, Run as Run_, DateUtil } from '@tskmgr/common';
 
 export type RunDocument = Run & Document;
 
-@Schema()
+@Schema({ timestamps: { createdAt: true, updatedAt: true } })
 export class Run implements Run_ {
   @Prop({ type: MongooseSchema.Types.ObjectId, auto: true })
   _id: ObjectId;
@@ -22,8 +22,11 @@ export class Run implements Run_ {
   @Prop({ enum: RunStatus, default: RunStatus.Created })
   status: string;
 
-  @Prop({ default: () => new Date() })
+  @Prop()
   createdAt: Date;
+
+  @Prop()
+  updatedAt: Date;
 
   @Prop()
   endedAt: Date;

@@ -5,7 +5,7 @@ import { PullRequest as PullRequest_ } from '@tskmgr/common';
 
 export type PullRequestDocument = PullRequest & Document;
 
-@Schema()
+@Schema({ timestamps: { createdAt: true, updatedAt: true } })
 export class PullRequest implements PullRequest_ {
   @Prop({ type: MongooseSchema.Types.ObjectId, auto: true })
   _id: ObjectId;
@@ -16,8 +16,11 @@ export class PullRequest implements PullRequest_ {
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Run' }] })
   runs: Run[];
 
-  @Prop({ default: () => new Date() })
+  @Prop()
   createdAt: Date;
+
+  @Prop()
+  updatedAt: Date;
 }
 
 export const PullRequestSchema = SchemaFactory.createForClass(PullRequest);

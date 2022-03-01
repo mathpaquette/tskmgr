@@ -3,11 +3,15 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
 import { RouterModule } from '@angular/router';
+import { API_URL_TOKEN } from './common/api-url.token';
+import { ApiUrl } from '@tskmgr/common';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
     BrowserModule,
+    HttpClientModule,
     RouterModule.forRoot(
       [
         { path: 'pull-requests', loadChildren: () => import('./pull-requests/pull-requests.module').then((m) => m.PullRequestsModule) },
@@ -17,7 +21,12 @@ import { RouterModule } from '@angular/router';
       { initialNavigation: 'enabledBlocking' }
     ),
   ],
-  providers: [],
+  providers: [
+    {
+      provide: API_URL_TOKEN,
+      useFactory: () => ApiUrl.create(''),
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

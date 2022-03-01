@@ -6,7 +6,7 @@ import { Task as Task_, TaskStatus } from '@tskmgr/common';
 
 export type TaskDocument = Task & Document;
 
-@Schema()
+@Schema({ timestamps: { createdAt: true, updatedAt: true } })
 export class Task implements Task_ {
   @Prop({ type: MongooseSchema.Types.ObjectId, auto: true })
   _id: ObjectId;
@@ -41,8 +41,11 @@ export class Task implements Task_ {
   @Prop({ enum: TaskStatus, default: TaskStatus.Pending })
   status: string;
 
-  @Prop({ default: () => new Date() })
+  @Prop()
   createdAt: Date;
+
+  @Prop()
+  updatedAt: Date;
 
   @Prop()
   startedAt: Date;

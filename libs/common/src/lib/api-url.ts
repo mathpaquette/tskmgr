@@ -6,7 +6,7 @@ export class ApiUrl {
   }
 
   public static createNoPrefix(): ApiUrl {
-    return new ApiUrl(null, null);
+    return new ApiUrl('', '');
   }
 
   createRunUrl = () => this.getUrl(`/runs`);
@@ -15,6 +15,8 @@ export class ApiUrl {
   startTaskUrl = (id: string) => this.getUrl(`/runs/${id}/tasks/start`);
   completeTaskUrl = (id: string) => this.getUrl(`/tasks/${id}/complete`);
   failTaskUrl = (id: string) => this.getUrl(`/tasks/${id}/fail`);
+
+  findAllPullRequestsUrl = () => this.getUrl(`/pull-requests`);
 
   getUrl = (url: string): string => {
     if (this.prefix) {
