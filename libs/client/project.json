@@ -26,7 +26,7 @@
         "tsConfig": "libs/client/tsconfig.lib.json",
         "packageJson": "libs/client/package.json",
         "main": "libs/client/src/index.ts",
-        "assets": ["libs/client/*.md"]
+        "assets": ["libs/client/*.md", "LICENSE"]
       }
     }
   },
