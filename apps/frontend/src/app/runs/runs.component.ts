@@ -3,25 +3,76 @@ import { EMPTY, Observable } from 'rxjs';
 import { Run } from '@tskmgr/common';
 import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ColDef, GridOptions, GridReadyEvent, RowDoubleClickedEvent, RowNode } from 'ag-grid-community';
+import { TasksCellRendererComponent } from './cell-renderers/tasks-cell-renderer.component';
+import { defaultGridOptions, valueFormatterDuration, valueFormatterTime } from '../common/ag-grid.util';
 
 @Component({
   selector: 'tskmgr-runs',
-  templateUrl: './runs.component.html',
-  styleUrls: ['./runs.component.scss'],
+  template: `
+    <ag-grid-angular class="ag-theme-alpine" [rowData]="runs$ | async" [columnDefs]="columnDefs" [gridOptions]="gridOptions">
+    </ag-grid-angular>
+  `,
+  styles: [
+    `
+      ag-grid-angular {
+        width: 100%;
+      }
+
+      :host {
+        display: flex;
+        flex: 1;
+      }
+    `,
+  ],
 })
 export class RunsComponent {
-  constructor(private readonly runsService: RunsService, private activatedRoute: ActivatedRoute, private router: Router) {}
+  constructor(
+    private readonly runsService: RunsService, //
+    private activatedRoute: ActivatedRoute,
+    private router: Router
+  ) {}
 
   runs$: Observable<Run[]> = EMPTY;
   id = '';
+
+  gridOptions: GridOptions = {
+    ...defaultGridOptions,
+
+    onGridReady: this.onGridReady.bind(this),
+    onRowDoubleClicked: this.onRowDoubleClicked.bind(this),
+    getRowNodeId: (data) => data._id,
+    getRowClass: (params) => (params.data._id === this.id ? 'highlight-row' : undefined),
+  };
+
+  columnDefs: ColDef[] = [
+    { field: '_id', headerName: 'Id' },
+    { field: 'name' },
+    { field: 'type' },
+    { field: 'status' },
+    { field: 'createdAt', valueFormatter: valueFormatterTime },
+    { field: 'updatedAt', valueFormatter: valueFormatterTime },
+    { field: 'endedAt', valueFormatter: valueFormatterTime },
+    { field: 'duration', valueFormatter: valueFormatterDuration },
+    { field: '_id', headerName: 'Tasks', cellRenderer: TasksCellRendererComponent },
+  ];
 
   ngOnInit(): void {
     this.runs$ = this.runsService.findAll();
     this.id = this.activatedRoute.snapshot.params['id'];
   }
 
-  onRowClick(run: Run): void {
-    this.id = run._id;
-    this.router.navigate(['runs', run._id]);
+  onGridReady(event: GridReadyEvent): void {
+    event.api.sizeColumnsToFit();
+  }
+
+  onRowDoubleClicked(event: RowDoubleClickedEvent): void {
+    const previousNode = event.api.getRowNode(this.id);
+    if (previousNode === event.node) return;
+
+    this.id = event.data._id;
+    this.router.navigate(['runs', this.id]);
+
+    event.api.redrawRows({ rowNodes: [previousNode as RowNode, event.node] });
   }
 }

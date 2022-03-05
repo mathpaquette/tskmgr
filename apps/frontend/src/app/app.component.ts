@@ -6,7 +6,15 @@ import { Component } from '@angular/core';
     <tskmgr-header></tskmgr-header>
     <router-outlet></router-outlet>
   `,
-  styles: [``],
+  styles: [
+    `
+      :host {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+    `,
+  ],
 })
 export class AppComponent {
   title = 'frontend';
