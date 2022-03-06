@@ -4,6 +4,7 @@ export interface Run {
   _id: string | any;
   pullRequest: PullRequest;
   name: string;
+  url: string;
   type: string;
   status: string;
   createdAt: Date;

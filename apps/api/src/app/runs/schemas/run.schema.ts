@@ -17,6 +17,9 @@ export class Run implements Run_ {
   name: string;
 
   @Prop()
+  url: string;
+
+  @Prop()
   type: string;
 
   @Prop({ enum: RunStatus, default: RunStatus.Created })

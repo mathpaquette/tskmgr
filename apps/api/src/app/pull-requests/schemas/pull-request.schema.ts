@@ -13,6 +13,9 @@ export class PullRequest implements PullRequest_ {
   @Prop({ required: true, unique: true })
   name: string;
 
+  @Prop()
+  url: string;
+
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Run' }] })
   runs: Run[];
 

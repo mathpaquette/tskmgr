@@ -5,7 +5,7 @@ import { EMPTY, Observable } from 'rxjs';
 import { Task } from '@tskmgr/common';
 import { ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { format } from 'date-fns';
-import { defaultGridOptions, valueFormatterDuration, valueFormatterTime } from '../../common/ag-grid.util';
+import { defaultGridOptions, durationValueFormatter, timeValueFormatter } from '../../common/ag-grid.util';
 
 @Component({
   selector: 'tskmgr-tasks',
@@ -52,13 +52,13 @@ export class TasksComponent implements OnInit {
     { field: 'runnerId' },
     { field: 'runnerHost' },
 
-    { field: 'createdAt', valueFormatter: valueFormatterTime },
-    { field: 'startedAt', valueFormatter: valueFormatterTime },
-    { field: 'updatedAt', valueFormatter: valueFormatterTime },
-    { field: 'endedAt', valueFormatter: valueFormatterTime },
+    { field: 'createdAt', valueFormatter: timeValueFormatter },
+    { field: 'startedAt', valueFormatter: timeValueFormatter },
+    { field: 'updatedAt', valueFormatter: timeValueFormatter },
+    { field: 'endedAt', valueFormatter: timeValueFormatter },
 
-    { field: 'duration', valueFormatter: valueFormatterDuration },
-    { field: 'avgDuration', valueFormatter: valueFormatterDuration },
+    { field: 'duration', valueFormatter: durationValueFormatter },
+    { field: 'avgDuration', valueFormatter: durationValueFormatter },
 
     { field: 'status' },
   ];

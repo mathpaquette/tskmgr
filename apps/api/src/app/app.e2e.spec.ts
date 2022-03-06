@@ -24,10 +24,13 @@ describe('Runs', () => {
   });
 
   beforeEach(() => {
+    const uniqueId = uuid();
     createRunDto = {
-      name: `test-project-${uuid()}`,
+      name: `test-project-${uniqueId}`,
+      url: `https://circleci.com/${uniqueId}/`,
       type: 'test-type',
-      pullRequestId: `test-pr-${uuid()}`,
+      pullRequestName: `test-pr-${uniqueId}`,
+      pullRequestUrl: `https://github.com/${uniqueId}/`,
     };
     createTasksDto = {
       tasks: [{ name: 'test-app', command: 'nx', type: 'lint' }],
@@ -44,8 +47,10 @@ describe('Runs', () => {
     expect(res.status).toEqual(201);
     expect(data.status).toEqual(RunStatus.Created);
     expect(data.type).toEqual(createRunDto.type);
-    expect(data.pullRequest.name).toEqual(createRunDto.pullRequestId);
+    expect(data.pullRequest.name).toEqual(createRunDto.pullRequestName);
+    expect(data.pullRequest.url).toEqual(createRunDto.pullRequestUrl);
     expect(data.name).toEqual(createRunDto.name);
+    expect(data.url).toEqual(createRunDto.url);
     expect(new Date(res.body.createdAt)).not.toBeNaN();
   });
 

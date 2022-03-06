@@ -15,11 +15,16 @@ export class RunsService {
   ) {}
 
   async create(createRunDto: CreateRunRequestDto): Promise<Run> {
-    const pullRequest = await this.pullRequestModel.findOneAndUpdate({ name: createRunDto.pullRequestId }, {}, { upsert: true, new: true });
+    const pullRequest = await this.pullRequestModel.findOneAndUpdate(
+      { name: createRunDto.pullRequestName },
+      { url: createRunDto.pullRequestUrl },
+      { upsert: true, new: true }
+    );
 
     const run = await this.runModel.create({
       pullRequest: pullRequest,
       name: createRunDto.name,
+      url: createRunDto.url,
       type: createRunDto.type,
     });
 

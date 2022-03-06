@@ -4,7 +4,7 @@ import { EMPTY, Observable } from 'rxjs';
 import { PullRequest } from '@tskmgr/common';
 import { ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { RunsCellRendererComponent } from './cell-renderers/runs-cell-renderer.component';
-import { defaultGridOptions, valueFormatterDate } from '../common/ag-grid.util';
+import { defaultGridOptions, urlCellRenderer, dateValueFormatter } from '../common/ag-grid.util';
 
 @Component({
   selector: 'tskmgr-pull-requests',
@@ -40,9 +40,9 @@ export class PullRequestsComponent implements OnInit {
 
   columnDefs: ColDef[] = [
     { field: '_id', headerName: 'Id' },
-    { field: 'name' },
-    { field: 'createdAt', valueFormatter: valueFormatterDate },
-    { field: 'updatedAt', valueFormatter: valueFormatterDate },
+    { field: 'name', cellRenderer: urlCellRenderer },
+    { field: 'createdAt', valueFormatter: dateValueFormatter },
+    { field: 'updatedAt', valueFormatter: dateValueFormatter },
     { field: 'runs', cellRenderer: RunsCellRendererComponent, autoHeight: true },
   ];
 

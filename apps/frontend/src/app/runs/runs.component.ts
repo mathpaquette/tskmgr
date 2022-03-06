@@ -5,7 +5,7 @@ import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ColDef, GridOptions, GridReadyEvent, RowDoubleClickedEvent, RowNode } from 'ag-grid-community';
 import { TasksCellRendererComponent } from './cell-renderers/tasks-cell-renderer.component';
-import { defaultGridOptions, valueFormatterDuration, valueFormatterTime } from '../common/ag-grid.util';
+import { defaultGridOptions, durationValueFormatter, timeValueFormatter, urlCellRenderer } from '../common/ag-grid.util';
 
 @Component({
   selector: 'tskmgr-runs',
@@ -47,13 +47,13 @@ export class RunsComponent {
 
   columnDefs: ColDef[] = [
     { field: '_id', headerName: 'Id' },
-    { field: 'name' },
+    { field: 'name', cellRenderer: urlCellRenderer },
     { field: 'type' },
     { field: 'status' },
-    { field: 'createdAt', valueFormatter: valueFormatterTime },
-    { field: 'updatedAt', valueFormatter: valueFormatterTime },
-    { field: 'endedAt', valueFormatter: valueFormatterTime },
-    { field: 'duration', valueFormatter: valueFormatterDuration },
+    { field: 'createdAt', valueFormatter: timeValueFormatter },
+    { field: 'updatedAt', valueFormatter: timeValueFormatter },
+    { field: 'endedAt', valueFormatter: timeValueFormatter },
+    { field: 'duration', valueFormatter: durationValueFormatter },
     { field: '_id', headerName: 'Tasks', cellRenderer: TasksCellRendererComponent },
   ];
 
