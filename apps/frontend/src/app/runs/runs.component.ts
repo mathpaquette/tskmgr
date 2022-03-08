@@ -10,8 +10,12 @@ import { defaultGridOptions, durationValueFormatter, timeValueFormatter, urlCell
 @Component({
   selector: 'tskmgr-runs',
   template: `
-    <ag-grid-angular class="ag-theme-alpine" [rowData]="runs$ | async" [columnDefs]="columnDefs" [gridOptions]="gridOptions">
-    </ag-grid-angular>
+    <ag-grid-angular
+      class="ag-theme-alpine"
+      [rowData]="runs$ | async"
+      [columnDefs]="columnDefs"
+      [gridOptions]="gridOptions"
+    ></ag-grid-angular>
   `,
   styles: [
     `
@@ -49,11 +53,11 @@ export class RunsComponent {
     { field: '_id', headerName: 'Id' },
     { field: 'name', cellRenderer: urlCellRenderer },
     { field: 'type' },
-    { field: 'status' },
     { field: 'createdAt', valueFormatter: timeValueFormatter },
     { field: 'updatedAt', valueFormatter: timeValueFormatter },
     { field: 'endedAt', valueFormatter: timeValueFormatter },
     { field: 'duration', valueFormatter: durationValueFormatter },
+    { field: 'status' },
     { field: '_id', headerName: 'Tasks', cellRenderer: TasksCellRendererComponent },
   ];
 

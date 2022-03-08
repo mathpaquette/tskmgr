@@ -9,8 +9,12 @@ import { defaultGridOptions, urlCellRenderer, dateValueFormatter } from '../comm
 @Component({
   selector: 'tskmgr-pull-requests',
   template: `
-    <ag-grid-angular class="ag-theme-alpine" [rowData]="pullRequests$ | async" [columnDefs]="columnDefs" [gridOptions]="gridOptions">
-    </ag-grid-angular>
+    <ag-grid-angular
+      class="ag-theme-alpine"
+      [rowData]="pullRequests$ | async"
+      [columnDefs]="columnDefs"
+      [gridOptions]="gridOptions"
+    ></ag-grid-angular>
   `,
   styles: [
     `

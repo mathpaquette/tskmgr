@@ -4,14 +4,17 @@ import { ActivatedRoute } from '@angular/router';
 import { EMPTY, Observable } from 'rxjs';
 import { Task } from '@tskmgr/common';
 import { ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
-import { format } from 'date-fns';
 import { defaultGridOptions, durationValueFormatter, timeValueFormatter } from '../../common/ag-grid.util';
 
 @Component({
   selector: 'tskmgr-tasks',
   template: `
-    <ag-grid-angular class="ag-theme-alpine" [rowData]="tasks$ | async" [columnDefs]="columnDefs" [gridOptions]="gridOptions">
-    </ag-grid-angular>
+    <ag-grid-angular
+      class="ag-theme-alpine"
+      [rowData]="tasks$ | async"
+      [columnDefs]="columnDefs"
+      [gridOptions]="gridOptions"
+    ></ag-grid-angular>
   `,
   styles: [
     `
@@ -52,13 +55,15 @@ export class TasksComponent implements OnInit {
     { field: 'runnerId' },
     { field: 'runnerHost' },
 
+    { field: 'cached' },
+
     { field: 'createdAt', valueFormatter: timeValueFormatter },
     { field: 'startedAt', valueFormatter: timeValueFormatter },
     { field: 'updatedAt', valueFormatter: timeValueFormatter },
     { field: 'endedAt', valueFormatter: timeValueFormatter },
 
-    { field: 'duration', valueFormatter: durationValueFormatter },
     { field: 'avgDuration', valueFormatter: durationValueFormatter },
+    { field: 'duration', valueFormatter: durationValueFormatter },
 
     { field: 'status' },
   ];
