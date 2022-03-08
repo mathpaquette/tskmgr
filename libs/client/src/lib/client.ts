@@ -10,14 +10,15 @@ import {
   Task,
 } from '@tskmgr/common';
 import fetch from 'node-fetch';
+import { createInterface } from 'readline';
 
 export class Client {
   constructor(
     private readonly apiUrl: ApiUrl,
     private readonly runnerId: string,
     private readonly parallel: number,
-    private readonly dataCallback: (task: Task, data: any, cached: () => void) => void,
-    private readonly errorCallback: (task: Task, data: any) => void,
+    private readonly dataCallback: (task: Task, data: string, cached: () => void) => void,
+    private readonly errorCallback: (task: Task, data: string) => void,
     private readonly pollingDelayMs,
     private readonly retryDelayMs,
     private readonly retryCount
@@ -115,11 +116,11 @@ export class Client {
       let cached = false;
       let hasCompleted = true;
 
-      const dataHandler = (data: any): void => {
+      const dataHandler = (data: string): void => {
         this.dataCallback(task, data, () => (cached = true));
       };
 
-      const errorHandler = (data: any): void => {
+      const errorHandler = (data: string): void => {
         this.errorCallback(task, data);
       };
 
@@ -149,19 +150,17 @@ export async function spawnAsync(
   command: string,
   args?: ReadonlyArray<string>,
   options?: SpawnOptionsWithoutStdio,
-  dataCallback?: (data: any) => void,
-  errorCallback?: (data: any) => void
+  dataCallback?: (data: string) => void,
+  errorCallback?: (data: string) => void
 ): Promise<ChildProcess> {
   return new Promise((resolve, reject) => {
     const childProcess = spawn(command, args, options);
 
-    if (dataCallback) {
-      childProcess.stdout.on('data', (data) => dataCallback(data));
-    }
+    const readlineStdout = createInterface({ input: childProcess.stdout });
+    const readlineStderr = createInterface({ input: childProcess.stderr });
 
-    if (errorCallback) {
-      childProcess.stderr.on('data', (data) => errorCallback(data));
-    }
+    readlineStdout.on('line', dataCallback);
+    readlineStderr.on('line', errorCallback);
 
     childProcess.on('close', (code) => {
       if (code === 0) {

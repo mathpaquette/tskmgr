@@ -8,8 +8,8 @@ export class ClientFactory {
     baseUrl: string, //
     runnerId: string,
     parallel = 1,
-    dataCallback: (task: Task, data: any, cached: () => void) => void = () => {},
-    errorCallback: (task: Task, data: any) => void = () => {},
+    dataCallback: (task: Task, data: string, cached: () => void) => void = () => {},
+    errorCallback: (task: Task, data: string) => void = () => {},
     pollingDelayMs = 2500,
     retryDelayMs = 5000,
     retryCount = 2

@@ -15,18 +15,12 @@ const client = ClientFactory.createNew('http://localhost:3333', '1', 4, dataCall
 
 (async () => {
   try {
-    const printAffected = execSync('nx print-affected --all');
-    const printAffectedO = JSON.parse(printAffected.toString());
-
+    const nxTasks = getNxTasks();
     const tasks: CreateTaskDto[] = [];
 
-    printAffectedO.projects
-      .filter((x) => !x.includes('-e2e'))
-      .forEach((project) => {
-        tasks.push({ name: project, type: 'lint', command: `nx lint ${project} --skip-nx-cache`, options: { shell: true } });
-        tasks.push({ name: project, type: 'test', command: `nx test ${project} --skip-nx-cache`, options: { shell: true } });
-        tasks.push({ name: project, type: 'build', command: `nx build ${project} --skip-nx-cache`, options: { shell: true } });
-      });
+    for (const nxTask of nxTasks) {
+      tasks.push({ name: nxTask.target.project, type: nxTask.target.target, command: nxTask.command, options: { shell: true } });
+    }
 
     const newRun = await client.createRun({ name: uuid(), type: '123', pullRequestName: '123' });
     console.log(newRun);
@@ -44,13 +38,31 @@ const client = ClientFactory.createNew('http://localhost:3333', '1', 4, dataCall
   }
 })();
 
-function dataCallback(task: Task, data: any, cached: () => void): void {
-  console.log(`${data}`);
-  if (data.includes(`${task.name}:${task.type}  [existing outputs match the cache, left as is]`)) {
+function getNxTasks(): NxTask[] {
+  const tasks: NxTask[] = [
+    ...JSON.parse(execSync('npx nx print-affected --target=lint').toString()).tasks,
+    ...JSON.parse(execSync('npx nx print-affected --target=test').toString()).tasks,
+    ...JSON.parse(execSync('npx nx print-affected --target=build').toString()).tasks,
+  ];
+  return tasks;
+}
+
+function dataCallback(task: Task, data: string, cached: () => void): void {
+  console.log(data);
+  // "> nx run client:lint  [existing outputs match the cache, left as is]"
+  if (data.startsWith(`> nx run ${task.name}:${task.type}`) && data.endsWith('[existing outputs match the cache, left as is]')) {
     cached();
   }
 }
 
-function errorCallback(task: Task, data: any): void {
-  console.log(`${data}`);
+function errorCallback(task: Task, data: string): void {
+  console.log(data);
+}
+
+interface NxTask {
+  id: string;
+  overrides: any;
+  target: { project: string; target: string };
+  command: string;
+  outputs: string[];
 }
