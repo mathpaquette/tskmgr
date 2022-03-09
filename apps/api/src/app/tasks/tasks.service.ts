@@ -28,11 +28,11 @@ export class TasksService {
       throw new Error(`Run with ${run.status} status can't accept new tasks`);
     }
 
-    const tasks: Promise<Task>[] = [];
+    const tasks: Partial<Task>[] = [];
     for (const createTaskDto of createTasksDto.tasks) {
       const avgDuration = await this.getAvgDuration(createTaskDto);
       const runnerId = await this.getPreviousRunnerId(run.pullRequest, createTaskDto);
-      const task: Partial<Task> = {
+      const task = {
         run: run._id,
         pullRequest: run.pullRequest,
         avgDuration: avgDuration,
@@ -43,7 +43,7 @@ export class TasksService {
         arguments: createTaskDto.arguments,
         options: createTaskDto.options,
       };
-      tasks.push(this.taskModel.create(task));
+      tasks.push(task);
     }
 
     if (run.status === RunStatus.Created) {
@@ -51,7 +51,7 @@ export class TasksService {
       await run.save();
     }
 
-    return Promise.all(tasks);
+    return this.taskModel.insertMany(tasks);
   }
 
   async findByRunId(runId: string): Promise<Task[]> {
