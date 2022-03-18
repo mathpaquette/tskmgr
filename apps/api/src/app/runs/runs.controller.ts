@@ -1,5 +1,12 @@
 import { Body, Controller, Get, Param, Post, Put, Headers } from '@nestjs/common';
-import { CreateRunRequestDto, CreateTasksDto, StartTaskDto, StartTaskResponseDto } from '@tskmgr/common';
+import {
+  CreateRunRequestDto,
+  CreateTasksDto,
+  StartTaskDto,
+  StartTaskResponseDto,
+  SetLeaderRequestDto,
+  SetLeaderResponseDto,
+} from '@tskmgr/common';
 import { RunsService } from './runs.service';
 import { Run } from './schemas/run.schema';
 import { Task } from '../tasks/schemas/task.schema';
@@ -20,6 +27,11 @@ export class RunsController {
   @Put(':id/close')
   async closeRun(@Param('id') runId: string): Promise<Run> {
     return this.runsService.close(runId);
+  }
+
+  @Put(':id/leader')
+  async setLeader(@Param('id') runId: string, @Body() setLeaderRequestDto: SetLeaderRequestDto): Promise<SetLeaderResponseDto> {
+    return this.runsService.setLeader(runId, setLeaderRequestDto);
   }
 
   @Get()

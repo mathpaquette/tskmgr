@@ -53,6 +53,7 @@ export class RunsComponent {
     { field: '_id', headerName: 'Id' },
     { field: 'name', cellRenderer: urlCellRenderer },
     { field: 'type' },
+    { field: 'leaderId' },
     { field: 'createdAt', valueFormatter: timeValueFormatter },
     { field: 'updatedAt', valueFormatter: timeValueFormatter },
     { field: 'endedAt', valueFormatter: timeValueFormatter },
