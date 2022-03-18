@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Run, RunDocument } from './schemas/run.schema';
 import { Model } from 'mongoose';
-import { CreateRunRequestDto, TaskStatus } from '@tskmgr/common';
+import { CreateRunRequestDto, TaskStatus, SetLeaderRequestDto, SetLeaderResponseDto } from '@tskmgr/common';
 import { PullRequest, PullRequestDocument } from '../pull-requests/schemas/pull-request.schema';
 import { Task, TaskDocument } from '../tasks/schemas/task.schema';
 
@@ -38,6 +38,20 @@ export class RunsService {
     const run = await this.runModel.findById(id).exec();
     const hasAllTasksCompleted = await this.hasAllTasksCompleted(run);
     return run.close(hasAllTasksCompleted).save();
+  }
+
+  async setLeader(id: string, setLeaderRequestDto: SetLeaderRequestDto): Promise<SetLeaderResponseDto> {
+    const { runnerId } = setLeaderRequestDto;
+    const run = await this.runModel.findOneAndUpdate(
+      {
+        _id: id,
+        $or: [{ leaderId: { $exists: false } }, { leaderId: runnerId }],
+      },
+      { $set: { leaderId: runnerId } },
+      { new: true }
+    );
+
+    return { isLeader: !!run, run: run };
   }
 
   async findAll(): Promise<Run[]> {

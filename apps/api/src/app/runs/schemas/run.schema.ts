@@ -40,6 +40,9 @@ export class Run implements Run_ {
   @Prop({ enum: TaskPriority, default: TaskPriority.Longest })
   priority: string;
 
+  @Prop()
+  leaderId: string;
+
   close: (hasAllTasksCompleted: boolean) => RunDocument;
 
   complete: () => RunDocument;

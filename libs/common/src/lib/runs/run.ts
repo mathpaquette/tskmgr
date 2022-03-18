@@ -12,4 +12,5 @@ export interface Run {
   endedAt: Date;
   duration: number;
   priority: string;
+  leaderId: string;
 }

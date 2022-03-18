@@ -8,6 +8,8 @@ import {
   StartTaskDto,
   StartTaskResponseDto,
   Task,
+  SetLeaderRequestDto,
+  SetLeaderResponseDto,
 } from '@tskmgr/common';
 import fetch from 'node-fetch';
 import { createInterface } from 'readline';
@@ -26,9 +28,9 @@ export class Client {
 
   public async createRun(params: CreateRunRequestDto): Promise<Run> {
     const res = await fetch(this.apiUrl.createRunUrl(), {
+      headers: { 'Content-Type': 'application/json' },
       method: 'POST',
       body: JSON.stringify(params),
-      headers: { 'Content-Type': 'application/json' },
     });
 
     return await checkStatus(res).json();
@@ -36,8 +38,19 @@ export class Client {
 
   public async closeRun(id: string): Promise<Run> {
     const res = await fetch(this.apiUrl.closeRunUrl(id), {
-      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
+    });
+
+    return await checkStatus(res).json();
+  }
+
+  public async setLeader(id: string): Promise<SetLeaderResponseDto> {
+    const params: SetLeaderRequestDto = { runnerId: this.runnerId };
+    const res = await fetch(this.apiUrl.setLeaderUrl(id), {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
+      body: JSON.stringify(params),
     });
 
     return await checkStatus(res).json();
@@ -45,9 +58,9 @@ export class Client {
 
   public async createTasks(id: string, params: CreateTasksDto): Promise<Task[]> {
     const res = await fetch(this.apiUrl.createTasksUrl(id), {
+      headers: { 'Content-Type': 'application/json' },
       method: 'POST',
       body: JSON.stringify(params),
-      headers: { 'Content-Type': 'application/json' },
     });
 
     return await checkStatus(res).json();
@@ -55,9 +68,9 @@ export class Client {
 
   public async startTask(id: string, params: StartTaskDto): Promise<StartTaskResponseDto> {
     const res = await fetch(this.apiUrl.startTaskUrl(id), {
+      headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
       body: JSON.stringify(params),
-      headers: { 'Content-Type': 'application/json' },
     });
 
     return await checkStatus(res).json();
@@ -65,9 +78,9 @@ export class Client {
 
   public async completeTask(id: string, params: CompleteTaskDto): Promise<Task> {
     const res = await fetch(this.apiUrl.completeTaskUrl(id), {
+      headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
       body: JSON.stringify(params),
-      headers: { 'Content-Type': 'application/json' },
     });
 
     return await checkStatus(res).json();
@@ -75,8 +88,8 @@ export class Client {
 
   public async failTask(id: string): Promise<Task> {
     const res = await fetch(this.apiUrl.failTaskUrl(id), {
-      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
     });
 
     return await checkStatus(res).json();

@@ -25,11 +25,14 @@ const client = ClientFactory.createNew('http://localhost:3333', '1', 4, dataCall
     const newRun = await client.createRun({ name: uuid(), type: '123', pullRequestName: '123' });
     console.log(newRun);
 
-    const createdTasks = await client.createTasks(newRun._id, { tasks });
-    console.log(createdTasks);
+    const res = await client.setLeader(newRun._id);
+    if (res.isLeader) {
+      const createdTasks = await client.createTasks(newRun._id, { tasks });
+      console.log(createdTasks);
 
-    const closeRun = await client.closeRun(newRun._id);
-    console.log(closeRun);
+      const closeRun = await client.closeRun(newRun._id);
+      console.log(closeRun);
+    }
 
     await client.runTasks(newRun._id);
   } catch (e) {

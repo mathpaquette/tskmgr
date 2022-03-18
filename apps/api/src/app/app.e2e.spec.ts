@@ -5,7 +5,17 @@ import { AppModule } from './app.module';
 import { v4 as uuid } from 'uuid';
 import { Run } from './runs/schemas/run.schema';
 import { Task } from './tasks/schemas/task.schema';
-import { ApiUrl, RunStatus, CreateRunRequestDto, CreateTasksDto, StartTaskDto, StartTaskResponseDto, TaskStatus } from '@tskmgr/common';
+import {
+  ApiUrl,
+  RunStatus,
+  CreateRunRequestDto,
+  CreateTasksDto,
+  StartTaskDto,
+  StartTaskResponseDto,
+  TaskStatus,
+  SetLeaderRequestDto,
+  SetLeaderResponseDto,
+} from '@tskmgr/common';
 
 describe('Runs', () => {
   let app: INestApplication;
@@ -24,14 +34,7 @@ describe('Runs', () => {
   });
 
   beforeEach(() => {
-    const uniqueId = uuid();
-    createRunDto = {
-      name: `test-project-${uniqueId}`,
-      url: `https://circleci.com/${uniqueId}/`,
-      type: 'test-type',
-      pullRequestName: `test-pr-${uniqueId}`,
-      pullRequestUrl: `https://github.com/${uniqueId}/`,
-    };
+    createRunDto = DtoHelper.createRunDto();
     createTasksDto = {
       tasks: [{ name: 'test-app', command: 'nx', type: 'lint' }],
     };
@@ -92,6 +95,37 @@ describe('Runs', () => {
     expect(data.endedAt).toBeTruthy();
     expect(data.duration).toBeTruthy();
     expect(data.run.status).toEqual(RunStatus.Started);
+  });
+
+  describe('set leader', () => {
+    let run: Run;
+
+    beforeAll(async () => {
+      // arrange
+      const createRunDto = DtoHelper.createRunDto();
+      run = (await createRun(app, createRunDto)).body;
+    });
+
+    it('should set leader when called first', async () => {
+      // arrange
+      const runnerId = 'RUNNER_1';
+      // act
+      const setLeaderResponseDto: SetLeaderResponseDto = (await setLeader(app, run._id, { runnerId }).expect(200)).body;
+      // assert
+      expect(setLeaderResponseDto.isLeader).toBe(true);
+      expect(setLeaderResponseDto.run).toBeTruthy();
+      expect(setLeaderResponseDto.run.leaderId).toBe(runnerId);
+    });
+
+    it('should not set leader when not called first', async () => {
+      // arrange
+      const runnerId = 'RUNNER_2';
+      // act
+      const setLeaderResponseDto: SetLeaderResponseDto = (await setLeader(app, run._id, { runnerId }).expect(200)).body;
+      // assert
+      expect(setLeaderResponseDto.isLeader).toBe(false);
+      expect(setLeaderResponseDto.run).toBeFalsy();
+    });
   });
 
   describe('one task has failed', () => {
@@ -173,12 +207,29 @@ describe('Runs', () => {
   });
 });
 
+class DtoHelper {
+  public static createRunDto(): CreateRunRequestDto {
+    const uniqueId = uuid();
+    return {
+      name: `test-project-${uniqueId}`,
+      url: `https://circleci.com/${uniqueId}/`,
+      type: 'test-type',
+      pullRequestName: `test-pr-${uniqueId}`,
+      pullRequestUrl: `https://github.com/${uniqueId}/`,
+    };
+  }
+}
+
 function createRun(app: INestApplication, data: CreateRunRequestDto): request.Test {
   return request(app.getHttpServer()).post(ApiUrl.createNoPrefix().createRunUrl()).send(data);
 }
 
 function closeRun(app: INestApplication, runId: any): request.Test {
   return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().closeRunUrl(runId));
+}
+
+function setLeader(app: INestApplication, runId: any, data: SetLeaderRequestDto): request.Test {
+  return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().setLeaderUrl(runId)).send(data);
 }
 
 function createTasks(app: INestApplication, runId: any, data: CreateTasksDto): request.Test {
