@@ -30,6 +30,7 @@
     ]
   },
   "defaultProject": "api",
+  "useDaemonProcess": false,
   "generators": {
     "@nrwl/angular:application": {
       "style": "scss",
