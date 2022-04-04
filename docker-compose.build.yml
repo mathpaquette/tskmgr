@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:4.2
+
+  api:
+    build:
+      dockerfile: apps/api/Dockerfile
+      context: .
+    image: mathpaquette/tskmgr-api:${VERSION:-latest}
+    environment:
+      MONGODB_URI: 'mongodb://mongo:27017/tskmgr'
+    ports:
+      - 3333:3333
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+      dockerfile: apps/frontend/Dockerfile
+      context: .
+    image: mathpaquette/tskmgr-frontend:${VERSION:-latest}
+    environment:
+      PORT: 8080
+      API_URL: 'http://api:3333'
+    ports:
+      - 8080:8080
+    depends_on:
+      - api

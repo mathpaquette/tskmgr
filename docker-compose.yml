@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:4.2
+    volumes:
+      - ./data/mongodb-tskmgr:/data/db
+    ports:
+      - 27017:27017
+
+  api:
+    image: mathpaquette/tskmgr-api:latest
+    environment:
+      MONGODB_URI: 'mongodb://mongo:27017/tskmgr'
+    ports:
+      - 3333:3333
+    depends_on:
+      - mongo
+
+  frontend:
+    image: mathpaquette/tskmgr-frontend:latest
+    environment:
+      PORT: 8080
+      API_URL: 'http://api:3333'
+    ports:
+      - 8080:8080
+    depends_on:
+      - api
