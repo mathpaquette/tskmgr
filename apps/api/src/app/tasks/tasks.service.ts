@@ -65,7 +65,7 @@ export class TasksService {
    * Get and start one pending task
    * @param runId
    * @param runnerId
-   * @param hostname
+   * @param runnerHost
    */
   async findOnePendingTask(runId: string, runnerId: string, runnerHost: string): Promise<StartTaskResponseDto> {
     const run = await this.runModel.findById(runId).exec();
@@ -75,8 +75,7 @@ export class TasksService {
       return { continue: false, task: null };
     }
 
-    const startedTask =
-      (await this.getPendingTaskP1(runId, runnerId, runnerHost)) || (await this.getPendingTaskP2(runId, runnerId, runnerHost));
+    const startedTask = await this.getPendingTaskP1(runId, runnerId, runnerHost);
 
     if (!startedTask) {
       const canTakeNewTask = !(run.status === RunStatus.Closed);
@@ -89,7 +88,7 @@ export class TasksService {
   /**
    * Complete existing task
    * @param taskId
-   * @param cached
+   * @param completeTaskDto
    */
   async complete(taskId: string, completeTaskDto: CompleteTaskDto): Promise<Task> {
     const { cached } = completeTaskDto;
@@ -140,21 +139,6 @@ export class TasksService {
           run: { _id: runId },
           status: TaskStatus.Pending,
           $or: [{ runnerId: runnerId }, { runnerId: { $exists: false } }],
-        },
-        { $set: { startedAt: new Date(), status: TaskStatus.Started, runnerId: runnerId, runnerHost: runnerHost } },
-        { new: true }
-      )
-      .sort({ avgDuration: -1 }) // prioritize task with >> average duration first.
-      .exec();
-  }
-
-  private async getPendingTaskP2(runId: string, runnerId: string, runnerHost: string): Promise<Task> {
-    return this.taskModel
-      .findOneAndUpdate(
-        {
-          run: { _id: runId },
-          status: TaskStatus.Pending,
-          runnerId: { $ne: runnerId },
         },
         { $set: { startedAt: new Date(), status: TaskStatus.Started, runnerId: runnerId, runnerHost: runnerHost } },
         { new: true }
