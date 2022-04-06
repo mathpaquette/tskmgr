@@ -45,6 +45,15 @@ export class Client {
     return await checkStatus(res).json();
   }
 
+  public async abortRun(id: string): Promise<Task> {
+    const res = await fetch(this.apiUrl.abortRunUrl(id), {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
+    });
+
+    return await checkStatus(res).json();
+  }
+
   public async setLeader(id: string): Promise<SetLeaderResponseDto> {
     const params: SetLeaderRequestDto = { runnerId: this.runnerId };
     const res = await fetch(this.apiUrl.setLeaderUrl(id), {
