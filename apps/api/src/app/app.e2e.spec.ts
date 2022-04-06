@@ -97,7 +97,7 @@ describe('Runs', () => {
     expect(data.run.status).toEqual(RunStatus.Started);
   });
 
-  describe.only('abort run', () => {
+  describe('abort run', () => {
     let run: Run;
 
     beforeAll(async () => {
