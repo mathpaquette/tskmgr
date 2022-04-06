@@ -55,4 +55,9 @@ export class RunsController {
     const runnerHost = host.substring(0, host.indexOf(':'));
     return this.tasksService.findOnePendingTask(runId, runnerId, runnerHost);
   }
+
+  @Put(':id/abort')
+  fail(@Param('id') id: string): Promise<Run> {
+    return this.runsService.abort(id);
+  }
 }

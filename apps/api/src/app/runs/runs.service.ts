@@ -40,6 +40,11 @@ export class RunsService {
     return run.close(hasAllTasksCompleted).save();
   }
 
+  async abort(id: string): Promise<Run> {
+    const run = await this.runModel.findById(id).exec();
+    return run.abort().save();
+  }
+
   async setLeader(id: string, setLeaderRequestDto: SetLeaderRequestDto): Promise<SetLeaderResponseDto> {
     const { runnerId } = setLeaderRequestDto;
     const run = await this.runModel.findOneAndUpdate(
