@@ -97,6 +97,32 @@ describe('Runs', () => {
     expect(data.run.status).toEqual(RunStatus.Started);
   });
 
+  describe.only('abort run', () => {
+    let run: Run;
+
+    beforeAll(async () => {
+      // arrange
+      const createRunDto = DtoHelper.createRunDto();
+      run = (await createRun(app, createRunDto)).body;
+    });
+
+    it('should abort when not ended', async () => {
+      // act
+      run = (await abortRun(app, run._id).expect(200)).body;
+      // assert
+      expect(run.endedAt).toBeTruthy();
+      expect(run.status).toBe(RunStatus.Aborted);
+    });
+
+    it('should throw when already ended', async () => {
+      // act
+      const exception = (await abortRun(app, run._id)).body;
+      // assert
+      expect(exception.statusCode).toBe(500);
+      expect(exception.reason).toBe("Can't abort already ended run.");
+    });
+  });
+
   describe('set leader', () => {
     let run: Run;
 
@@ -222,6 +248,10 @@ class DtoHelper {
 
 function createRun(app: INestApplication, data: CreateRunRequestDto): request.Test {
   return request(app.getHttpServer()).post(ApiUrl.createNoPrefix().createRunUrl()).send(data);
+}
+
+function abortRun(app: INestApplication, runId: any): request.Test {
+  return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().abortRunUrl(runId));
 }
 
 function closeRun(app: INestApplication, runId: any): request.Test {

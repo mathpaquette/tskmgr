@@ -66,6 +66,10 @@ RunSchema.methods.close = function (hasAllTasksCompleted: boolean): RunDocument 
 };
 
 RunSchema.methods.complete = function (): RunDocument {
+  if (this.endedAt) {
+    throw new Error(`Can't complete already ended run.`);
+  }
+
   const endedAt = new Date();
   this.status = RunStatus.Completed;
   this.duration = DateUtil.getDuration(this.createdAt, endedAt);
@@ -74,6 +78,10 @@ RunSchema.methods.complete = function (): RunDocument {
 };
 
 RunSchema.methods.abort = function (): RunDocument {
+  if (this.endedAt) {
+    throw new Error(`Can't abort already ended run.`);
+  }
+
   const endedAt = new Date();
   this.status = RunStatus.Aborted;
   this.duration = DateUtil.getDuration(this.createdAt, endedAt);
