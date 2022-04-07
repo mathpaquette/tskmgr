@@ -57,7 +57,12 @@ export class RunsController {
   }
 
   @Put(':id/abort')
-  fail(@Param('id') id: string): Promise<Run> {
+  abort(@Param('id') id: string): Promise<Run> {
     return this.runsService.abort(id);
+  }
+
+  @Put(':id/fail')
+  fail(@Param('id') id: string): Promise<Run> {
+    return this.runsService.fail(id);
   }
 }

@@ -11,6 +11,7 @@ export class ApiUrl {
 
   createRunUrl = () => this.getUrl(`/runs`);
   abortRunUrl = (id: string) => this.getUrl(`/runs/${id}/abort`);
+  failRunUrl = (id: string) => this.getUrl(`/runs/${id}/fail`);
   closeRunUrl = (id: string) => this.getUrl(`/runs/${id}/close`);
   setLeaderUrl = (id: string) => this.getUrl(`/runs/${id}/leader`);
   createTasksUrl = (id: string) => this.getUrl(`/runs/${id}/tasks`);
