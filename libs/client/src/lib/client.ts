@@ -45,8 +45,17 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async abortRun(id: string): Promise<Task> {
+  public async abortRun(id: string): Promise<Run> {
     const res = await fetch(this.apiUrl.abortRunUrl(id), {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
+    });
+
+    return await checkStatus(res).json();
+  }
+
+  public async failRun(id: string): Promise<Run> {
+    const res = await fetch(this.apiUrl.failRunUrl(id), {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
     });

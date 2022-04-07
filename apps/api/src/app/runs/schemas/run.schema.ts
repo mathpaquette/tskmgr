@@ -48,6 +48,8 @@ export class Run implements Run_ {
   complete: () => RunDocument;
 
   abort: () => RunDocument;
+
+  fail: () => RunDocument;
 }
 
 export const RunSchema = SchemaFactory.createForClass(Run);
@@ -84,6 +86,18 @@ RunSchema.methods.abort = function (): RunDocument {
 
   const endedAt = new Date();
   this.status = RunStatus.Aborted;
+  this.duration = DateUtil.getDuration(this.createdAt, endedAt);
+  this.endedAt = endedAt;
+  return this;
+};
+
+RunSchema.methods.fail = function (): RunDocument {
+  if (this.endedAt) {
+    throw new Error(`Can't fail already ended run.`);
+  }
+
+  const endedAt = new Date();
+  this.status = RunStatus.Failed;
   this.duration = DateUtil.getDuration(this.createdAt, endedAt);
   this.endedAt = endedAt;
   return this;

@@ -128,7 +128,7 @@ export class TasksService {
     task.status = TaskStatus.Failed;
     task.duration = DateUtil.getDuration(task.startedAt, endedAt);
 
-    await task.run.abort().save();
+    await task.run.fail().save();
     return task.save();
   }
 

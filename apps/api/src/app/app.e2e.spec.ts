@@ -106,7 +106,7 @@ describe('Runs', () => {
       run = (await createRun(app, createRunDto)).body;
     });
 
-    it('should abort when not ended', async () => {
+    it('should abort run when not ended', async () => {
       // act
       run = (await abortRun(app, run._id).expect(200)).body;
       // assert
@@ -114,12 +114,38 @@ describe('Runs', () => {
       expect(run.status).toBe(RunStatus.Aborted);
     });
 
-    it('should throw when already ended', async () => {
+    it('should not abort run when already ended', async () => {
       // act
       const exception = (await abortRun(app, run._id)).body;
       // assert
       expect(exception.statusCode).toBe(500);
       expect(exception.reason).toBe("Can't abort already ended run.");
+    });
+  });
+
+  describe('fail run', () => {
+    let run: Run;
+
+    beforeAll(async () => {
+      // arrange
+      const createRunDto = DtoHelper.createRunDto();
+      run = (await createRun(app, createRunDto)).body;
+    });
+
+    it('should fail run when not ended', async () => {
+      // act
+      run = (await failRun(app, run._id).expect(200)).body;
+      // assert
+      expect(run.endedAt).toBeTruthy();
+      expect(run.status).toBe(RunStatus.Failed);
+    });
+
+    it('should not fail run when already ended', async () => {
+      // act
+      const exception = (await failRun(app, run._id)).body;
+      // assert
+      expect(exception.statusCode).toBe(500);
+      expect(exception.reason).toBe("Can't fail already ended run.");
     });
   });
 
@@ -176,7 +202,7 @@ describe('Runs', () => {
     });
 
     it('should abort run', () => {
-      expect(failedTask.run.status).toEqual(RunStatus.Aborted);
+      expect(failedTask.run.status).toEqual(RunStatus.Failed);
     });
 
     it('should not continue', async () => {
@@ -190,7 +216,7 @@ describe('Runs', () => {
       // act
       const res = await createTasks(app, run._id, createTasksDto).expect(500);
       // expect
-      expect(res.body.reason).toEqual("Run with ABORTED status can't accept new tasks");
+      expect(res.body.reason).toEqual("Run with FAILED status can't accept new tasks");
     });
   });
 
@@ -252,6 +278,10 @@ function createRun(app: INestApplication, data: CreateRunRequestDto): request.Te
 
 function abortRun(app: INestApplication, runId: any): request.Test {
   return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().abortRunUrl(runId));
+}
+
+function failRun(app: INestApplication, runId: any): request.Test {
+  return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().failRunUrl(runId));
 }
 
 function closeRun(app: INestApplication, runId: any): request.Test {

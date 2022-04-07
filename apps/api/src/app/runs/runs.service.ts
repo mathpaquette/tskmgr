@@ -45,6 +45,11 @@ export class RunsService {
     return run.abort().save();
   }
 
+  async fail(id: string): Promise<Run> {
+    const run = await this.runModel.findById(id).exec();
+    return run.fail().save();
+  }
+
   async setLeader(id: string, setLeaderRequestDto: SetLeaderRequestDto): Promise<SetLeaderResponseDto> {
     const { runnerId } = setLeaderRequestDto;
     const run = await this.runModel.findOneAndUpdate(
