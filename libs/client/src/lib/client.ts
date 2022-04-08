@@ -14,16 +14,31 @@ import {
 import fetch from 'node-fetch';
 import { createInterface } from 'readline';
 
+export interface ClientOptions {
+  parallel?: number;
+  dataCallback?: (task: Task, data: string, cached: () => void) => void;
+  errorCallback?: (task: Task, data: string) => void;
+  pollingDelayMs?: number;
+  retryDelayMs?: number;
+  retryCount?: number;
+}
+
 export class Client {
+  public static readonly DefaultOptions: ClientOptions = {
+    parallel: 1,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    dataCallback: (task, data, cached) => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    errorCallback: (task, data) => {},
+    pollingDelayMs: 2500,
+    retryDelayMs: 5000,
+    retryCount: 2,
+  };
+
   constructor(
-    private readonly apiUrl: ApiUrl,
+    private readonly apiUrl: ApiUrl, //
     private readonly runnerId: string,
-    private readonly parallel: number,
-    private readonly dataCallback: (task: Task, data: string, cached: () => void) => void,
-    private readonly errorCallback: (task: Task, data: string) => void,
-    private readonly pollingDelayMs,
-    private readonly retryDelayMs,
-    private readonly retryCount
+    private readonly options: ClientOptions
   ) {}
 
   public async createRun(params: CreateRunRequestDto): Promise<Run> {
@@ -36,8 +51,8 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async closeRun(id: string): Promise<Run> {
-    const res = await fetch(this.apiUrl.closeRunUrl(id), {
+  public async closeRun(runId: string): Promise<Run> {
+    const res = await fetch(this.apiUrl.closeRunUrl(runId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
     });
@@ -45,8 +60,8 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async abortRun(id: string): Promise<Run> {
-    const res = await fetch(this.apiUrl.abortRunUrl(id), {
+  public async abortRun(runId: string): Promise<Run> {
+    const res = await fetch(this.apiUrl.abortRunUrl(runId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
     });
@@ -54,8 +69,8 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async failRun(id: string): Promise<Run> {
-    const res = await fetch(this.apiUrl.failRunUrl(id), {
+  public async failRun(runId: string): Promise<Run> {
+    const res = await fetch(this.apiUrl.failRunUrl(runId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
     });
@@ -63,9 +78,9 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async setLeader(id: string): Promise<SetLeaderResponseDto> {
+  public async setLeader(runId: string): Promise<SetLeaderResponseDto> {
     const params: SetLeaderRequestDto = { runnerId: this.runnerId };
-    const res = await fetch(this.apiUrl.setLeaderUrl(id), {
+    const res = await fetch(this.apiUrl.setLeaderUrl(runId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
       body: JSON.stringify(params),
@@ -74,8 +89,8 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async createTasks(id: string, params: CreateTasksDto): Promise<Task[]> {
-    const res = await fetch(this.apiUrl.createTasksUrl(id), {
+  public async createTasks(runId: string, params: CreateTasksDto): Promise<Task[]> {
+    const res = await fetch(this.apiUrl.createTasksUrl(runId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'POST',
       body: JSON.stringify(params),
@@ -84,8 +99,8 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async startTask(id: string, params: StartTaskDto): Promise<StartTaskResponseDto> {
-    const res = await fetch(this.apiUrl.startTaskUrl(id), {
+  public async startTask(runId: string, params: StartTaskDto): Promise<StartTaskResponseDto> {
+    const res = await fetch(this.apiUrl.startTaskUrl(runId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
       body: JSON.stringify(params),
@@ -94,40 +109,40 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async completeTask(id: string, params: CompleteTaskDto): Promise<Task> {
-    const res = await fetch(this.apiUrl.completeTaskUrl(id), {
-      headers: { 'Content-Type': 'application/json' },
-      method: 'PUT',
-      body: JSON.stringify(params),
-    });
-
-    return await checkStatus(res).json();
-  }
-
-  public async failTask(id: string): Promise<Task> {
-    const res = await fetch(this.apiUrl.failTaskUrl(id), {
-      headers: { 'Content-Type': 'application/json' },
-      method: 'PUT',
-    });
-
-    return await checkStatus(res).json();
-  }
-
-  public runTasks(id: string): Promise<void[]> {
+  public runTasks(runId: string): Promise<void[]> {
     const taskRunners = [];
 
-    for (let i = 0; i < this.parallel; i++) {
-      taskRunners.push(this.defaultTaskRunner(id));
+    for (let i = 0; i < this.options.parallel; i++) {
+      taskRunners.push(this.defaultTaskRunner(runId));
     }
 
     return Promise.all(taskRunners);
   }
 
-  async defaultTaskRunner(id: string): Promise<void> {
+  public async completeTask(taskId: string, params: CompleteTaskDto): Promise<Task> {
+    const res = await fetch(this.apiUrl.completeTaskUrl(taskId), {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
+      body: JSON.stringify(params),
+    });
+
+    return await checkStatus(res).json();
+  }
+
+  public async failTask(taskId: string): Promise<Task> {
+    const res = await fetch(this.apiUrl.failTaskUrl(taskId), {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
+    });
+
+    return await checkStatus(res).json();
+  }
+
+  private async defaultTaskRunner(runId: string): Promise<void> {
     let _continue = true;
 
     while (_continue) {
-      const response = await this.startTask(id, { runnerId: this.runnerId });
+      const response = await this.startTask(runId, { runnerId: this.runnerId });
 
       if (!response.continue) {
         _continue = false;
@@ -138,8 +153,8 @@ export class Client {
       }
 
       if (!response.task) {
-        console.log(`polling for a new task in: ${this.pollingDelayMs} ms`);
-        await delay(this.pollingDelayMs);
+        console.log(`polling for a new task in: ${this.options.pollingDelayMs} ms`);
+        await delay(this.options.pollingDelayMs);
         continue;
       }
 
@@ -148,11 +163,11 @@ export class Client {
       let hasCompleted = true;
 
       const dataHandler = (data: string): void => {
-        this.dataCallback(task, data, () => (cached = true));
+        this.options.dataCallback(task, data, () => (cached = true));
       };
 
       const errorHandler = (data: string): void => {
-        this.errorCallback(task, data);
+        this.options.errorCallback(task, data);
       };
 
       try {
