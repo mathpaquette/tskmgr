@@ -1,28 +1,16 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-
-import { Client } from './client';
-import { ApiUrl, Task } from '@tskmgr/common';
+import { Client, ClientOptions } from './client';
+import { ApiUrl } from '@tskmgr/common';
 
 export class ClientFactory {
   public static createNew(
     baseUrl: string, //
     runnerId: string,
-    parallel = 1,
-    dataCallback: (task: Task, data: string, cached: () => void) => void = () => {},
-    errorCallback: (task: Task, data: string) => void = () => {},
-    pollingDelayMs = 2500,
-    retryDelayMs = 5000,
-    retryCount = 2
+    options?: ClientOptions
   ): Client {
     return new Client(
       ApiUrl.create(baseUrl), //
       runnerId,
-      parallel,
-      dataCallback,
-      errorCallback,
-      pollingDelayMs,
-      retryDelayMs,
-      retryCount
+      { ...Client.DefaultOptions, ...options }
     );
   }
 }

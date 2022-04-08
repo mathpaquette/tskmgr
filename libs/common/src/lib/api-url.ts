@@ -9,6 +9,7 @@ export class ApiUrl {
     return new ApiUrl('', '');
   }
 
+  // runs
   createRunUrl = () => this.getUrl(`/runs`);
   abortRunUrl = (id: string) => this.getUrl(`/runs/${id}/abort`);
   failRunUrl = (id: string) => this.getUrl(`/runs/${id}/fail`);
@@ -16,9 +17,12 @@ export class ApiUrl {
   setLeaderUrl = (id: string) => this.getUrl(`/runs/${id}/leader`);
   createTasksUrl = (id: string) => this.getUrl(`/runs/${id}/tasks`);
   startTaskUrl = (id: string) => this.getUrl(`/runs/${id}/tasks/start`);
+
+  // tasks
   completeTaskUrl = (id: string) => this.getUrl(`/tasks/${id}/complete`);
   failTaskUrl = (id: string) => this.getUrl(`/tasks/${id}/fail`);
 
+  // pull-requests
   findAllPullRequestsUrl = () => this.getUrl(`/pull-requests`);
 
   getUrl = (url: string): string => {

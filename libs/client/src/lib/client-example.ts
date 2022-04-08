@@ -6,12 +6,14 @@
 
 import { execSync } from 'child_process';
 import { CreateTaskDto, Task } from '@tskmgr/common';
+import { ClientOptions } from './client';
 import { ClientFactory } from './client-factory';
 import { v4 as uuid } from 'uuid';
 
 delete process.env.TS_NODE_PROJECT;
 
-const client = ClientFactory.createNew('http://localhost:3333', '1', 4, dataCallback, errorCallback);
+const options: ClientOptions = { parallel: 4, dataCallback, errorCallback };
+const client = ClientFactory.createNew('http://localhost:3333', 'RUNNER_1', options);
 
 (async () => {
   try {
