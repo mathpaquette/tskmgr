@@ -64,6 +64,10 @@ export class RunsService {
     return { isLeader: !!run, run: run };
   }
 
+  async findById(id: string): Promise<Run> {
+    return this.runModel.findById(id).exec();
+  }
+
   async findAll(): Promise<Run[]> {
     return this.runModel
       .find() //

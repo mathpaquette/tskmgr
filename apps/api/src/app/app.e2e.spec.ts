@@ -57,6 +57,16 @@ describe('Runs', () => {
     expect(new Date(res.body.createdAt)).not.toBeNaN();
   });
 
+  it('should get run', async () => {
+    // arrange
+    const runId = (await createRun(app, createRunDto)).body._id;
+    // act
+    const run: Run = (await getRun(app, runId)).body;
+    // assert
+    expect(run._id).toEqual(runId);
+    expect(run.status).toEqual(RunStatus.Created);
+  });
+
   it('should create tasks', async () => {
     // arrange
     const run: Run = (await createRun(app, createRunDto)).body;
@@ -274,6 +284,10 @@ class DtoHelper {
 
 function createRun(app: INestApplication, data: CreateRunRequestDto): request.Test {
   return request(app.getHttpServer()).post(ApiUrl.createNoPrefix().createRunUrl()).send(data);
+}
+
+function getRun(app: INestApplication, runId: any): request.Test {
+  return request(app.getHttpServer()).get(ApiUrl.createNoPrefix().getRunUrl(runId));
 }
 
 function abortRun(app: INestApplication, runId: any): request.Test {
