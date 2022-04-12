@@ -34,6 +34,11 @@ export class RunsController {
     return this.runsService.setLeader(runId, setLeaderRequestDto);
   }
 
+  @Get(':id')
+  async findById(@Param('id') runId: string): Promise<Run> {
+    return this.runsService.findById(runId);
+  }
+
   @Get()
   async findAll(): Promise<Run[]> {
     return this.runsService.findAll();
