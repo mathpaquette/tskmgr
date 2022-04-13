@@ -28,21 +28,28 @@ export class TasksService {
       throw new Error(`Run with ${run.status} status can't accept new tasks`);
     }
 
+    const previousRun = await this.getPreviousRun(run);
+    const canAssignRunnerId = previousRun?.runners === run.runners;
+
     const tasks: Partial<Task>[] = [];
     for (const createTaskDto of createTasksDto.tasks) {
       const avgDuration = await this.getAvgDuration(createTaskDto);
-      const runnerId = await this.getPreviousRunnerId(run.pullRequest, createTaskDto);
-      const task = {
+
+      const task: Partial<Task> = {
         run: run._id,
         pullRequest: run.pullRequest,
         avgDuration: avgDuration,
-        runnerId: runnerId,
         name: createTaskDto.name,
         type: createTaskDto.type,
         command: createTaskDto.command,
         arguments: createTaskDto.arguments,
         options: createTaskDto.options,
       };
+
+      if (canAssignRunnerId) {
+        task.runnerId = await this.getPreviousRunnerId(run.pullRequest, createTaskDto);
+      }
+
       tasks.push(task);
     }
 
@@ -163,6 +170,10 @@ export class TasksService {
 
     const sum = previousTasks.reduce((p, c) => p + c.duration, 0);
     return sum / previousTasks.length || undefined;
+  }
+
+  private async getPreviousRun(run: Run): Promise<Run> {
+    return this.runModel.findOne({ pullRequest: run.pullRequest._id }).sort({ endedAt: -1 });
   }
 
   private async getPreviousRunnerId(pullRequest: PullRequest, createTaskDto: CreateTaskDto): Promise<string> {

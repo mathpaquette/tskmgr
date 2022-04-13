@@ -7,4 +7,5 @@ export class CreateRunRequestDto {
   readonly pullRequestUrl?: string;
   readonly type: string;
   readonly priority?: TaskPriority;
+  readonly runners?: number;
 }

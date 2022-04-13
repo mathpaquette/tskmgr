@@ -13,4 +13,5 @@ export interface Run {
   duration: number;
   priority: string;
   leaderId: string;
+  runners: number;
 }
