@@ -43,6 +43,9 @@ export class Run implements Run_ {
   @Prop()
   leaderId: string;
 
+  @Prop()
+  runners: number;
+
   close: (hasAllTasksCompleted: boolean) => RunDocument;
 
   complete: () => RunDocument;
