@@ -2,6 +2,7 @@
  * IntelliJ debug:
  *  Node parameters: --require ts-node/register --require tsconfig-paths/register
  *  Environment variables: TS_NODE_PROJECT=libs/client/tsconfig.lib.json
+ *  Start API: nx serve api
  */
 
 import { execSync } from 'child_process';
@@ -45,9 +46,10 @@ const client = ClientFactory.createNew('http://localhost:3333', 'RUNNER_1', opti
 
 function getNxTasks(): NxTask[] {
   const tasks: NxTask[] = [
-    ...JSON.parse(execSync('npx nx print-affected --target=lint').toString()).tasks,
-    ...JSON.parse(execSync('npx nx print-affected --target=test').toString()).tasks,
-    ...JSON.parse(execSync('npx nx print-affected --target=build').toString()).tasks,
+    // --all should be removed in CI environment. Just for demo purpose.
+    ...JSON.parse(execSync('npx nx print-affected --all --target=lint').toString()).tasks,
+    ...JSON.parse(execSync('npx nx print-affected --all --target=test').toString()).tasks,
+    ...JSON.parse(execSync('npx nx print-affected --all --target=build').toString()).tasks,
   ];
   return tasks;
 }
