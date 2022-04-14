@@ -1,5 +1,6 @@
 import { Run } from '../runs/run';
 import { PullRequest } from '../pull-requests/pull-request';
+import { TaskPriority } from './task-priority';
 
 export interface Task {
   _id: string | any;
@@ -20,4 +21,5 @@ export interface Task {
   cached: boolean;
   duration: number;
   avgDuration: number;
+  priority: TaskPriority;
 }

@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Run } from '../../runs/schemas/run.schema';
 import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 import { PullRequest } from '../../pull-requests/schemas/pull-request.schema';
-import { Task as Task_, TaskStatus } from '@tskmgr/common';
+import { Task as Task_, TaskPriority, TaskStatus } from '@tskmgr/common';
 
 export type TaskDocument = Task & Document;
 
@@ -61,6 +61,9 @@ export class Task implements Task_ {
 
   @Prop()
   avgDuration: number;
+
+  @Prop({ type: MongooseSchema.Types.String, enum: TaskPriority, default: TaskPriority.Longest })
+  priority: TaskPriority;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);

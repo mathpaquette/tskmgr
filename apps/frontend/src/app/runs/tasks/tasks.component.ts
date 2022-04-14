@@ -56,6 +56,7 @@ export class TasksComponent implements OnInit {
     { field: 'runnerHost' },
 
     { field: 'cached' },
+    { field: 'priority' },
 
     { field: 'createdAt', valueFormatter: timeValueFormatter },
     { field: 'startedAt', valueFormatter: timeValueFormatter },

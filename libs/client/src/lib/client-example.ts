@@ -6,7 +6,7 @@
  */
 
 import { execSync } from 'child_process';
-import { CreateTaskDto, Task } from '@tskmgr/common';
+import { CreateTaskDto, Task, TaskPriority } from '@tskmgr/common';
 import { ClientOptions } from './client';
 import { ClientFactory } from './client-factory';
 import { v4 as uuid } from 'uuid';
@@ -18,14 +18,22 @@ const client = ClientFactory.createNew('http://localhost:3333', 'RUNNER_1', opti
 
 (async () => {
   try {
-    const nxTasks = getNxTasks();
-    const tasks: CreateTaskDto[] = [];
+    const tasks = getNxTasks().map<CreateTaskDto>((nxTask) => {
+      return {
+        name: nxTask.target.project,
+        type: nxTask.target.target,
+        command: nxTask.command,
+        options: { shell: true },
+        priority: TaskPriority.Longest,
+      };
+    });
 
-    for (const nxTask of nxTasks) {
-      tasks.push({ name: nxTask.target.project, type: nxTask.target.target, command: nxTask.command, options: { shell: true } });
-    }
-
-    const newRun = await client.createRun({ name: uuid(), type: '123', pullRequestName: '123' });
+    const newRun = await client.createRun({
+      name: uuid(),
+      type: '123',
+      pullRequestName: '123',
+      prioritization: [TaskPriority.Longest],
+    });
     console.log(newRun);
 
     const res = await client.setLeader(newRun._id);

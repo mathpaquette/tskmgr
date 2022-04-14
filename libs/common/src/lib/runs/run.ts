@@ -1,4 +1,5 @@
 import { PullRequest } from '../pull-requests/pull-request';
+import { TaskPriority } from '../tasks/task-priority';
 
 export interface Run {
   _id: string | any;
@@ -11,7 +12,7 @@ export interface Run {
   updatedAt: Date;
   endedAt: Date;
   duration: number;
-  priority: string;
+  prioritization: TaskPriority[];
   leaderId: string;
   runners: number;
 }

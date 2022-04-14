@@ -55,6 +55,7 @@ export class RunsComponent {
     { field: 'type' },
     { field: 'runners' },
     { field: 'leaderId' },
+    { field: 'prioritization' },
     { field: 'createdAt', valueFormatter: timeValueFormatter },
     { field: 'updatedAt', valueFormatter: timeValueFormatter },
     { field: 'endedAt', valueFormatter: timeValueFormatter },
