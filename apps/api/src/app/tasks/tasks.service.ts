@@ -5,7 +5,17 @@ import { Task, TaskDocument } from './schemas/task.schema';
 import { Run, RunDocument } from '../runs/schemas/run.schema';
 import { RunsService } from '../runs/runs.service';
 import { PullRequest } from '../pull-requests/schemas/pull-request.schema';
-import { RunStatus, CompleteTaskDto, CreateTaskDto, CreateTasksDto, DateUtil, StartTaskResponseDto, TaskStatus } from '@tskmgr/common';
+import {
+  RunStatus,
+  CompleteTaskDto,
+  CreateTaskDto,
+  CreateTasksDto,
+  DateUtil,
+  StartTaskResponseDto,
+  TaskStatus,
+  TaskPriority,
+} from '@tskmgr/common';
+import { run } from 'jest';
 
 @Injectable()
 export class TasksService {
@@ -82,7 +92,7 @@ export class TasksService {
       return { continue: false, task: null };
     }
 
-    const startedTask = await this.getPendingTaskP1(runId, runnerId, runnerHost);
+    const startedTask = await this.getPendingTask(runId, runnerId, runnerHost, run.prioritization);
 
     if (!startedTask) {
       const canTakeNewTask = !(run.status === RunStatus.Closed);
@@ -139,7 +149,36 @@ export class TasksService {
     return task.save();
   }
 
-  private async getPendingTaskP1(runId: string, runnerId: string, runnerHost: string): Promise<Task> {
+  private async getPendingTask(runId: string, runnerId: string, runnerHost: string, prioritization: TaskPriority[]) {
+    for (const priority of prioritization) {
+      let task;
+
+      switch (priority) {
+        case TaskPriority.Longest:
+          task = await this.getPendingTaskLongest(runId, runnerId, runnerHost);
+          break;
+        case TaskPriority.Shortest:
+          task = await this.getPendingTaskShortest(runId, runnerId, runnerHost);
+          break;
+        case TaskPriority.Newest:
+          task = await this.getPendingTaskNewest(runId, runnerId, runnerHost);
+          break;
+        case TaskPriority.Oldest:
+          task = await this.getPendingTaskOldest(runId, runnerId, runnerHost);
+          break;
+        default:
+          throw Error('Unknown priority type');
+      }
+
+      if (task) {
+        return task;
+      }
+    }
+
+    return undefined;
+  }
+
+  private async getPendingTaskLongest(runId: string, runnerId: string, runnerHost: string): Promise<Task> {
     return this.taskModel
       .findOneAndUpdate(
         {
@@ -150,7 +189,52 @@ export class TasksService {
         { $set: { startedAt: new Date(), status: TaskStatus.Started, runnerId: runnerId, runnerHost: runnerHost } },
         { new: true }
       )
-      .sort({ avgDuration: -1 }) // prioritize task with >> average duration first.
+      .sort({ avgDuration: -1 })
+      .exec();
+  }
+
+  private async getPendingTaskShortest(runId: string, runnerId: string, runnerHost: string): Promise<Task> {
+    return this.taskModel
+      .findOneAndUpdate(
+        {
+          run: { _id: runId },
+          status: TaskStatus.Pending,
+          $or: [{ runnerId: runnerId }, { runnerId: { $exists: false } }],
+        },
+        { $set: { startedAt: new Date(), status: TaskStatus.Started, runnerId: runnerId, runnerHost: runnerHost } },
+        { new: true }
+      )
+      .sort({ avgDuration: 1 })
+      .exec();
+  }
+
+  private async getPendingTaskOldest(runId: string, runnerId: string, runnerHost: string): Promise<Task> {
+    return this.taskModel
+      .findOneAndUpdate(
+        {
+          run: { _id: runId },
+          status: TaskStatus.Pending,
+          $or: [{ runnerId: runnerId }, { runnerId: { $exists: false } }],
+        },
+        { $set: { startedAt: new Date(), status: TaskStatus.Started, runnerId: runnerId, runnerHost: runnerHost } },
+        { new: true }
+      )
+      .sort({ createdAt: 1 })
+      .exec();
+  }
+
+  private async getPendingTaskNewest(runId: string, runnerId: string, runnerHost: string): Promise<Task> {
+    return this.taskModel
+      .findOneAndUpdate(
+        {
+          run: { _id: runId },
+          status: TaskStatus.Pending,
+          $or: [{ runnerId: runnerId }, { runnerId: { $exists: false } }],
+        },
+        { $set: { startedAt: new Date(), status: TaskStatus.Started, runnerId: runnerId, runnerHost: runnerHost } },
+        { new: true }
+      )
+      .sort({ createdAt: -1 })
       .exec();
   }
 

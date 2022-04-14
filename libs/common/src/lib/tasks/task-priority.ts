@@ -1,6 +1,6 @@
 export enum TaskPriority {
-  Fifo = 'FIFO',
-  Lifo = 'LIFO',
+  Newest = 'NEWEST',
+  Oldest = 'OLDEST',
   Longest = 'LONGEST',
   Shortest = 'SHORTEST',
 }

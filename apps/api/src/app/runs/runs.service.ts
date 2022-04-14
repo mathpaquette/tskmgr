@@ -27,6 +27,7 @@ export class RunsService {
       url: createRunDto.url,
       type: createRunDto.type,
       runners: createRunDto.runners,
+      prioritization: createRunDto.prioritization,
     });
 
     pullRequest.runs.push(run._id);

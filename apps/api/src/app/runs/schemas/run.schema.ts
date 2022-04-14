@@ -37,8 +37,8 @@ export class Run implements Run_ {
   @Prop()
   duration: number;
 
-  @Prop({ enum: TaskPriority, default: TaskPriority.Longest })
-  priority: string;
+  @Prop({ type: MongooseSchema.Types.Array, default: [TaskPriority.Longest] })
+  prioritization: TaskPriority[];
 
   @Prop()
   leaderId: string;
