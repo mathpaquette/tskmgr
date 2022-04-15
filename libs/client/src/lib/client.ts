@@ -21,6 +21,7 @@ export interface ClientOptions {
   pollingDelayMs?: number;
   retryDelayMs?: number;
   retryCount?: number;
+  spawnOptions?: SpawnOptionsWithoutStdio;
 }
 
 export class Client {
@@ -171,7 +172,7 @@ export class Client {
       };
 
       try {
-        await spawnAsync(task.command, task.arguments, task.options, dataHandler, errorHandler);
+        await spawnAsync(task.command, task.arguments, { ...task.options, ...this.options.spawnOptions }, dataHandler, errorHandler);
       } catch (e) {
         hasCompleted = false;
         throw e;
