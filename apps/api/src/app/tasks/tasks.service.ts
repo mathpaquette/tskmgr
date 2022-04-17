@@ -15,7 +15,6 @@ import {
   TaskStatus,
   TaskPriority,
 } from '@tskmgr/common';
-import { run } from 'jest';
 
 @Injectable()
 export class TasksService {
@@ -39,7 +38,7 @@ export class TasksService {
     }
 
     const previousRun = await this.getPreviousRun(run);
-    const canAssignRunnerId = previousRun?.runners === run.runners;
+    const canAssignRunnerId = run.runnerAffinity && previousRun?.runners === run.runners;
 
     const tasks: Partial<Task>[] = [];
     for (const createTaskDto of createTasksDto.tasks) {

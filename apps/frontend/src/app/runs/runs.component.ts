@@ -54,6 +54,7 @@ export class RunsComponent {
     { field: 'name', cellRenderer: urlCellRenderer },
     { field: 'type' },
     { field: 'runners' },
+    { field: 'runnerAffinity' },
     { field: 'leaderId' },
     { field: 'prioritization' },
     { field: 'createdAt', valueFormatter: timeValueFormatter },
