@@ -25,6 +25,9 @@ export class Run implements Run_ {
   @Prop({ enum: RunStatus, default: RunStatus.Created })
   status: string;
 
+  @Prop({ default: false })
+  closed: boolean;
+
   @Prop()
   createdAt: Date;
 
@@ -49,7 +52,7 @@ export class Run implements Run_ {
   @Prop({ default: false })
   runnerAffinity: boolean;
 
-  close: (hasAllTasksCompleted: boolean) => RunDocument;
+  close: () => RunDocument;
 
   complete: () => RunDocument;
 
@@ -60,17 +63,13 @@ export class Run implements Run_ {
 
 export const RunSchema = SchemaFactory.createForClass(Run);
 
-RunSchema.methods.close = function (hasAllTasksCompleted: boolean): RunDocument {
-  if (hasAllTasksCompleted) {
-    this.complete();
-    return this;
+RunSchema.methods.close = function (): RunDocument {
+  if (this.closed) {
+    throw new Error(`Run has been already closed!`);
   }
 
-  if (this.status === RunStatus.Created || this.status === RunStatus.Started) {
-    this.status = RunStatus.Closed;
-    return this;
-  }
-  throw new Error(`Run with ${this.status} status can't move to ${RunStatus.Closed}`);
+  this.closed = true;
+  return this;
 };
 
 RunSchema.methods.complete = function (): RunDocument {

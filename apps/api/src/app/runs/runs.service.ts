@@ -38,8 +38,7 @@ export class RunsService {
 
   async close(id: string): Promise<Run> {
     const run = await this.runModel.findById(id).exec();
-    const hasAllTasksCompleted = await this.hasAllTasksCompleted(run);
-    return run.close(hasAllTasksCompleted).save();
+    return run.close().save();
   }
 
   async abort(id: string): Promise<Run> {
