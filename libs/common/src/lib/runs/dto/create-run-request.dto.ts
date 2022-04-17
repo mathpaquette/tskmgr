@@ -8,4 +8,6 @@ export class CreateRunRequestDto {
   readonly type: string;
   readonly prioritization?: TaskPriority[];
   readonly runners?: number;
+  /** runnerAffinity will reschedule tasks from one pull request on previous runner. Default: true */
+  readonly runnerAffinity?: boolean;
 }

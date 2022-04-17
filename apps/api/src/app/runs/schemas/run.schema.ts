@@ -46,6 +46,9 @@ export class Run implements Run_ {
   @Prop()
   runners: number;
 
+  @Prop({ default: false })
+  runnerAffinity: boolean;
+
   close: (hasAllTasksCompleted: boolean) => RunDocument;
 
   complete: () => RunDocument;

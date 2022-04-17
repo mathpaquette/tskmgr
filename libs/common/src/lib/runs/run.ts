@@ -15,4 +15,5 @@ export interface Run {
   prioritization: TaskPriority[];
   leaderId: string;
   runners: number;
+  runnerAffinity: boolean;
 }
