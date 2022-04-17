@@ -1,20 +1,11 @@
-import { Injectable, NotImplementedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task, TaskDocument } from './schemas/task.schema';
 import { Run, RunDocument } from '../runs/schemas/run.schema';
 import { RunsService } from '../runs/runs.service';
 import { PullRequest } from '../pull-requests/schemas/pull-request.schema';
-import {
-  RunStatus,
-  CompleteTaskDto,
-  CreateTaskDto,
-  CreateTasksDto,
-  DateUtil,
-  StartTaskResponseDto,
-  TaskStatus,
-  TaskPriority,
-} from '@tskmgr/common';
+import { RunStatus, CompleteTaskDto, CreateTaskDto, CreateTasksDto, StartTaskResponseDto, TaskStatus, TaskPriority } from '@tskmgr/common';
 
 @Injectable()
 export class TasksService {
@@ -115,41 +106,37 @@ export class TasksService {
     const task = await this.taskModel.findOne({ _id: taskId }).populate('run').exec();
     if (!task) throw new Error(`Task id: ${taskId} can't be found.`);
 
-    if (!task.startedAt || task.endedAt) {
-      throw new NotImplementedException(`Task with ${task.status} status can't change to ${TaskStatus.Completed}`);
-    }
-
-    const endedAt = new Date();
-    task.endedAt = endedAt;
-    task.status = TaskStatus.Completed;
-    task.duration = DateUtil.getDuration(task.startedAt, endedAt);
-    task.cached = cached;
-    await task.save();
-
-    if (task.run.closed) {
-      if (await this.runsService.hasAllTasksCompleted(task.run)) {
-        await task.run.complete().save();
-      }
-    }
-
-    return task;
+    const completedTask = await task.complete(cached).save();
+    await this.updateRunStatus(task.run);
+    return completedTask;
   }
 
   async fail(taskId: string): Promise<Task> {
     const task = await this.taskModel.findOne({ _id: taskId }).populate('run').exec();
     if (!task) throw new Error(`Task id: ${taskId} can't be found.`);
 
-    if (!task.startedAt || task.endedAt) {
-      throw new NotImplementedException(`Task with ${task.status} status can't change to ${TaskStatus.Failed}`);
+    const failedTask = await task.fail().save();
+    await this.updateRunStatus(task.run);
+    return failedTask;
+  }
+
+  async updateRunStatus(run: Run): Promise<void> {
+    const allTasks = await this.taskModel.find({ run: { _id: run._id } });
+    const endedTasks = allTasks.filter((x) => x.endedAt);
+    const failedTasks = allTasks.filter((x) => x.status === TaskStatus.Failed);
+
+    if (run.failFast && failedTasks.length > 0) {
+      await run.fail().save();
+      return;
     }
 
-    const endedAt = new Date();
-    task.endedAt = endedAt;
-    task.status = TaskStatus.Failed;
-    task.duration = DateUtil.getDuration(task.startedAt, endedAt);
-
-    await task.run.fail().save();
-    return task.save();
+    if (run.closed && allTasks.length === endedTasks.length) {
+      if (failedTasks.length > 0) {
+        await run.fail().save();
+      } else {
+        await run.complete().save();
+      }
+    }
   }
 
   private async getPendingTask(runId: string, runnerId: string, runnerHost: string, prioritization: TaskPriority[]) {

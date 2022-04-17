@@ -52,6 +52,9 @@ export class Run implements Run_ {
   @Prop({ default: false })
   runnerAffinity: boolean;
 
+  @Prop({ default: false })
+  failFast: boolean;
+
   close: () => RunDocument;
 
   complete: () => RunDocument;
