@@ -33,7 +33,11 @@ export class TasksService {
     const run = await this.runModel.findById(runId).populate('pullRequest').exec();
     if (!run) throw new Error(`Run id: ${runId} can't be found.`);
 
-    if (run.status === RunStatus.Closed || run.endedAt) {
+    if (run.closed) {
+      throw new Error(`Closed run can't accept new tasks`);
+    }
+
+    if (run.endedAt) {
       throw new Error(`Run with ${run.status} status can't accept new tasks`);
     }
 
@@ -94,8 +98,8 @@ export class TasksService {
     const startedTask = await this.getPendingTask(runId, runnerId, runnerHost, run.prioritization);
 
     if (!startedTask) {
-      const canTakeNewTask = !(run.status === RunStatus.Closed);
-      return { continue: canTakeNewTask, task: null };
+      const canCreateNewTask = !(run.closed === false);
+      return { continue: canCreateNewTask, task: null };
     }
 
     return { continue: true, task: startedTask };
@@ -122,7 +126,7 @@ export class TasksService {
     task.cached = cached;
     await task.save();
 
-    if (task.run.status === RunStatus.Closed) {
+    if (task.run.closed) {
       if (await this.runsService.hasAllTasksCompleted(task.run)) {
         await task.run.complete().save();
       }

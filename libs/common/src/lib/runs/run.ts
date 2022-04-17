@@ -8,6 +8,7 @@ export interface Run {
   url: string;
   type: string;
   status: string;
+  closed: boolean;
   createdAt: Date;
   updatedAt: Date;
   endedAt: Date;

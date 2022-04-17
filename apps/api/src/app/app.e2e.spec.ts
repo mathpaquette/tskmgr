@@ -246,7 +246,7 @@ describe('Runs', () => {
 
     it('should close run', () => {
       // expect
-      expect(closedRun.status).toEqual(RunStatus.Closed);
+      expect(closedRun.closed).toEqual(true);
     });
 
     it('should complete run when task complete', async () => {
@@ -260,7 +260,7 @@ describe('Runs', () => {
       // act
       const res = await createTasks(app, run._id, createTasksDto).expect(500);
       // expect
-      expect(res.body.reason).toEqual("Run with CLOSED status can't accept new tasks");
+      expect(res.body.reason).toEqual("Closed run can't accept new tasks");
     });
   });
 
