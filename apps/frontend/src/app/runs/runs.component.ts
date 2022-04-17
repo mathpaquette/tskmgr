@@ -5,7 +5,13 @@ import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ColDef, GridOptions, GridReadyEvent, RowDoubleClickedEvent, RowNode } from 'ag-grid-community';
 import { TasksCellRendererComponent } from './cell-renderers/tasks-cell-renderer.component';
-import { defaultGridOptions, durationValueFormatter, timeValueFormatter, urlCellRenderer } from '../common/ag-grid.util';
+import {
+  checkboxCellRenderer,
+  defaultGridOptions,
+  durationValueFormatter,
+  timeValueFormatter,
+  urlCellRenderer,
+} from '../common/ag-grid.util';
 
 @Component({
   selector: 'tskmgr-runs',
@@ -54,7 +60,8 @@ export class RunsComponent {
     { field: 'name', cellRenderer: urlCellRenderer },
     { field: 'type' },
     { field: 'runners' },
-    { field: 'runnerAffinity' },
+    { field: 'runnerAffinity', cellRenderer: checkboxCellRenderer },
+    { field: 'failFast', cellRenderer: checkboxCellRenderer },
     { field: 'leaderId' },
     { field: 'prioritization' },
     { field: 'createdAt', valueFormatter: timeValueFormatter },

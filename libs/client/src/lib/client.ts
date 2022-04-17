@@ -159,7 +159,7 @@ export class Client {
         continue;
       }
 
-      const { task } = response;
+      const { run, task } = response;
       let cached = false;
       let hasCompleted = true;
 
@@ -175,7 +175,9 @@ export class Client {
         await spawnAsync(task.command, task.arguments, { ...task.options, ...this.options.spawnOptions }, dataHandler, errorHandler);
       } catch (e) {
         hasCompleted = false;
-        throw e;
+        if (run.failFast) {
+          throw e;
+        }
       } finally {
         if (hasCompleted) {
           await this.completeTask(task._id, { cached });

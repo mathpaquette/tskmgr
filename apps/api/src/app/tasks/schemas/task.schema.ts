@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Run } from '../../runs/schemas/run.schema';
 import { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
 import { PullRequest } from '../../pull-requests/schemas/pull-request.schema';
-import { Task as Task_, TaskPriority, TaskStatus } from '@tskmgr/common';
+import { DateUtil, Task as Task_, TaskPriority, TaskStatus } from '@tskmgr/common';
 
 export type TaskDocument = Task & Document;
 
@@ -64,6 +64,35 @@ export class Task implements Task_ {
 
   @Prop({ type: MongooseSchema.Types.String, enum: TaskPriority, default: TaskPriority.Longest })
   priority: TaskPriority;
+
+  complete: (cached: boolean) => TaskDocument;
+
+  fail: () => TaskDocument;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);
+
+TaskSchema.methods.complete = function (cached: boolean): TaskDocument {
+  if (!this.startedAt || this.endedAt) {
+    throw new Error(`Task with ${this.status} status can't change to ${TaskStatus.Completed}`);
+  }
+
+  const endedAt = new Date();
+  this.endedAt = endedAt;
+  this.status = TaskStatus.Completed;
+  this.duration = DateUtil.getDuration(this.startedAt, endedAt);
+  this.cached = cached;
+  return this;
+};
+
+TaskSchema.methods.fail = function (): TaskDocument {
+  if (!this.startedAt || this.endedAt) {
+    throw new Error(`Task with ${this.status} status can't change to ${TaskStatus.Failed}`);
+  }
+
+  const endedAt = new Date();
+  this.endedAt = endedAt;
+  this.status = TaskStatus.Failed;
+  this.duration = DateUtil.getDuration(this.startedAt, endedAt);
+  return this;
+};

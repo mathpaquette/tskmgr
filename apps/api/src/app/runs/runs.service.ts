@@ -28,6 +28,8 @@ export class RunsService {
       type: createRunDto.type,
       runners: createRunDto.runners,
       prioritization: createRunDto.prioritization,
+      runnerAffinity: createRunDto.runnerAffinity,
+      failFast: createRunDto.failFast,
     });
 
     pullRequest.runs.push(run._id);

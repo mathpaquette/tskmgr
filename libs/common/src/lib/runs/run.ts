@@ -17,4 +17,5 @@ export interface Run {
   leaderId: string;
   runners: number;
   runnerAffinity: boolean;
+  failFast: boolean;
 }

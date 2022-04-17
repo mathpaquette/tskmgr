@@ -10,4 +10,5 @@ export class CreateRunRequestDto {
   readonly runners?: number;
   /** runnerAffinity will reschedule tasks from one pull request on previous runner. Default: true */
   readonly runnerAffinity?: boolean;
+  readonly failFast?: boolean;
 }

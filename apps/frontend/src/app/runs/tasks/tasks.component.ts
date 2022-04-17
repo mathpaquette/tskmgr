@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { EMPTY, Observable } from 'rxjs';
 import { Task } from '@tskmgr/common';
 import { ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
-import { defaultGridOptions, durationValueFormatter, timeValueFormatter } from '../../common/ag-grid.util';
+import { checkboxCellRenderer, defaultGridOptions, durationValueFormatter, timeValueFormatter } from '../../common/ag-grid.util';
 
 @Component({
   selector: 'tskmgr-tasks',
@@ -55,7 +55,7 @@ export class TasksComponent implements OnInit {
     { field: 'runnerId' },
     { field: 'runnerHost' },
 
-    { field: 'cached' },
+    { field: 'cached', cellRenderer: checkboxCellRenderer },
     { field: 'priority' },
 
     { field: 'createdAt', valueFormatter: timeValueFormatter },

@@ -279,6 +279,7 @@ class DtoHelper {
       pullRequestName: `test-pr-${uniqueId}`,
       pullRequestUrl: `https://github.com/${uniqueId}/`,
       runners: 4,
+      failFast: true,
     };
   }
 }
