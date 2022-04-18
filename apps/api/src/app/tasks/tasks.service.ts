@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task, TaskDocument } from './schemas/task.schema';
 import { Run, RunDocument } from '../runs/schemas/run.schema';
-import { RunsService } from '../runs/runs.service';
 import { PullRequest } from '../pull-requests/schemas/pull-request.schema';
 import { RunStatus, CompleteTaskDto, CreateTaskDto, CreateTasksDto, StartTaskResponseDto, TaskStatus, TaskPriority } from '@tskmgr/common';
 
@@ -11,8 +10,7 @@ import { RunStatus, CompleteTaskDto, CreateTaskDto, CreateTasksDto, StartTaskRes
 export class TasksService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<TaskDocument>,
-    @InjectModel(Run.name) private readonly runModel: Model<RunDocument>,
-    private readonly runsService: RunsService
+    @InjectModel(Run.name) private readonly runModel: Model<RunDocument>
   ) {}
 
   /**
@@ -90,7 +88,7 @@ export class TasksService {
     const startedTask = await this.getPendingTask(runId, runnerId, runnerHost, run.prioritization);
 
     if (!startedTask) {
-      const canCreateNewTask = !(run.closed === false);
+      const canCreateNewTask = !run.closed;
       return { continue: canCreateNewTask, run, task: null };
     }
 
