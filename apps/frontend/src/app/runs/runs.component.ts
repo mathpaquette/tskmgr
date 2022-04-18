@@ -62,6 +62,7 @@ export class RunsComponent {
     { field: 'runners' },
     { field: 'runnerAffinity', cellRenderer: checkboxCellRenderer },
     { field: 'failFast', cellRenderer: checkboxCellRenderer },
+    { field: 'closed', cellRenderer: checkboxCellRenderer },
     { field: 'leaderId' },
     { field: 'prioritization' },
     { field: 'createdAt', valueFormatter: timeValueFormatter },

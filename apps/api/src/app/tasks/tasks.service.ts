@@ -48,6 +48,7 @@ export class TasksService {
         command: createTaskDto.command,
         arguments: createTaskDto.arguments,
         options: createTaskDto.options,
+        priority: createTaskDto.priority,
       };
 
       if (canAssignRunnerId) {

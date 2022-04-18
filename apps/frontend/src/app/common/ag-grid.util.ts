@@ -26,5 +26,5 @@ export const urlCellRenderer = (params: ICellRendererParams) => {
 };
 
 export const checkboxCellRenderer = (params: ICellRendererParams) => {
-  return `<input type='checkbox' ${params.value ? 'checked' : ''} />`;
+  return `<input type='checkbox' onclick="return false" ${params.value ? 'checked' : ''} />`;
 };
