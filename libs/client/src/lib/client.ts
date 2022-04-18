@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { ChildProcess, spawn, SpawnOptionsWithoutStdio } from 'child_process';
 import {
   ApiUrl,
@@ -27,11 +28,9 @@ export interface ClientOptions {
 export class Client {
   public static readonly DefaultOptions: ClientOptions = {
     parallel: 1,
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     dataCallback: (task, data, cached) => {},
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     errorCallback: (task, data) => {},
-    pollingDelayMs: 2500,
+    pollingDelayMs: 1000,
     retryDelayMs: 5000,
     retryCount: 2,
   };
@@ -110,14 +109,15 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public runTasks(runId: string): Promise<void[]> {
-    const taskRunners = [];
+  public async runTasks(runId: string): Promise<RunTasksResult> {
+    const taskRunners: Promise<TaskResult[]>[] = [];
 
     for (let i = 0; i < this.options.parallel; i++) {
       taskRunners.push(this.defaultTaskRunner(runId));
     }
 
-    return Promise.all(taskRunners);
+    const taskResults = await Promise.all(taskRunners);
+    return new RunTasksResult(taskResults.flatMap((x) => x));
   }
 
   public async completeTask(taskId: string, params: CompleteTaskDto): Promise<Task> {
@@ -139,7 +139,8 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  private async defaultTaskRunner(runId: string): Promise<void> {
+  private async defaultTaskRunner(runId: string): Promise<TaskResult[]> {
+    const taskResults: TaskResult[] = [];
     let _continue = true;
 
     while (_continue) {
@@ -162,6 +163,8 @@ export class Client {
       const { run, task } = response;
       let cached = false;
       let hasCompleted = true;
+      let childProcess: ChildProcess;
+      let error: Error;
 
       const dataHandler = (data: string): void => {
         this.options.dataCallback(task, data, () => (cached = true));
@@ -172,13 +175,21 @@ export class Client {
       };
 
       try {
-        await spawnAsync(task.command, task.arguments, { ...task.options, ...this.options.spawnOptions }, dataHandler, errorHandler);
-      } catch (e) {
+        childProcess = await spawnAsync(
+          task.command,
+          task.arguments,
+          { ...task.options, ...this.options.spawnOptions },
+          dataHandler,
+          errorHandler
+        );
+      } catch (err) {
+        error = err;
         hasCompleted = false;
         if (run.failFast) {
-          throw e;
+          throw err;
         }
       } finally {
+        taskResults.push({ run, task, childProcess, hasCompleted, error });
         if (hasCompleted) {
           await this.completeTask(task._id, { cached });
         } else {
@@ -186,6 +197,8 @@ export class Client {
         }
       }
     }
+
+    return taskResults;
   }
 }
 
@@ -240,3 +253,27 @@ const checkStatus = (response) => {
     throw new HTTPResponseError(response);
   }
 };
+
+export interface TaskResult {
+  run: Run;
+  task: Task;
+  childProcess: ChildProcess;
+  hasCompleted: boolean;
+  error?: Error;
+}
+
+export class RunTasksResult {
+  public readonly completedTasks: TaskResult[];
+  public readonly failedTasks: TaskResult[];
+
+  public readonly completed: boolean;
+  public readonly failed: boolean;
+
+  constructor(public readonly tasks: TaskResult[]) {
+    this.completedTasks = tasks.filter((x) => x.hasCompleted);
+    this.failedTasks = tasks.filter((x) => !x.hasCompleted);
+
+    this.completed = this.failedTasks.length === 0;
+    this.failed = this.failedTasks.length > 0;
+  }
+}

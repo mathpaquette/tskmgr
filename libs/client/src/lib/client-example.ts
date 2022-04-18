@@ -45,7 +45,10 @@ const client = ClientFactory.createNew('http://localhost:3333', 'RUNNER_1', opti
       console.log(closeRun);
     }
 
-    await client.runTasks(newRun._id);
+    const result = await client.runTasks(newRun._id);
+    if (result.failed) {
+      process.exit(1);
+    }
   } catch (e) {
     console.log(e);
     process.exit(1);
