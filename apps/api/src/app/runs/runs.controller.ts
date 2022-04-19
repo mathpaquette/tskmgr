@@ -30,7 +30,10 @@ export class RunsController {
   }
 
   @Put(':id/leader')
-  async setLeader(@Param('id') runId: string, @Body() setLeaderRequestDto: SetLeaderRequestDto): Promise<SetLeaderResponseDto> {
+  async setLeader(
+    @Param('id') runId: string,
+    @Body() setLeaderRequestDto: SetLeaderRequestDto
+  ): Promise<SetLeaderResponseDto> {
     return this.runsService.setLeader(runId, setLeaderRequestDto);
   }
 
@@ -55,7 +58,11 @@ export class RunsController {
   }
 
   @Put(':id/tasks/start')
-  async startTask(@Headers('host') host, @Param('id') runId: string, @Body() startTaskDto: StartTaskDto): Promise<StartTaskResponseDto> {
+  async startTask(
+    @Headers('host') host,
+    @Param('id') runId: string,
+    @Body() startTaskDto: StartTaskDto
+  ): Promise<StartTaskResponseDto> {
     const { runnerId } = startTaskDto;
     const runnerHost = host.substring(0, host.indexOf(':'));
     return this.tasksService.findOnePendingTask(runId, runnerId, runnerHost);

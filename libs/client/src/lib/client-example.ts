@@ -68,7 +68,10 @@ function getNxTasks(): NxTask[] {
 function dataCallback(task: Task, data: string, cached: () => void): void {
   console.log(data);
   // "> nx run client:lint  [existing outputs match the cache, left as is]"
-  if (data.startsWith(`> nx run ${task.name}:${task.type}`) && data.endsWith('[existing outputs match the cache, left as is]')) {
+  if (
+    data.startsWith(`> nx run ${task.name}:${task.type}`) &&
+    data.endsWith('[existing outputs match the cache, left as is]')
+  ) {
     cached();
   }
 }

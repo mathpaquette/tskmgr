@@ -15,7 +15,10 @@ import { HeaderComponent } from './common/header/header.component';
     HttpClientModule,
     RouterModule.forRoot(
       [
-        { path: 'pull-requests', loadChildren: () => import('./pull-requests/pull-requests.module').then((m) => m.PullRequestsModule) },
+        {
+          path: 'pull-requests',
+          loadChildren: () => import('./pull-requests/pull-requests.module').then((m) => m.PullRequestsModule),
+        },
         { path: 'tasks', loadChildren: () => import('./tasks/tasks.module').then((m) => m.TasksModule) },
         { path: 'runs', loadChildren: () => import('./runs/runs.module').then((m) => m.RunsModule) },
       ],

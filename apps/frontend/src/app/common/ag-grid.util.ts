@@ -22,7 +22,9 @@ export const defaultGridOptions: GridOptions = {
 };
 
 export const urlCellRenderer = (params: ICellRendererParams) => {
-  return params.data.url ? `<a href="${params.data.url}" target="_blank" rel="noopener">${params.value}</a>` : params.value;
+  return params.data.url
+    ? `<a href="${params.data.url}" target="_blank" rel="noopener">${params.value}</a>`
+    : params.value;
 };
 
 export const checkboxCellRenderer = (params: ICellRendererParams) => {
