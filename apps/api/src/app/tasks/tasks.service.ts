@@ -61,7 +61,13 @@ export class TasksService {
       await run.save();
     }
 
-    return this.taskModel.insertMany(tasks);
+    const session = await this.taskModel.startSession();
+    try {
+      session.startTransaction();
+      return this.taskModel.insertMany(tasks, { session });
+    } finally {
+      await session.commitTransaction();
+    }
   }
 
   async findByRunId(runId: string): Promise<Task[]> {
