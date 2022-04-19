@@ -3,6 +3,7 @@
  *  Node parameters: --require ts-node/register --require tsconfig-paths/register
  *  Environment variables: TS_NODE_PROJECT=libs/client/tsconfig.lib.json
  *  Start API: nx serve api
+ *  Command: TS_NODE_PROJECT=libs/client/tsconfig.lib.json node --require ts-node/register --require tsconfig-paths/register libs/client/src/lib/client-example.ts
  */
 
 import { execSync } from 'child_process';
