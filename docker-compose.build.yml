@@ -8,7 +8,7 @@ services:
     build:
       dockerfile: apps/api/Dockerfile
       context: .
-    image: mathpaquette/tskmgr-api:${VERSION:-latest}
+    image: mathpaquette/tskmgr-api:${TSKMGR_VERSION:-latest}
     environment:
       MONGODB_URI: 'mongodb://mongo:27017/tskmgr'
     ports:
@@ -20,7 +20,7 @@ services:
     build:
       dockerfile: apps/frontend/Dockerfile
       context: .
-    image: mathpaquette/tskmgr-frontend:${VERSION:-latest}
+    image: mathpaquette/tskmgr-frontend:${TSKMGR_VERSION:-latest}
     environment:
       PORT: 8080
       API_URL: 'http://api:3333'
