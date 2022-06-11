@@ -10,7 +10,7 @@ import { RunsController } from './runs/runs.controller';
 import { RunsService } from './runs/runs.service';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
-import { environment } from '../environments/environment';
+import { environment } from './environments/environment';
 import { PullRequestsService } from './pull-requests/pull-requests.service';
 import { PullRequestsController } from './pull-requests/pull-requests.controller';
 
