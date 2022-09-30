@@ -1,5 +1,4 @@
 {
-  "root": "libs/common",
   "sourceRoot": "libs/common/src",
   "projectType": "library",
   "targets": {
@@ -14,12 +13,12 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/common"],
       "options": {
-        "jestConfig": "libs/common/jest.config.js",
+        "jestConfig": "libs/common/jest.config.ts",
         "passWithNoTests": true
       }
     },
     "build": {
-      "executor": "@nrwl/node:package",
+      "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/common",

@@ -1,6 +1,5 @@
 {
   "projectType": "application",
-  "root": "apps/frontend",
   "sourceRoot": "apps/frontend/src",
   "prefix": "tskmgr",
   "targets": {
@@ -80,7 +79,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/apps/frontend"],
       "options": {
-        "jestConfig": "apps/frontend/jest.config.js",
+        "jestConfig": "apps/frontend/jest.config.ts",
         "passWithNoTests": true
       }
     }
