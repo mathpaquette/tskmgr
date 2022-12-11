@@ -1,0 +1,8 @@
+curl -X POST http://localhost:3333/api/runs
+   -H 'Content-Type: application/json'
+   -d '{"login":"my_login","password":"my_password"}'
+
+
+drop table task cascade;
+drop table run cascade;
+drop table pull_request cascade;

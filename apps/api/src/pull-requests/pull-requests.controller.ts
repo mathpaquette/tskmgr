@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { PullRequestsService } from './pull-requests.service';
-import { PullRequest } from './schemas/pull-request.schema';
+import { PullRequest } from './pull-request.entity';
 
 @Controller('pull-requests')
 export class PullRequestsController {

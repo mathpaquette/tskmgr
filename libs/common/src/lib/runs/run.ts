@@ -2,7 +2,7 @@ import { PullRequest } from '../pull-requests/pull-request';
 import { TaskPriority } from '../tasks/task-priority';
 
 export interface Run {
-  _id: string | any;
+  id: number;
   pullRequest: PullRequest;
   name: string;
   url: string;

@@ -19,6 +19,7 @@ export * from './lib/tasks/dto/create-tasks.dto';
 
 // pull-requests
 export * from './lib/pull-requests/pull-request';
+export * from './lib/pull-requests/dto/create-pull-request.dto';
 
 // utils
 export * from './lib/utils/date-util';

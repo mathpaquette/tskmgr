@@ -1,7 +1,7 @@
 import { Run } from '../runs/run';
 
 export interface PullRequest {
-  _id: string | any;
+  id: number;
   name: string;
   url: string;
   runs: Run[];
