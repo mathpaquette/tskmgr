@@ -10,7 +10,7 @@ export class PullRequest implements PullRequest_ {
   @Column({ unique: true })
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   url: string;
 
   @OneToMany((type) => Run, (run) => run.pullRequest)

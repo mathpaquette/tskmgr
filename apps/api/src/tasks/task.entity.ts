@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import { Task as Task_, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { Run } from '../runs/run.entity';
-import { PullRequest } from '../pull-requests/pull-request.entity';
 
 @Entity()
 export class Task implements Task_ {
@@ -19,10 +18,6 @@ export class Task implements Task_ {
   @ManyToOne((type) => Run, (run) => run.id)
   @JoinColumn({ name: 'run_id' })
   run: Run;
-
-  @ManyToOne((type) => PullRequest, (pullRequest) => pullRequest.id)
-  @JoinColumn({ name: 'pull_request_id' })
-  pullRequest: PullRequest;
 
   @Column()
   name: string;
@@ -39,10 +34,10 @@ export class Task implements Task_ {
   @Column({ type: 'jsonb', nullable: true })
   options: object;
 
-  @Column({ name: 'runner_id', nullable: true })
+  @Column({ name: 'runner_id', nullable: true }) // TODO: move it's own table
   runnerId: string;
 
-  @Column({ name: 'runner_host', nullable: true })
+  @Column({ name: 'runner_host', nullable: true }) // TODO: move it's own table
   runnerHost: string;
 
   @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.Pending })

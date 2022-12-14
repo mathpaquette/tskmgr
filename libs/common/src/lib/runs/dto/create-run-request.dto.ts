@@ -3,12 +3,12 @@ import { CreatePullRequestDto } from '../../pull-requests/dto/create-pull-reques
 
 export class CreateRunRequestDto {
   readonly name: string;
-  readonly pullRequest: CreatePullRequestDto;
   readonly type: string;
+  readonly pullRequest?: CreatePullRequestDto;
   readonly url?: string;
   readonly prioritization?: TaskPriority[];
   readonly runners?: number;
-  /** runnerAffinity will reschedule tasks from one pull request on previous runner. Default: true */
-  readonly runnerAffinity?: boolean;
+  /** affinity will try to reschedule task on previous runner id */
+  readonly affinity?: boolean;
   readonly failFast?: boolean;
 }

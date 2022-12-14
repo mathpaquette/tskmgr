@@ -36,12 +36,12 @@ export class Run implements Run_ {
   @Column({ type: 'simple-array', default: TaskPriority.Longest })
   prioritization: TaskPriority[];
 
-  @ManyToOne((type) => PullRequest, (pullRequest) => pullRequest.id, { eager: true })
+  @ManyToOne((type) => PullRequest, (pullRequest) => pullRequest.id, { eager: true, nullable: true })
   @JoinColumn({ name: 'pull_request_id' })
   pullRequest: PullRequest;
 
-  @Column({ name: 'runner_affinity', default: false })
-  runnerAffinity: boolean;
+  @Column({ default: false })
+  affinity: boolean;
 
   @Column()
   runners: number;

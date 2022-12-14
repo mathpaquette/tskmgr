@@ -22,7 +22,7 @@ export class RunsService {
       type: createRunDto.type,
       runners: createRunDto.runners,
       prioritization: createRunDto.prioritization,
-      runnerAffinity: createRunDto.runnerAffinity,
+      affinity: createRunDto.affinity,
       failFast: createRunDto.failFast,
     });
 

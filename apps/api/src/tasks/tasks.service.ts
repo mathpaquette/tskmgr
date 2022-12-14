@@ -16,7 +16,9 @@ export class TasksService {
   /**
    * Create new tasks in bulk
    */
-  async createTasks(run: Run, createTasksDto: CreateTasksDto): Promise<Task[]> {
+  async createTasks(runId: number, createTasksDto: CreateTasksDto): Promise<Task[]> {
+    const run = await this.runsRepository.findOneBy({ id: runId });
+
     if (!run) {
       throw new Error(`Run not found`);
     }
@@ -29,26 +31,25 @@ export class TasksService {
       throw new Error(`Run with ${run.status} status can't accept new tasks`);
     }
 
-    const hasAffinity = await this.hasAffinity(run);
     const tasks: Task[] = [];
+    const hasRunnerAffinity = await this.hasRunnerAffinity(run);
 
     for (const createTaskDto of createTasksDto.tasks) {
       const avgDuration = await this.getAvgDuration(createTaskDto);
 
       const task = this.tasksRepository.create({
         run: run,
-        pullRequest: run.pullRequest,
-        avgDuration: avgDuration,
         name: createTaskDto.name,
         type: createTaskDto.type,
         command: createTaskDto.command,
         arguments: createTaskDto.arguments,
         options: createTaskDto.options,
         priority: createTaskDto.priority,
+        avgDuration: avgDuration,
       });
 
-      if (hasAffinity) {
-        task.runnerId = await this.getPreviousRunnerId(run.pullRequest, createTaskDto);
+      if (hasRunnerAffinity) {
+        task.runnerId = await this.getRunnerAffinityId(run.pullRequest, createTaskDto);
       }
 
       tasks.push(task);
@@ -62,8 +63,13 @@ export class TasksService {
     return this.tasksRepository.save(tasks);
   }
 
-  private async hasAffinity(run: Run): Promise<boolean> {
-    if (!run.runnerAffinity) {
+  private async hasRunnerAffinity(run: Run): Promise<boolean> {
+    if (!run.affinity) {
+      return false;
+    }
+
+    // TODO: check if it's possible to assign without pull request
+    if (!run.pullRequest) {
       return false;
     }
 
@@ -93,22 +99,22 @@ export class TasksService {
         cached: false,
       },
       order: { endedAt: 'DESC' },
-      take: 25,
+      take: 25, // TODO: make it configurable
     });
 
     const sum = previousTasks.reduce((p, c) => p + c.duration, 0);
     return sum / previousTasks.length || undefined;
   }
 
-  private async getPreviousRunnerId(pullRequest: PullRequest, createTaskDto: CreateTaskDto): Promise<string> {
+  private async getRunnerAffinityId(pullRequest: PullRequest, createTaskDto: CreateTaskDto): Promise<string> {
     const task = await this.tasksRepository.findOne({
       where: {
-        pullRequest: { id: pullRequest.id },
+        run: { pullRequest: { id: pullRequest.id } },
         runnerId: Not(IsNull()),
         status: TaskStatus.Completed,
         type: createTaskDto.type,
         command: createTaskDto.command,
-        arguments: In(createTaskDto.arguments),
+        arguments: In(createTaskDto.arguments || []),
         options: createTaskDto.options,
       },
       order: { endedAt: 'DESC' },

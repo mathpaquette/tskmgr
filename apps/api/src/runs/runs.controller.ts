@@ -46,8 +46,7 @@ export class RunsController {
 
   @Post(':id/tasks')
   async createTask(@Param('id') runId: number, @Body() createTaskDto: CreateTasksDto): Promise<Task[]> {
-    const run = await this.runsService.findById(runId);
-    return this.tasksService.createTasks(run, createTaskDto);
+    return this.tasksService.createTasks(runId, createTaskDto);
   }
   //
   // @Get(':id/tasks')
