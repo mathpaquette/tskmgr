@@ -3,24 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Run } from './run.entity';
 import { CreateRunRequestDto } from '@tskmgr/common';
-import { PullRequestsService } from '../pull-requests/pull-requests.service';
 
 @Injectable()
 export class RunsService {
-  constructor(
-    @InjectRepository(Run) private readonly runsRepository: Repository<Run>,
-    private readonly pullRequestsService: PullRequestsService
-  ) {}
+  constructor(@InjectRepository(Run) private readonly runsRepository: Repository<Run>) {}
 
   async create(createRunDto: CreateRunRequestDto): Promise<Run> {
-    const pullRequest = await this.pullRequestsService.findOneOrCreate(createRunDto.pullRequest);
-
     const run = this.runsRepository.create({
-      pullRequest: pullRequest,
       name: createRunDto.name,
-      url: createRunDto.url,
       type: createRunDto.type,
-      runners: createRunDto.runners,
+      url: createRunDto.url,
+      parameters: createRunDto.parameters,
       prioritization: createRunDto.prioritization,
       affinity: createRunDto.affinity,
       failFast: createRunDto.failFast,

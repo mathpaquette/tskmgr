@@ -2,13 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { RunStatus, TaskPriority, Run as Run_, DateUtil } from '@tskmgr/common';
-import { PullRequest } from '../pull-requests/pull-request.entity';
+import { RunStatus, TaskPriority, Run as Run_ } from '@tskmgr/common';
 
 @Entity()
 export class Run implements Run_ {
@@ -17,9 +14,6 @@ export class Run implements Run_ {
 
   @Column({ default: false })
   closed: boolean;
-
-  @Column({ nullable: true })
-  duration: number;
 
   @Column()
   url: string;
@@ -36,15 +30,14 @@ export class Run implements Run_ {
   @Column({ type: 'simple-array', default: TaskPriority.Longest })
   prioritization: TaskPriority[];
 
-  @ManyToOne((type) => PullRequest, (pullRequest) => pullRequest.id, { eager: true, nullable: true })
-  @JoinColumn({ name: 'pull_request_id' })
-  pullRequest: PullRequest;
+  @Column({type: 'jsonb'})
+  parameters: object;
 
   @Column({ default: false })
   affinity: boolean;
 
-  @Column()
-  runners: number;
+  @Column({ nullable: true })
+  duration: number;
 
   @Column({ type: 'enum', enum: RunStatus, default: RunStatus.Created })
   status: RunStatus;

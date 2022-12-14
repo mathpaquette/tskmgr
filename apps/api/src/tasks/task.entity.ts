@@ -34,11 +34,11 @@ export class Task implements Task_ {
   @Column({ type: 'jsonb', nullable: true })
   options: object;
 
-  @Column({ name: 'runner_id', nullable: true }) // TODO: move it's own table
+  @Column({ name: 'runner_id', nullable: true })
   runnerId: string;
 
-  @Column({ name: 'runner_host', nullable: true }) // TODO: move it's own table
-  runnerHost: string;
+  @Column({ type: 'jsonb', name: 'runner_info', nullable: true })
+  runnerInfo: object;
 
   @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.Pending })
   status: TaskStatus;

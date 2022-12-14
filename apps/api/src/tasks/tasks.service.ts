@@ -4,7 +4,6 @@ import { In, IsNull, Not, Repository } from 'typeorm';
 import { Task } from './task.entity';
 import { CreateTaskDto, CreateTasksDto, RunStatus, TaskStatus } from '@tskmgr/common';
 import { Run } from '../runs/run.entity';
-import { PullRequest } from '../pull-requests/pull-request.entity';
 
 @Injectable()
 export class TasksService {
@@ -32,7 +31,7 @@ export class TasksService {
     }
 
     const tasks: Task[] = [];
-    const hasRunnerAffinity = await this.hasRunnerAffinity(run);
+    const runAffinity = await this.hasRunAffinity(run);
 
     for (const createTaskDto of createTasksDto.tasks) {
       const avgDuration = await this.getAvgDuration(createTaskDto);
@@ -48,8 +47,8 @@ export class TasksService {
         avgDuration: avgDuration,
       });
 
-      if (hasRunnerAffinity) {
-        task.runnerId = await this.getRunnerAffinityId(run.pullRequest, createTaskDto);
+      if (runAffinity) {
+        task.runnerId = await this.getRunnerAffinityId(runAffinity, createTaskDto);
       }
 
       tasks.push(task);
@@ -63,26 +62,24 @@ export class TasksService {
     return this.tasksRepository.save(tasks);
   }
 
-  private async hasRunnerAffinity(run: Run): Promise<boolean> {
+  private async hasRunAffinity(run: Run): Promise<Run> {
     if (!run.affinity) {
-      return false;
+      return null;
     }
 
-    // TODO: check if it's possible to assign without pull request
-    if (!run.pullRequest) {
-      return false;
+    if (!run.parameters) {
+      return null;
     }
 
-    await this.getPreviousPullRequestRun(run);
+    await this.getPreviousMatchingRun(run);
   }
 
-  private async getPreviousPullRequestRun(run: Run): Promise<Run> {
+  private async getPreviousMatchingRun(currentRun: Run): Promise<Run> {
     return this.runsRepository.findOne({
       where: {
-        id: Not(run.id),
-        pullRequest: { id: run.pullRequest.id },
+        id: Not(currentRun.id),
+        parameters: currentRun.parameters,
         status: RunStatus.Completed,
-        runners: run.runners,
       },
       order: { endedAt: 'DESC' },
     });
@@ -106,10 +103,10 @@ export class TasksService {
     return sum / previousTasks.length || undefined;
   }
 
-  private async getRunnerAffinityId(pullRequest: PullRequest, createTaskDto: CreateTaskDto): Promise<string> {
+  private async getRunnerAffinityId(run: Run, createTaskDto: CreateTaskDto): Promise<string> {
     const task = await this.tasksRepository.findOne({
       where: {
-        run: { pullRequest: { id: pullRequest.id } },
+        run: { id: run.id },
         runnerId: Not(IsNull()),
         status: TaskStatus.Completed,
         type: createTaskDto.type,

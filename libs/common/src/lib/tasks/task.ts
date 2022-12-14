@@ -10,7 +10,7 @@ export interface Task {
   arguments: string[];
   options: object;
   runnerId: string;
-  runnerHost: string;
+  runnerInfo: object;
   status: string;
   cached: boolean;
   duration: number;

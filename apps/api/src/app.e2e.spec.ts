@@ -34,9 +34,9 @@ describe('Runs', () => {
   });
 
   beforeEach(() => {
-    createRunDto = DtoHelper.createRunDto();
+    createRunDto = DtoUtils.createRunDto();
     createTasksDto = {
-      tasks: [{ name: 'test-app', command: 'nx', type: 'lint' }],
+      tasks: [{ name: 'test', type: 'lint', command: 'nx', arguments: ['a1', 'a2'], options: { shell: true } }],
     };
     startTaskDto = { runnerId: '1' };
   });
@@ -50,8 +50,6 @@ describe('Runs', () => {
     expect(res.status).toEqual(201);
     expect(data.status).toEqual(RunStatus.Created);
     expect(data.type).toEqual(createRunDto.type);
-    expect(data.pullRequest.name).toEqual(createRunDto.pullRequest.name);
-    expect(data.pullRequest.url).toEqual(createRunDto.pullRequest.url);
     expect(data.name).toEqual(createRunDto.name);
     expect(data.url).toEqual(createRunDto.url);
     expect(new Date(res.body.createdAt)).not.toBeNaN();
@@ -67,7 +65,7 @@ describe('Runs', () => {
     expect(run.status).toEqual(RunStatus.Created);
   });
 
-  fit('should create tasks', async () => {
+  it('should create tasks', async () => {
     // arrange
     const run: Run = (await createRun(app, createRunDto)).body;
     // act
@@ -269,20 +267,24 @@ describe('Runs', () => {
   });
 });
 
-class DtoHelper {
+class DtoUtils {
   public static createRunDto(): CreateRunRequestDto {
-    const uniqueId = uuid();
+    const id = DtoUtils.getShortId(16);
     return {
-      name: `test-project-${uniqueId}`,
-      url: `https://circleci.com/${uniqueId}/`,
-      type: 'test-type',
-      pullRequest: {
-        name: `test-pr-${uniqueId}`,
-        url: `https://github.com/${uniqueId}/`,
+      name: `${id}`,
+      url: `http://${id}/`,
+      type: 'test',
+      parameters: {
+        name: `PR-${id}`,
+        runner_size: 4,
       },
-      runners: 4,
       failFast: true,
     };
+  }
+  public static getShortId(size: number): string {
+    const hexString = uuid().replace(/-/g, '');
+    const base64String = Buffer.from(hexString, 'hex').toString('base64');
+    return base64String.slice(0, size);
   }
 }
 
@@ -290,38 +292,38 @@ function createRun(app: INestApplication, data: CreateRunRequestDto): request.Te
   return request(app.getHttpServer()).post(ApiUrl.createNoPrefix().createRunUrl()).send(data);
 }
 
-function getRun(app: INestApplication, runId: any): request.Test {
+function getRun(app: INestApplication, runId: number): request.Test {
   return request(app.getHttpServer()).get(ApiUrl.createNoPrefix().getRunUrl(runId));
 }
 
-function abortRun(app: INestApplication, runId: any): request.Test {
+function abortRun(app: INestApplication, runId: number): request.Test {
   return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().abortRunUrl(runId));
 }
 
-function failRun(app: INestApplication, runId: any): request.Test {
+function failRun(app: INestApplication, runId: number): request.Test {
   return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().failRunUrl(runId));
 }
 
-function closeRun(app: INestApplication, runId: any): request.Test {
+function closeRun(app: INestApplication, runId: number): request.Test {
   return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().closeRunUrl(runId));
 }
 
-function setLeader(app: INestApplication, runId: any, data: SetLeaderRequestDto): request.Test {
+function setLeader(app: INestApplication, runId: number, data: SetLeaderRequestDto): request.Test {
   return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().setLeaderUrl(runId)).send(data);
 }
 
-function createTasks(app: INestApplication, runId: any, data: CreateTasksDto): request.Test {
+function createTasks(app: INestApplication, runId: number, data: CreateTasksDto): request.Test {
   return request(app.getHttpServer()).post(ApiUrl.createNoPrefix().createTasksUrl(runId)).send(data);
 }
 
-function startTask(app: INestApplication, runId: any, data: StartTaskDto): request.Test {
+function startTask(app: INestApplication, runId: number, data: StartTaskDto): request.Test {
   return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().startTaskUrl(runId)).send(data);
 }
 
-function completeTask(app: INestApplication, taskId: any): request.Test {
+function completeTask(app: INestApplication, taskId: number): request.Test {
   return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().completeTaskUrl(taskId));
 }
 
-function failTask(app: INestApplication, taskId: any): request.Test {
+function failTask(app: INestApplication, taskId: number): request.Test {
   return request(app.getHttpServer()).put(ApiUrl.createNoPrefix().failTaskUrl(taskId));
 }
