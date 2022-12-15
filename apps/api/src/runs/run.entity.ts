@@ -1,10 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { RunStatus, TaskPriority, Run as Run_ } from '@tskmgr/common';
 
 @Entity()
@@ -30,7 +24,7 @@ export class Run implements Run_ {
   @Column({ type: 'simple-array', default: TaskPriority.Longest })
   prioritization: TaskPriority[];
 
-  @Column({type: 'jsonb'})
+  @Column({ type: 'jsonb' })
   parameters: object;
 
   @Column({ default: false })
