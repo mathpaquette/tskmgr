@@ -8,16 +8,16 @@ import {
   SetLeaderResponseDto,
 } from '@tskmgr/common';
 import { RunsService } from './runs.service';
-import { Run } from './run.entity';
+import { RunEntity } from './run.entity';
 import { TasksService } from '../tasks/tasks.service';
-import { Task } from '../tasks/task.entity';
+import { TaskEntity } from '../tasks/task.entity';
 
 @Controller('runs')
 export class RunsController {
   constructor(private readonly runsService: RunsService, private readonly tasksService: TasksService) {}
 
   @Post()
-  createRun(@Body() createRunDto: CreateRunRequestDto): Promise<Run> {
+  createRun(@Body() createRunDto: CreateRunRequestDto): Promise<RunEntity> {
     return this.runsService.create(createRunDto);
   }
 
@@ -35,7 +35,7 @@ export class RunsController {
   // }
   //
   @Get(':id')
-  async findById(@Param('id') runId: number): Promise<Run> {
+  async findById(@Param('id') runId: number): Promise<RunEntity> {
     return this.runsService.findById(runId);
   }
   //
@@ -45,7 +45,7 @@ export class RunsController {
   // }
 
   @Post(':id/tasks')
-  async createTask(@Param('id') runId: number, @Body() createTaskDto: CreateTasksDto): Promise<Task[]> {
+  async createTask(@Param('id') runId: number, @Body() createTaskDto: CreateTasksDto): Promise<TaskEntity[]> {
     return this.tasksService.createTasks(runId, createTaskDto);
   }
   //

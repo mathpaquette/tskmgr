@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Run } from './run.entity';
+import { RunEntity } from './run.entity';
 import { CreateRunRequestDto } from '@tskmgr/common';
 
 @Injectable()
 export class RunsService {
-  constructor(@InjectRepository(Run) private readonly runsRepository: Repository<Run>) {}
+  constructor(@InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>) {}
 
-  async create(createRunDto: CreateRunRequestDto): Promise<Run> {
+  async create(createRunDto: CreateRunRequestDto): Promise<RunEntity> {
     const run = this.runsRepository.create({
       name: createRunDto.name,
       type: createRunDto.type,
@@ -52,7 +52,7 @@ export class RunsService {
   //   return { isLeader: !!run, run: run };
   // }
   //
-  async findById(id: number): Promise<Run> {
+  async findById(id: number): Promise<RunEntity> {
     return this.runsRepository.findOneBy({ id: id });
   }
   //

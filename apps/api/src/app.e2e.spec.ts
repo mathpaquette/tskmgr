@@ -13,9 +13,9 @@ import {
   SetLeaderRequestDto,
   SetLeaderResponseDto,
 } from '@tskmgr/common';
-import { Run } from './runs/run.entity';
+import { RunEntity } from './runs/run.entity';
 import { AppModule } from './app.module';
-import { Task } from './tasks/task.entity';
+import { TaskEntity } from './tasks/task.entity';
 
 describe('Runs', () => {
   let app: INestApplication;
@@ -45,7 +45,7 @@ describe('Runs', () => {
     // arrange
     // act
     const res = await createRun(app, createRunDto);
-    const data: Run = res.body;
+    const data: RunEntity = res.body;
     // assert
     expect(res.status).toEqual(201);
     expect(data.status).toEqual(RunStatus.Created);
@@ -59,7 +59,7 @@ describe('Runs', () => {
     // arrange
     const runId = (await createRun(app, createRunDto)).body.id;
     // act
-    const run: Run = (await getRun(app, runId)).body;
+    const run: RunEntity = (await getRun(app, runId)).body;
     // assert
     expect(run.id).toEqual(runId);
     expect(run.status).toEqual(RunStatus.Created);
@@ -67,9 +67,9 @@ describe('Runs', () => {
 
   it('should create tasks', async () => {
     // arrange
-    const run: Run = (await createRun(app, createRunDto)).body;
+    const run: RunEntity = (await createRun(app, createRunDto)).body;
     // act
-    const tasks: Task[] = (await createTasks(app, run.id, createTasksDto).expect(201)).body;
+    const tasks: TaskEntity[] = (await createTasks(app, run.id, createTasksDto).expect(201)).body;
     // assert
     expect(tasks.length).toBe(1);
     expect(tasks[0].status).toEqual(TaskStatus.Pending);

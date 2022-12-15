@@ -1,8 +1,8 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { RunStatus, TaskPriority, Run as Run_ } from '@tskmgr/common';
+import { RunStatus, TaskPriority, Run } from '@tskmgr/common';
 
-@Entity()
-export class Run implements Run_ {
+@Entity({ name: 'run' })
+export class RunEntity implements Run {
   @PrimaryGeneratedColumn()
   id: number;
 

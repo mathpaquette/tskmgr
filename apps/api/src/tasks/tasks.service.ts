@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, IsNull, Not, Repository } from 'typeorm';
-import { Task } from './task.entity';
+import { TaskEntity } from './task.entity';
 import { CreateTaskDto, CreateTasksDto, RunStatus, TaskStatus } from '@tskmgr/common';
-import { Run } from '../runs/run.entity';
+import { RunEntity } from '../runs/run.entity';
 
 @Injectable()
 export class TasksService {
   public constructor(
-    @InjectRepository(Task) private readonly tasksRepository: Repository<Task>,
-    @InjectRepository(Run) private readonly runsRepository: Repository<Run>
+    @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
+    @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>
   ) {}
 
   /**
    * Create new tasks in bulk
    */
-  async createTasks(runId: number, createTasksDto: CreateTasksDto): Promise<Task[]> {
+  async createTasks(runId: number, createTasksDto: CreateTasksDto): Promise<TaskEntity[]> {
     const run = await this.runsRepository.findOneBy({ id: runId });
 
     if (!run) {
@@ -30,11 +30,11 @@ export class TasksService {
       throw new Error(`Run with ${run.status} status can't accept new tasks`);
     }
 
-    const tasks: Task[] = [];
+    const tasks: TaskEntity[] = [];
     const runAffinity = await this.hasRunAffinity(run);
 
     for (const createTaskDto of createTasksDto.tasks) {
-      const avgDuration = await this.getAvgDuration(createTaskDto);
+      const avgDuration = await this.getAverageTaskDuration(createTaskDto);
 
       const task = this.tasksRepository.create({
         run: run,
@@ -62,7 +62,7 @@ export class TasksService {
     return this.tasksRepository.save(tasks);
   }
 
-  private async hasRunAffinity(run: Run): Promise<Run> {
+  private async hasRunAffinity(run: RunEntity): Promise<RunEntity> {
     if (!run.affinity) {
       return null;
     }
@@ -74,7 +74,7 @@ export class TasksService {
     await this.getPreviousMatchingRun(run);
   }
 
-  private async getPreviousMatchingRun(currentRun: Run): Promise<Run> {
+  private async getPreviousMatchingRun(currentRun: RunEntity): Promise<RunEntity> {
     return this.runsRepository.findOne({
       where: {
         id: Not(currentRun.id),
@@ -85,7 +85,7 @@ export class TasksService {
     });
   }
 
-  private async getAvgDuration(createTaskDto: CreateTaskDto): Promise<number> {
+  private async getAverageTaskDuration(createTaskDto: CreateTaskDto): Promise<number> {
     const previousTasks = await this.tasksRepository.find({
       where: {
         type: createTaskDto.type,
@@ -103,7 +103,7 @@ export class TasksService {
     return sum / previousTasks.length || undefined;
   }
 
-  private async getRunnerAffinityId(run: Run, createTaskDto: CreateTaskDto): Promise<string> {
+  private async getRunnerAffinityId(run: RunEntity, createTaskDto: CreateTaskDto): Promise<string> {
     const task = await this.tasksRepository.findOne({
       where: {
         run: { id: run.id },

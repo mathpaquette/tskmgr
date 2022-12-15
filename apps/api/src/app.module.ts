@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Run } from './runs/run.entity';
-import { Task } from './tasks/task.entity';
+import { RunEntity } from './runs/run.entity';
+import { TaskEntity } from './tasks/task.entity';
 import { RunsController } from './runs/runs.controller';
 import { RunsService } from './runs/runs.service';
 import { TasksService } from './tasks/tasks.service';
@@ -18,8 +18,8 @@ import { TasksService } from './tasks/tasks.service';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([Run]),
-    TypeOrmModule.forFeature([Task]),
+    TypeOrmModule.forFeature([RunEntity]),
+    TypeOrmModule.forFeature([TaskEntity]),
   ],
   controllers: [
     RunsController, //

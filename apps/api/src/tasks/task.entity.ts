@@ -7,17 +7,17 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Task as Task_, TaskPriority, TaskStatus } from '@tskmgr/common';
-import { Run } from '../runs/run.entity';
+import { Task, TaskPriority, TaskStatus } from '@tskmgr/common';
+import { RunEntity } from '../runs/run.entity';
 
-@Entity()
-export class Task implements Task_ {
+@Entity({ name: 'task' })
+export class TaskEntity implements Task {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => Run, (run) => run.id)
+  @ManyToOne((type) => RunEntity, (run) => run.id)
   @JoinColumn({ name: 'run_id' })
-  run: Run;
+  run: RunEntity;
 
   @Column()
   name: string;
