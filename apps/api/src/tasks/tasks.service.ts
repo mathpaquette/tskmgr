@@ -1,16 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import {Body, Injectable, Post, UploadedFile, UseInterceptors} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, IsNull, Not, Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
-import { CreateTaskDto, CreateTasksDto, RunStatus, TaskStatus } from '@tskmgr/common';
+import { CreateTaskDto, CreateTasksDto, RunStatus, TaskStatus, CreateFileRequestDto } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
+import {FileEntity} from "../files/file.entity";
+import {FileInterceptor} from "@nestjs/platform-express";
 
 @Injectable()
 export class TasksService {
   public constructor(
     @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
-    @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>
+    @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
+    @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>
   ) {}
+
+
+  async createFile() {
+    const file = this.filesRepository.create({
+      originName: 'test',
+    })
+  }
 
   /**
    * Create new tasks in bulk

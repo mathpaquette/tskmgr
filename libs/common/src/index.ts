@@ -17,9 +17,9 @@ export * from './lib/tasks/task-status';
 export * from './lib/tasks/dto/complete-task.dto';
 export * from './lib/tasks/dto/create-tasks.dto';
 
-// pull-requests
-export * from './lib/pull-requests/pull-request';
-export * from './lib/pull-requests/dto/create-pull-request.dto';
+// files
+export * from './lib/files/file'
+export * from './lib/files/dto/create-file-request.dto'
 
 // utils
 export * from './lib/utils/date-util';

@@ -5,6 +5,9 @@ import { TaskEntity } from './tasks/task.entity';
 import { RunsController } from './runs/runs.controller';
 import { RunsService } from './runs/runs.service';
 import { TasksService } from './tasks/tasks.service';
+import { FileEntity } from './files/file.entity';
+import { MulterModule } from '@nestjs/platform-express';
+import { RunnerEntity } from './runners/runner.entity';
 
 @Module({
   imports: [
@@ -18,8 +21,15 @@ import { TasksService } from './tasks/tasks.service';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([RunEntity]),
-    TypeOrmModule.forFeature([TaskEntity]),
+    TypeOrmModule.forFeature([
+      RunEntity, //
+      RunnerEntity,
+      TaskEntity,
+      FileEntity,
+    ]),
+    MulterModule.register({
+      dest: './files', // TODO: configure
+    }),
   ],
   controllers: [
     RunsController, //

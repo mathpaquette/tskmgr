@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Headers } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Headers, UseInterceptors, UploadedFile } from '@nestjs/common';
 import {
   CreateRunRequestDto,
   CreateTasksDto,
@@ -6,15 +6,22 @@ import {
   StartTaskResponseDto,
   SetLeaderRequestDto,
   SetLeaderResponseDto,
+  CreateFileRequestDto,
 } from '@tskmgr/common';
 import { RunsService } from './runs.service';
 import { RunEntity } from './run.entity';
 import { TasksService } from '../tasks/tasks.service';
 import { TaskEntity } from '../tasks/task.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
+import { Multer } from 'multer';
 
 @Controller('runs')
 export class RunsController {
-  constructor(private readonly runsService: RunsService, private readonly tasksService: TasksService) {}
+  constructor(
+    private readonly runsService: RunsService, //
+    private readonly tasksService: TasksService
+  ) {}
 
   @Post()
   createRun(@Body() createRunDto: CreateRunRequestDto): Promise<RunEntity> {
@@ -45,9 +52,23 @@ export class RunsController {
   // }
 
   @Post(':id/tasks')
-  async createTask(@Param('id') runId: number, @Body() createTaskDto: CreateTasksDto): Promise<TaskEntity[]> {
+  async createTasks(@Param('id') runId: number, @Body() createTaskDto: CreateTasksDto): Promise<TaskEntity[]> {
     return this.tasksService.createTasks(runId, createTaskDto);
   }
+
+  /**
+   * Usage: curl -F file=@dump_2022-08-06.gz http://localhost:3333/api/runs/file
+   * @param file
+   */
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('files')
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log('sdsd')
+    return {
+      file
+    };
+  }
+
   //
   // @Get(':id/tasks')
   // findAllTasks(@Param('id') runId: string): Promise<Task[]> {
