@@ -7,7 +7,6 @@ import { RunsService } from './runs/runs.service';
 import { TasksService } from './tasks/tasks.service';
 import { FileEntity } from './files/file.entity';
 import { MulterModule } from '@nestjs/platform-express';
-import { RunnerEntity } from './runners/runner.entity';
 
 @Module({
   imports: [
@@ -23,7 +22,6 @@ import { RunnerEntity } from './runners/runner.entity';
     }),
     TypeOrmModule.forFeature([
       RunEntity, //
-      RunnerEntity,
       TaskEntity,
       FileEntity,
     ]),

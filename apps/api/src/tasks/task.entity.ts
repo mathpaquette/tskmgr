@@ -3,13 +3,14 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToOne, OneToMany,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import {File, Task, TaskPriority, TaskStatus} from '@tskmgr/common';
+import { File, Task, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
-import {FileEntity} from "../files/file.entity";
+import { FileEntity } from '../files/file.entity';
 
 @Entity({ name: 'task' })
 export class TaskEntity implements Task {
@@ -69,5 +70,5 @@ export class TaskEntity implements Task {
   endedAt: Date;
 
   @OneToMany(() => FileEntity, (file) => file.id)
-  files: File[]
+  files: File[];
 }

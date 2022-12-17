@@ -5,17 +5,14 @@ import { TaskEntity } from '../tasks/task.entity';
 
 @Entity({ name: 'file' })
 export class FileEntity implements File {
-  filename: string;
-  destination: string;
-  mimeType: string;
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  originName: string;
+  @Column({ nullable: true })
+  description: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  @Column({ nullable: true })
+  status: string;
 
   @ManyToOne(() => RunEntity, (run) => run.id, { nullable: true })
   @JoinColumn({ name: 'run_id' })
@@ -24,4 +21,16 @@ export class FileEntity implements File {
   @ManyToOne(() => TaskEntity, (task) => task.id, { nullable: true })
   @JoinColumn({ name: 'task_id' })
   task: TaskEntity;
+
+  @Column()
+  originName: string;
+
+  @Column()
+  filename: string;
+
+  @Column()
+  mimeType: string;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 }

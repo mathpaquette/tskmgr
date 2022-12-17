@@ -1,6 +1,6 @@
-import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { RunStatus, TaskPriority, Run, File } from '@tskmgr/common';
-import {FileEntity} from "../files/file.entity";
+import { FileEntity } from '../files/file.entity';
 
 @Entity({ name: 'run' })
 export class RunEntity implements Run {
@@ -16,7 +16,7 @@ export class RunEntity implements Run {
   @Column({ default: false })
   closed: boolean;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   url: string;
 
   @Column({ name: 'fail_fast', default: true })
@@ -49,6 +49,6 @@ export class RunEntity implements Run {
   @Column({ name: 'ended_at', nullable: true })
   endedAt: Date;
 
-  @OneToMany(() => FileEntity, (file) => file.id, {nullable: false})
-  files: File[]
+  @OneToMany(() => FileEntity, (file) => file.id, { nullable: false })
+  files: File[];
 }

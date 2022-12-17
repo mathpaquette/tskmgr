@@ -2,14 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RunEntity } from './run.entity';
-import { CreateRunRequestDto } from '@tskmgr/common';
+import { CreateFileRequestDto, CreateRunRequestDto } from '@tskmgr/common';
+import { FileEntity } from '../files/file.entity';
+import { Express } from 'express';
 
 @Injectable()
 export class RunsService {
-  constructor(@InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>) {}
+  constructor(
+    @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
+    @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>
+  ) {}
 
-  async create(createRunDto: CreateRunRequestDto): Promise<RunEntity> {
-    const run = this.runsRepository.create({
+  async createRun(createRunDto: CreateRunRequestDto): Promise<RunEntity> {
+    const runEntity = this.runsRepository.create({
       name: createRunDto.name,
       type: createRunDto.type,
       url: createRunDto.url,
@@ -19,7 +24,29 @@ export class RunsService {
       failFast: createRunDto.failFast,
     });
 
-    return this.runsRepository.save(run);
+    return this.runsRepository.save(runEntity);
+  }
+
+  async createFile(
+    runId: number,
+    file: Express.Multer.File,
+    createFileRequestDto: CreateFileRequestDto
+  ): Promise<FileEntity> {
+    const run = await this.runsRepository.findOneBy({ id: runId });
+    if (!run) {
+      throw new Error(`Unable run find run id: ${runId}`);
+    }
+
+    const fileEntity = this.filesRepository.create({
+      run: run,
+      status: createFileRequestDto.status,
+      description: createFileRequestDto.description,
+      originName: file.originalname,
+      filename: file.filename,
+      mimeType: file.mimetype,
+    });
+
+    return this.filesRepository.save(fileEntity);
   }
 
   //

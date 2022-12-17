@@ -18,8 +18,8 @@ export * from './lib/tasks/dto/complete-task.dto';
 export * from './lib/tasks/dto/create-tasks.dto';
 
 // files
-export * from './lib/files/file'
-export * from './lib/files/dto/create-file-request.dto'
+export * from './lib/files/file';
+export * from './lib/files/dto/create-file-request.dto';
 
 // utils
 export * from './lib/utils/date-util';

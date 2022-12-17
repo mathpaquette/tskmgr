@@ -25,7 +25,7 @@ export class RunsController {
 
   @Post()
   createRun(@Body() createRunDto: CreateRunRequestDto): Promise<RunEntity> {
-    return this.runsService.create(createRunDto);
+    return this.runsService.createRun(createRunDto);
   }
 
   // @Put(':id/close')
@@ -57,16 +57,17 @@ export class RunsController {
   }
 
   /**
-   * Usage: curl -F file=@dump_2022-08-06.gz http://localhost:3333/api/runs/file
+   * Usage: curl -vv -F file=@dump_2022-08-06.gz http://localhost:3333/api/runs/1/files
    * @param file
    */
   @UseInterceptors(FileInterceptor('file'))
-  @Post('files')
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log('sdsd')
-    return {
-      file
-    };
+  @Post(':id/files')
+  uploadFile(
+    @Param('id') runId: number,
+    @Body() body: CreateFileRequestDto,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    return this.runsService.createFile(runId, file, body);
   }
 
   //

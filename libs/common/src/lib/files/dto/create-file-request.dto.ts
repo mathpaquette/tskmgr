@@ -1,3 +1,4 @@
 export class CreateFileRequestDto {
-  readonly filename: number;
+  readonly description?: string;
+  readonly status?: string; // TODO: add enum
 }
