@@ -69,11 +69,12 @@ export class RunsService {
     run.abort();
     return this.runsRepository.save(run);
   }
-  //
-  // async fail(id: string): Promise<Run> {
-  //   const run = await this.runModel.findById(id).exec();
-  //   return run.fail().save();
-  // }
+
+  async fail(id: number): Promise<RunEntity> {
+    const run = await this.runsRepository.findOneBy({ id: id });
+    run.fail();
+    return this.runsRepository.save(run);
+  }
   //
   // async setLeader(id: string, setLeaderRequestDto: SetLeaderRequestDto): Promise<SetLeaderResponseDto> {
   //   const { runnerId } = setLeaderRequestDto;

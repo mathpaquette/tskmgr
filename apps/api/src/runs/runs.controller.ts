@@ -94,9 +94,9 @@ export class RunsController {
   abort(@Param('id') id: number): Promise<RunEntity> {
     return this.runsService.abort(id);
   }
-  //
-  // @Put(':id/fail')
-  // fail(@Param('id') id: string): Promise<Run> {
-  //   return this.runsService.fail(id);
-  // }
+
+  @Put(':id/fail')
+  fail(@Param('id') id: number): Promise<RunEntity> {
+    return this.runsService.fail(id);
+  }
 }
