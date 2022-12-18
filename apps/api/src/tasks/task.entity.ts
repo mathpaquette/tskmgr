@@ -48,10 +48,10 @@ export class TaskEntity implements Task {
   @Column({ nullable: true })
   cached: boolean;
 
-  @Column({ nullable: true, type: 'real' })
+  @Column({ type: 'real', nullable: true })
   duration: number;
 
-  @Column({ name: 'avg_duration', nullable: true, type: 'real' })
+  @Column({ type: 'real', name: 'avg_duration', nullable: true })
   avgDuration: number;
 
   @Column({ type: 'enum', enum: TaskPriority, default: TaskPriority.Longest })

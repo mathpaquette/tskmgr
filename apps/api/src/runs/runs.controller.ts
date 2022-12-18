@@ -89,11 +89,11 @@ export class RunsController {
   async startTask(@Param('id') runId: number, @Body() startTaskDto: StartTaskDto): Promise<StartTaskResponseDto> {
     return this.pendingTasksService.startPendingTask(runId, startTaskDto);
   }
-  //
-  // @Put(':id/abort')
-  // abort(@Param('id') id: string): Promise<Run> {
-  //   return this.runsService.abort(id);
-  // }
+
+  @Put(':id/abort')
+  abort(@Param('id') id: number): Promise<RunEntity> {
+    return this.runsService.abort(id);
+  }
   //
   // @Put(':id/fail')
   // fail(@Param('id') id: string): Promise<Run> {

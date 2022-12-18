@@ -64,10 +64,11 @@ export class RunsService {
   //   return run.close().save();
   // }
   //
-  // async abort(id: string): Promise<Run> {
-  //   const run = await this.runModel.findById(id).exec();
-  //   return run.abort().save();
-  // }
+  async abort(id: number): Promise<RunEntity> {
+    const run = await this.runsRepository.findOneBy({ id: id });
+    run.abort();
+    return this.runsRepository.save(run);
+  }
   //
   // async fail(id: string): Promise<Run> {
   //   const run = await this.runModel.findById(id).exec();

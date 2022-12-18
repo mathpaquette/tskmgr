@@ -34,7 +34,7 @@ export class RunEntity implements Run {
   @Column({ default: false })
   affinity: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: 'real', nullable: true })
   duration: number;
 
   @Column({ type: 'enum', enum: RunStatus, default: RunStatus.Created })

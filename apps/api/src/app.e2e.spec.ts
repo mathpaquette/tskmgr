@@ -104,32 +104,32 @@ describe('Runs', () => {
     expect(data.duration).toBeTruthy();
     expect(data.run.status).toEqual(RunStatus.Started);
   });
-  //
-  // describe('abort run', () => {
-  //   let run: Run;
-  //
-  //   beforeAll(async () => {
-  //     // arrange
-  //     const createRunDto = DtoHelper.createRunDto();
-  //     run = (await createRun(app, createRunDto)).body;
-  //   });
-  //
-  //   it('should abort run when not ended', async () => {
-  //     // act
-  //     run = (await abortRun(app, run._id).expect(200)).body;
-  //     // assert
-  //     expect(run.endedAt).toBeTruthy();
-  //     expect(run.status).toBe(RunStatus.Aborted);
-  //   });
-  //
-  //   it('should not abort run when already ended', async () => {
-  //     // act
-  //     const exception = (await abortRun(app, run._id)).body;
-  //     // assert
-  //     expect(exception.statusCode).toBe(500);
-  //     expect(exception.reason).toBe("Can't abort already ended run.");
-  //   });
-  // });
+
+  describe('abort run', () => {
+    let run: Run;
+
+    beforeAll(async () => {
+      // arrange
+      const createRunDto = DtoUtils.createRunDto();
+      run = (await createRun(app, createRunDto)).body;
+    });
+
+    it('should abort run when not ended', async () => {
+      // act
+      run = (await abortRun(app, run.id).expect(200)).body;
+      // assert
+      expect(run.endedAt).toBeTruthy();
+      expect(run.status).toBe(RunStatus.Aborted);
+    });
+
+    it('should not abort run when already ended', async () => {
+      // act
+      const exception = (await abortRun(app, run.id)).body;
+      // assert
+      expect(exception.statusCode).toBe(500);
+      expect(exception.reason).toBe("Can't abort already ended run.");
+    });
+  });
   //
   // describe('fail run', () => {
   //   let run: Run;
