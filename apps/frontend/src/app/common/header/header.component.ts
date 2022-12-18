@@ -19,7 +19,6 @@ import { Component, OnInit } from '@angular/core';
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav">
-            <a class="nav-link" routerLinkActive="active" routerLink="/pull-requests">Pull Requests</a>
             <a class="nav-link" routerLinkActive="active" routerLink="/runs">Runs</a>
           </div>
         </div>

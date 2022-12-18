@@ -37,7 +37,7 @@ import {
 export class TasksComponent implements OnInit {
   constructor(private readonly runsService: RunsService, private activatedRoute: ActivatedRoute) {}
 
-  id = '';
+  id: number;
   tasks$: Observable<Task[]> = EMPTY;
 
   gridOptions: GridOptions = {

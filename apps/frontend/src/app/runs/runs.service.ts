@@ -18,7 +18,7 @@ export class RunsService {
     return this.http.get<Run[]>(url);
   }
 
-  public findTasks(id: string): Observable<Task[]> {
+  public findTasks(id: number): Observable<Task[]> {
     const url = this.apiUrl.createTasksUrl(id);
     return this.http.get<Task[]>(url);
   }
