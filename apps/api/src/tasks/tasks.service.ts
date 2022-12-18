@@ -2,7 +2,14 @@ import { Body, Injectable, Post, UploadedFile, UseInterceptors } from '@nestjs/c
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, IsNull, Not, Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
-import { CreateTaskDto, CreateTasksDto, RunStatus, TaskStatus, CreateFileRequestDto } from '@tskmgr/common';
+import {
+  CreateTaskDto,
+  CreateTasksDto,
+  RunStatus,
+  TaskStatus,
+  CreateFileRequestDto,
+  CompleteTaskDto,
+} from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
 
@@ -61,6 +68,54 @@ export class TasksService {
     }
 
     return this.tasksRepository.save(tasks);
+  }
+
+  async completeTask(taskId: number, completeTaskDto: CompleteTaskDto): Promise<TaskEntity> {
+    const task = await this.tasksRepository.findOne({
+      where: { id: taskId },
+      relations: { run: true },
+    });
+
+    if (!task) {
+      throw new Error(`Task id: ${taskId} can't be found.`);
+    }
+
+    const { cached } = completeTaskDto;
+    task.complete(cached);
+    await this.tasksRepository.save(task);
+    await this.updateRunStatus(task.run);
+    return task;
+  }
+
+  // async fail(taskId: string): Promise<TaskEntity> {
+  //   const task = await this.taskModel.findOne({ _id: taskId }).populate('run').exec();
+  //   if (!task) throw new Error(`Task id: ${taskId} can't be found.`);
+  //
+  //   const failedTask = await task.fail().save();
+  //   await this.updateRunStatus(task.run);
+  //   return failedTask;
+  // }
+
+  private async updateRunStatus(run: RunEntity): Promise<RunEntity> {
+    const allTasks = await this.tasksRepository.find({
+      where: { run: { id: run.id } },
+    });
+    const endedTasks = allTasks.filter((x) => x.endedAt);
+    const failedTasks = allTasks.filter((x) => x.status === TaskStatus.Failed);
+
+    if (run.failFast && failedTasks.length > 0) {
+      run.fail();
+    }
+
+    if (run.closed && allTasks.length === endedTasks.length) {
+      if (failedTasks.length > 0) {
+        run.fail();
+      } else {
+        run.complete();
+      }
+    }
+
+    return this.runsRepository.save(run);
   }
 
   private async hasRunAffinity(run: RunEntity): Promise<RunEntity> {

@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { File, Task, TaskPriority, TaskStatus } from '@tskmgr/common';
+import { DateUtil, File, Task, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
 
@@ -48,10 +48,10 @@ export class TaskEntity implements Task {
   @Column({ nullable: true })
   cached: boolean;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'real' })
   duration: number;
 
-  @Column({ name: 'avg_duration', nullable: true })
+  @Column({ name: 'avg_duration', nullable: true, type: 'real' })
   avgDuration: number;
 
   @Column({ type: 'enum', enum: TaskPriority, default: TaskPriority.Longest })
@@ -85,5 +85,28 @@ export class TaskEntity implements Task {
     this.status = TaskStatus.Started;
     this.runnerId = runnerId;
     this.runnerInfo = runnerInfo;
+  }
+
+  public complete(cached: boolean): void {
+    if (!this.startedAt || this.endedAt) {
+      throw new Error(`Task with ${this.status} status can't change to ${TaskStatus.Completed}`);
+    }
+
+    const endedAt = new Date();
+    this.endedAt = endedAt;
+    this.status = TaskStatus.Completed;
+    this.duration = DateUtil.getDurationInSeconds(this.startedAt, endedAt);
+    this.cached = cached;
+  }
+
+  public fail(): void {
+    if (!this.startedAt || this.endedAt) {
+      throw new Error(`Task with ${this.status} status can't change to ${TaskStatus.Failed}`);
+    }
+
+    const endedAt = new Date();
+    this.endedAt = endedAt;
+    this.status = TaskStatus.Failed;
+    this.duration = DateUtil.getDurationInSeconds(this.startedAt, endedAt);
   }
 }

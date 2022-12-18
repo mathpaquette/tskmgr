@@ -90,20 +90,20 @@ describe('Runs', () => {
     expect(data.task.status).toEqual(TaskStatus.Started);
     expect(data.task.startedAt).toBeTruthy();
   });
-  //
-  // it('should complete task', async () => {
-  //   // arrange
-  //   const run: Run = (await createRun(app, createRunDto)).body;
-  //   const tasks: Task[] = (await createTasks(app, run._id, createTasksDto)).body;
-  //   const startedTask: StartTaskResponseDto = (await startTask(app, run._id, startTaskDto)).body;
-  //   // act
-  //   const data: Task = (await completeTask(app, startedTask.task._id).expect(200)).body;
-  //   // expect
-  //   expect(data.status).toEqual(TaskStatus.Completed);
-  //   expect(data.endedAt).toBeTruthy();
-  //   expect(data.duration).toBeTruthy();
-  //   expect(data.run.status).toEqual(RunStatus.Started);
-  // });
+
+  it('should complete task', async () => {
+    // arrange
+    const run: Run = (await createRun(app, createRunDto)).body;
+    const tasks: Task[] = (await createTasks(app, run.id, createTasksDto)).body;
+    const startedTask: StartTaskResponseDto = (await startTask(app, run.id, startTaskDto)).body;
+    // act
+    const data: Task = (await completeTask(app, startedTask.task.id).expect(200)).body;
+    // expect
+    expect(data.status).toEqual(TaskStatus.Completed);
+    expect(data.endedAt).toBeTruthy();
+    expect(data.duration).toBeTruthy();
+    expect(data.run.status).toEqual(RunStatus.Started);
+  });
   //
   // describe('abort run', () => {
   //   let run: Run;

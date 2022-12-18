@@ -63,7 +63,7 @@ export class RunEntity implements Run {
 
     const endedAt = new Date();
     this.status = RunStatus.Completed;
-    this.duration = DateUtil.getDuration(this.createdAt, endedAt);
+    this.duration = DateUtil.getDurationInSeconds(this.createdAt, endedAt);
     this.endedAt = endedAt;
   }
 
@@ -74,7 +74,7 @@ export class RunEntity implements Run {
 
     const endedAt = new Date();
     this.status = RunStatus.Failed;
-    this.duration = DateUtil.getDuration(this.createdAt, endedAt);
+    this.duration = DateUtil.getDurationInSeconds(this.createdAt, endedAt);
     this.endedAt = endedAt;
   }
 
@@ -85,7 +85,7 @@ export class RunEntity implements Run {
 
     const endedAt = new Date();
     this.status = RunStatus.Aborted;
-    this.duration = DateUtil.getDuration(this.createdAt, endedAt);
+    this.duration = DateUtil.getDurationInSeconds(this.createdAt, endedAt);
     this.endedAt = endedAt;
   }
 

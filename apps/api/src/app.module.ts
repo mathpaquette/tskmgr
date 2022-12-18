@@ -8,6 +8,7 @@ import { TasksService } from './tasks/tasks.service';
 import { FileEntity } from './files/file.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { PendingTasksService } from './tasks/pending-tasks.service';
+import { TasksController } from './tasks/tasks.controller';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { PendingTasksService } from './tasks/pending-tasks.service';
   ],
   controllers: [
     RunsController, //
+    TasksController,
   ],
   providers: [
     RunsService, //

@@ -5,7 +5,7 @@ export class DateUtil {
    * @param endDate
    * @private
    */
-  public static getDuration(startDate: Date, endDate: Date): number {
+  public static getDurationInSeconds(startDate: Date, endDate: Date): number {
     return (endDate.getTime() - startDate.getTime()) / 1000;
   }
 }
