@@ -83,12 +83,10 @@ export class RunsController {
   //
   // @Put(':id/tasks/start')
   // async startTask(
-  //   @Headers('host') host,
-  //   @Param('id') runId: string,
+  //   @Param('id') runId: number,
   //   @Body() startTaskDto: StartTaskDto
   // ): Promise<StartTaskResponseDto> {
   //   const { runnerId } = startTaskDto;
-  //   const runnerHost = host.substring(0, host.indexOf(':'));
   //   return this.tasksService.findOnePendingTask(runId, runnerId, runnerHost);
   // }
   //

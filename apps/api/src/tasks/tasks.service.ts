@@ -5,7 +5,6 @@ import { TaskEntity } from './task.entity';
 import { CreateTaskDto, CreateTasksDto, RunStatus, TaskStatus, CreateFileRequestDto } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 @Injectable()
 export class TasksService {
@@ -14,13 +13,6 @@ export class TasksService {
     @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
     @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>
   ) {}
-
-  async createFile() {
-    const file = this.filesRepository.create({
-      originName: 'test',
-    });
-  }
-
   /**
    * Create new tasks in bulk
    */

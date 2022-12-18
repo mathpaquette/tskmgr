@@ -11,11 +11,9 @@ import {
   StartTaskResponseDto,
   TaskStatus,
   SetLeaderRequestDto,
-  SetLeaderResponseDto,
+  SetLeaderResponseDto, Run, Task
 } from '@tskmgr/common';
-import { RunEntity } from './runs/run.entity';
 import { AppModule } from './app.module';
-import { TaskEntity } from './tasks/task.entity';
 
 describe('Runs', () => {
   let app: INestApplication;
@@ -45,7 +43,7 @@ describe('Runs', () => {
     // arrange
     // act
     const res = await createRun(app, createRunDto);
-    const data: RunEntity = res.body;
+    const data: Run = res.body;
     // assert
     expect(res.status).toEqual(201);
     expect(data.status).toEqual(RunStatus.Created);
@@ -59,7 +57,7 @@ describe('Runs', () => {
     // arrange
     const runId = (await createRun(app, createRunDto)).body.id;
     // act
-    const run: RunEntity = (await getRun(app, runId)).body;
+    const run: Run = (await getRun(app, runId)).body;
     // assert
     expect(run.id).toEqual(runId);
     expect(run.status).toEqual(RunStatus.Created);
@@ -67,21 +65,21 @@ describe('Runs', () => {
 
   it('should create tasks', async () => {
     // arrange
-    const run: RunEntity = (await createRun(app, createRunDto)).body;
+    const run: Run = (await createRun(app, createRunDto)).body;
     // act
-    const tasks: TaskEntity[] = (await createTasks(app, run.id, createTasksDto).expect(201)).body;
+    const tasks: Task[] = (await createTasks(app, run.id, createTasksDto).expect(201)).body;
     // assert
     expect(tasks.length).toBe(1);
     expect(tasks[0].status).toEqual(TaskStatus.Pending);
     expect(tasks[0].createdAt).toBeTruthy();
   });
-  //
+
   // it('should start task', async () => {
   //   // arrange
   //   const run: Run = (await createRun(app, createRunDto)).body;
-  //   const tasks: Task[] = (await createTasks(app, run._id, createTasksDto)).body;
+  //   const tasks: Task[] = (await createTasks(app, run.id, createTasksDto)).body;
   //   // act
-  //   const res = await startTask(app, run._id, startTaskDto);
+  //   const res = await startTask(app, run.id, startTaskDto);
   //   const data: StartTaskResponseDto = res.body;
   //   // expect
   //   expect(res.status).toEqual(200);
