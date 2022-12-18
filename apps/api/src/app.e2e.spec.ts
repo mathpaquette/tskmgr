@@ -11,7 +11,9 @@ import {
   StartTaskResponseDto,
   TaskStatus,
   SetLeaderRequestDto,
-  SetLeaderResponseDto, Run, Task
+  SetLeaderResponseDto,
+  Run,
+  Task,
 } from '@tskmgr/common';
 import { AppModule } from './app.module';
 
@@ -74,20 +76,20 @@ describe('Runs', () => {
     expect(tasks[0].createdAt).toBeTruthy();
   });
 
-  // it('should start task', async () => {
-  //   // arrange
-  //   const run: Run = (await createRun(app, createRunDto)).body;
-  //   const tasks: Task[] = (await createTasks(app, run.id, createTasksDto)).body;
-  //   // act
-  //   const res = await startTask(app, run.id, startTaskDto);
-  //   const data: StartTaskResponseDto = res.body;
-  //   // expect
-  //   expect(res.status).toEqual(200);
-  //   expect(data.continue).toEqual(true);
-  //   expect(data.task).toBeTruthy();
-  //   expect(data.task.status).toEqual(TaskStatus.Started);
-  //   expect(data.task.startedAt).toBeTruthy();
-  // });
+  it('should start task', async () => {
+    // arrange
+    const run: Run = (await createRun(app, createRunDto)).body;
+    const tasks: Task[] = (await createTasks(app, run.id, createTasksDto)).body;
+    // act
+    const res = await startTask(app, run.id, startTaskDto);
+    const data: StartTaskResponseDto = res.body;
+    // expect
+    expect(res.status).toEqual(200);
+    expect(data.continue).toEqual(true);
+    expect(data.task).toBeTruthy();
+    expect(data.task.status).toEqual(TaskStatus.Started);
+    expect(data.task.startedAt).toBeTruthy();
+  });
   //
   // it('should complete task', async () => {
   //   // arrange

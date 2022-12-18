@@ -71,4 +71,19 @@ export class TaskEntity implements Task {
 
   @OneToMany(() => FileEntity, (file) => file.id)
   files: File[];
+
+  public hasEnded(): boolean {
+    return !!this.endedAt;
+  }
+
+  public start(runnerId: string, runnerInfo: object): void {
+    if (this.startedAt) {
+      throw new Error(`Can't start already started task.`);
+    }
+
+    this.startedAt = new Date();
+    this.status = TaskStatus.Started;
+    this.runnerId = runnerId;
+    this.runnerInfo = runnerInfo;
+  }
 }

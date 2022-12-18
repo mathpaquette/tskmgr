@@ -6,7 +6,8 @@ import {
   StartTaskResponseDto,
   SetLeaderRequestDto,
   SetLeaderResponseDto,
-  CreateFileRequestDto, SearchRunDto,
+  CreateFileRequestDto,
+  SearchRunDto,
 } from '@tskmgr/common';
 import { RunsService } from './runs.service';
 import { RunEntity } from './run.entity';
@@ -14,13 +15,15 @@ import { TasksService } from '../tasks/tasks.service';
 import { TaskEntity } from '../tasks/task.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
-import { Multer } from 'multer'; // required by Express.Multer.File
+import { Multer } from 'multer';
+import { PendingTasksService } from '../tasks/pending-tasks.service'; // required by Express.Multer.File
 
 @Controller('runs')
 export class RunsController {
   constructor(
     private readonly runsService: RunsService, //
-    private readonly tasksService: TasksService
+    private readonly tasksService: TasksService,
+    private readonly pendingTasksService: PendingTasksService
   ) {}
 
   @Post()
@@ -81,14 +84,11 @@ export class RunsController {
   //   return this.tasksService.findByRunId(runId);
   // }
   //
-  // @Put(':id/tasks/start')
-  // async startTask(
-  //   @Param('id') runId: number,
-  //   @Body() startTaskDto: StartTaskDto
-  // ): Promise<StartTaskResponseDto> {
-  //   const { runnerId } = startTaskDto;
-  //   return this.tasksService.findOnePendingTask(runId, runnerId, runnerHost);
-  // }
+
+  @Put(':id/tasks/start')
+  async startTask(@Param('id') runId: number, @Body() startTaskDto: StartTaskDto): Promise<StartTaskResponseDto> {
+    return this.pendingTasksService.startPendingTask(runId, startTaskDto);
+  }
   //
   // @Put(':id/abort')
   // abort(@Param('id') id: string): Promise<Run> {

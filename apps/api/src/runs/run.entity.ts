@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { RunStatus, TaskPriority, Run, File } from '@tskmgr/common';
+import { RunStatus, TaskPriority, Run, File, DateUtil } from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
 
 @Entity({ name: 'run' })
@@ -51,4 +51,49 @@ export class RunEntity implements Run {
 
   @OneToMany(() => FileEntity, (file) => file.id, { nullable: false })
   files: File[];
+
+  public hasEnded(): boolean {
+    return !!this.endedAt;
+  }
+
+  public complete(): void {
+    if (this.hasEnded()) {
+      throw new Error(`Can't complete already ended run.`);
+    }
+
+    const endedAt = new Date();
+    this.status = RunStatus.Completed;
+    this.duration = DateUtil.getDuration(this.createdAt, endedAt);
+    this.endedAt = endedAt;
+  }
+
+  public fail(): void {
+    if (this.hasEnded()) {
+      throw new Error(`Can't fail already ended run.`);
+    }
+
+    const endedAt = new Date();
+    this.status = RunStatus.Failed;
+    this.duration = DateUtil.getDuration(this.createdAt, endedAt);
+    this.endedAt = endedAt;
+  }
+
+  public abort(): void {
+    if (this.hasEnded()) {
+      throw new Error(`Can't abort already ended run.`);
+    }
+
+    const endedAt = new Date();
+    this.status = RunStatus.Aborted;
+    this.duration = DateUtil.getDuration(this.createdAt, endedAt);
+    this.endedAt = endedAt;
+  }
+
+  public close(): void {
+    if (this.closed) {
+      throw new Error(`Run has been already closed!`);
+    }
+
+    this.closed = true;
+  }
 }

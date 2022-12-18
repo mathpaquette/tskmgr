@@ -8,7 +8,7 @@ export * from './lib/runs/dto/start-task.dto';
 export * from './lib/runs/dto/start-task-response.dto';
 export * from './lib/runs/dto/set-leader-request.dto';
 export * from './lib/runs/dto/set-leader-response.dto';
-export * from './lib/runs/dto/search-run.dto'
+export * from './lib/runs/dto/search-run.dto';
 export * from './lib/runs/run-status';
 
 // tasks
