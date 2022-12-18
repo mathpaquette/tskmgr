@@ -6,7 +6,7 @@ import {
   StartTaskResponseDto,
   SetLeaderRequestDto,
   SetLeaderResponseDto,
-  CreateFileRequestDto,
+  CreateFileRequestDto, SearchRunDto,
 } from '@tskmgr/common';
 import { RunsService } from './runs.service';
 import { RunEntity } from './run.entity';
@@ -14,7 +14,7 @@ import { TasksService } from '../tasks/tasks.service';
 import { TaskEntity } from '../tasks/task.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
-import { Multer } from 'multer';
+import { Multer } from 'multer'; // required by Express.Multer.File
 
 @Controller('runs')
 export class RunsController {
@@ -26,6 +26,11 @@ export class RunsController {
   @Post()
   createRun(@Body() createRunDto: CreateRunRequestDto): Promise<RunEntity> {
     return this.runsService.createRun(createRunDto);
+  }
+
+  @Post('search')
+  searchRun(@Body() searchRunDto: SearchRunDto): Promise<RunEntity[]> {
+    return this.runsService.searchRun(searchRunDto);
   }
 
   // @Put(':id/close')

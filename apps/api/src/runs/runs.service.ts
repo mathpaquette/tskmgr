@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RunEntity } from './run.entity';
-import { CreateFileRequestDto, CreateRunRequestDto } from '@tskmgr/common';
+import { CreateFileRequestDto, CreateRunRequestDto, SearchRunDto } from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
 import { Express } from 'express';
 
@@ -25,6 +25,15 @@ export class RunsService {
     });
 
     return this.runsRepository.save(runEntity);
+  }
+
+  async searchRun(dto: SearchRunDto): Promise<RunEntity[]> {
+    return this.runsRepository
+      .createQueryBuilder('run')
+      .where('name LIKE :name', { name: `%${dto.name}%` })
+      .where('parameters::text LIKE :name', { name: `%${dto.name}%` })
+      .limit(dto.limit)
+      .getMany();
   }
 
   async createFile(
