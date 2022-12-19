@@ -90,7 +90,13 @@ export class RunsService {
   }
 
   async findById(runId: number): Promise<RunEntity> {
-    return this.runsRepository.findOneBy({ id: runId });
+    return this.runsRepository.findOne({
+      where: { id: runId },
+      relations: {
+        tasks: true,
+        files: true,
+      },
+    });
   }
 
   async findAll(search: string): Promise<RunEntity[]> {

@@ -6,9 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./run-details.component.scss'],
 })
 export class RunDetailsComponent implements OnInit {
-  constructor() {
-
-  }
+  constructor() {}
 
   ngOnInit(): void {}
 }

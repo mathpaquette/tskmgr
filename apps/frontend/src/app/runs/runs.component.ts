@@ -52,7 +52,7 @@ export class RunsComponent {
     onGridReady: this.onGridReady.bind(this),
     onRowDoubleClicked: this.onRowDoubleClicked.bind(this),
     getRowNodeId: (data) => data._id,
-   // getRowClass: (params) => (params.data._id === this.id ? 'highlight-row' : undefined),
+    // getRowClass: (params) => (params.data._id === this.id ? 'highlight-row' : undefined),
   };
 
   columnDefs: ColDef[] = [
@@ -70,7 +70,7 @@ export class RunsComponent {
     { field: 'createdAt', valueFormatter: timeValueFormatter },
     { field: 'updatedAt', valueFormatter: timeValueFormatter },
     { field: 'endedAt', valueFormatter: timeValueFormatter },
-   // { field: '_id', headerName: 'Tasks', cellRenderer: TasksCellRendererComponent },
+    // { field: '_id', headerName: 'Tasks', cellRenderer: TasksCellRendererComponent },
   ];
 
   ngOnInit(): void {

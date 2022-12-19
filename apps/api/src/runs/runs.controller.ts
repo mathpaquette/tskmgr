@@ -51,7 +51,6 @@ export class RunsController {
   @Get()
   @ApiImplicitQuery({ name: 'search', required: false, type: String })
   async findAll(@Query('search') search: string): Promise<RunEntity[]> {
-    console.log(search);
     return this.runsService.findAll(search);
   }
 
@@ -60,8 +59,8 @@ export class RunsController {
     return this.tasksService.createTasks(runId, createTaskDto);
   }
 
-  @UseInterceptors(FileInterceptor('file'))
   @Post(':id/files')
+  @UseInterceptors(FileInterceptor('file'))
   createFile(
     @Param('id') runId: number,
     @Body() createFileRequestDto: CreateFileRequestDto,

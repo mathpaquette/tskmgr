@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { RunStatus, TaskPriority, Run, File, DateUtil } from '@tskmgr/common';
+import { RunStatus, TaskPriority, Run, DateUtil } from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
+import { TaskEntity } from '../tasks/task.entity';
 
 @Entity({ name: 'run' })
 export class RunEntity implements Run {
@@ -49,8 +50,11 @@ export class RunEntity implements Run {
   @Column({ name: 'ended_at', nullable: true })
   endedAt: Date;
 
-  @OneToMany(() => FileEntity, (file) => file.id, { nullable: false })
-  files: File[];
+  @OneToMany(() => TaskEntity, (task) => task.run)
+  tasks: TaskEntity[];
+
+  @OneToMany(() => FileEntity, (file) => file.run)
+  files: FileEntity[];
 
   public hasEnded(): boolean {
     return !!this.endedAt;

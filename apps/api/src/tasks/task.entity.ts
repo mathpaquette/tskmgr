@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { DateUtil, File, Task, TaskPriority, TaskStatus } from '@tskmgr/common';
+import { DateUtil, Task, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
 
@@ -20,6 +20,9 @@ export class TaskEntity implements Task {
   @ManyToOne((type) => RunEntity, (run) => run.id)
   @JoinColumn({ name: 'run_id' })
   run: RunEntity;
+
+  @OneToMany(() => FileEntity, (file) => file.task)
+  files: FileEntity[];
 
   @Column()
   name: string;
@@ -68,9 +71,6 @@ export class TaskEntity implements Task {
 
   @Column({ name: 'ended_at', nullable: true })
   endedAt: Date;
-
-  @OneToMany(() => FileEntity, (file) => file.id)
-  files: File[];
 
   public hasEnded(): boolean {
     return !!this.endedAt;
