@@ -1,8 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { RunEntity } from './run.entity';
-import { CreateFileRequestDto, CreateRunRequestDto, SearchRunDto } from '@tskmgr/common';
+import {
+  CreateFileRequestDto,
+  CreateRunRequestDto,
+  SearchRunDto,
+  SetLeaderRequestDto,
+  SetLeaderResponseDto,
+} from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
 import { Express } from 'express';
 
@@ -75,23 +81,31 @@ export class RunsService {
     run.fail();
     return this.runsRepository.save(run);
   }
-  //
-  // async setLeader(id: string, setLeaderRequestDto: SetLeaderRequestDto): Promise<SetLeaderResponseDto> {
-  //   const { runnerId } = setLeaderRequestDto;
-  //   const run = await this.runModel.findOneAndUpdate(
-  //     {
-  //       _id: id,
-  //       $or: [{ leaderId: { $exists: false } }, { leaderId: runnerId }],
-  //     },
-  //     { $set: { leaderId: runnerId } },
-  //     { new: true }
-  //   );
-  //
-  //   return { isLeader: !!run, run: run };
-  // }
-  //
-  async findById(id: number): Promise<RunEntity> {
-    return this.runsRepository.findOneBy({ id: id });
+
+  async setLeader(runId: number, setLeaderRequestDto: SetLeaderRequestDto): Promise<SetLeaderResponseDto> {
+    // TODO: set lock
+    const { runnerId } = setLeaderRequestDto;
+    const run = await this.runsRepository.findOneBy([
+      {
+        id: runId,
+        leaderId: IsNull(),
+      },
+      {
+        id: runId,
+        leaderId: runnerId,
+      },
+    ]);
+
+    if (run) {
+      run.leaderId = runnerId;
+      await this.runsRepository.save(run);
+    }
+
+    return { isLeader: !!run, run: run };
+  }
+
+  async findById(runId: number): Promise<RunEntity> {
+    return this.runsRepository.findOneBy({ id: runId });
   }
   //
   // async findAll(): Promise<Run[]> {

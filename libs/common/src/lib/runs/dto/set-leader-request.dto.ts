@@ -1,3 +1,3 @@
 export class SetLeaderRequestDto {
-  runnerId: string;
+  readonly runnerId: string;
 }

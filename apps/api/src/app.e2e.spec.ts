@@ -156,37 +156,37 @@ describe('Runs', () => {
       expect(exception.reason).toBe("Can't fail already ended run.");
     });
   });
-  //
-  // describe('set leader', () => {
-  //   let run: Run;
-  //
-  //   beforeAll(async () => {
-  //     // arrange
-  //     const createRunDto = DtoHelper.createRunDto();
-  //     run = (await createRun(app, createRunDto)).body;
-  //   });
-  //
-  //   it('should set leader when called first', async () => {
-  //     // arrange
-  //     const runnerId = 'RUNNER_1';
-  //     // act
-  //     const setLeaderResponseDto: SetLeaderResponseDto = (await setLeader(app, run._id, { runnerId }).expect(200)).body;
-  //     // assert
-  //     expect(setLeaderResponseDto.isLeader).toBe(true);
-  //     expect(setLeaderResponseDto.run).toBeTruthy();
-  //     expect(setLeaderResponseDto.run.leaderId).toBe(runnerId);
-  //   });
-  //
-  //   it('should not set leader when not called first', async () => {
-  //     // arrange
-  //     const runnerId = 'RUNNER_2';
-  //     // act
-  //     const setLeaderResponseDto: SetLeaderResponseDto = (await setLeader(app, run._id, { runnerId }).expect(200)).body;
-  //     // assert
-  //     expect(setLeaderResponseDto.isLeader).toBe(false);
-  //     expect(setLeaderResponseDto.run).toBeFalsy();
-  //   });
-  // });
+
+  describe('set leader', () => {
+    let run: Run;
+
+    beforeAll(async () => {
+      // arrange
+      const createRunDto = DtoUtils.createRunDto();
+      run = (await createRun(app, createRunDto)).body;
+    });
+
+    it('should set leader when called first', async () => {
+      // arrange
+      const runnerId = 'RUNNER_1';
+      // act
+      const setLeaderResponseDto: SetLeaderResponseDto = (await setLeader(app, run.id, { runnerId }).expect(200)).body;
+      // assert
+      expect(setLeaderResponseDto.isLeader).toBe(true);
+      expect(setLeaderResponseDto.run).toBeTruthy();
+      expect(setLeaderResponseDto.run.leaderId).toBe(runnerId);
+    });
+
+    it('should not set leader when not called first', async () => {
+      // arrange
+      const runnerId = 'RUNNER_2';
+      // act
+      const setLeaderResponseDto: SetLeaderResponseDto = (await setLeader(app, run.id, { runnerId }).expect(200)).body;
+      // assert
+      expect(setLeaderResponseDto.isLeader).toBe(false);
+      expect(setLeaderResponseDto.run).toBeFalsy();
+    });
+  });
   //
   // describe('one task has failed', () => {
   //   let run: Run;

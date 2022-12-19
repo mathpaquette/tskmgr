@@ -41,14 +41,14 @@ export class RunsController {
   //   return this.runsService.close(runId);
   // }
   //
-  // @Put(':id/leader')
-  // async setLeader(
-  //   @Param('id') runId: string,
-  //   @Body() setLeaderRequestDto: SetLeaderRequestDto
-  // ): Promise<SetLeaderResponseDto> {
-  //   return this.runsService.setLeader(runId, setLeaderRequestDto);
-  // }
-  //
+  @Put(':id/leader')
+  async setLeader(
+    @Param('id') runId: number,
+    @Body() setLeaderRequestDto: SetLeaderRequestDto
+  ): Promise<SetLeaderResponseDto> {
+    return this.runsService.setLeader(runId, setLeaderRequestDto);
+  }
+
   @Get(':id')
   async findById(@Param('id') runId: number): Promise<RunEntity> {
     return this.runsService.findById(runId);
@@ -86,7 +86,10 @@ export class RunsController {
   //
 
   @Put(':id/tasks/start')
-  async startTask(@Param('id') runId: number, @Body() startTaskDto: StartTaskDto): Promise<StartTaskResponseDto> {
+  async startTask(
+    @Param('id') runId: number, //
+    @Body() startTaskDto: StartTaskDto
+  ): Promise<StartTaskResponseDto> {
     return this.pendingTasksService.startPendingTask(runId, startTaskDto);
   }
 
