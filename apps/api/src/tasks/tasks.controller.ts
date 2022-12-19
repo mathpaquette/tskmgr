@@ -12,8 +12,8 @@ export class TasksController {
     return this.tasksService.completeTask(id, completeTaskDto);
   }
 
-  // @Put(':id/fail')
-  // fail(@Param('id') id: string): Promise<TaskEntity> {
-  //   return this.tasksService.fail(id);
-  // }
+  @Put(':id/fail')
+  fail(@Param('id') id: number): Promise<TaskEntity> {
+    return this.tasksService.fail(id);
+  }
 }

@@ -187,46 +187,46 @@ describe('Runs', () => {
       expect(setLeaderResponseDto.run).toBeFalsy();
     });
   });
-  //
-  // describe('one task has failed', () => {
-  //   let run: Run;
-  //   let tasks: Task[];
-  //   let startedTask: StartTaskResponseDto;
-  //   let failedTask: Task;
-  //
-  //   beforeEach(async () => {
-  //     // arrange
-  //     run = (await createRun(app, createRunDto)).body;
-  //     tasks = (await createTasks(app, run._id, createTasksDto)).body;
-  //     startedTask = (await startTask(app, run._id, startTaskDto)).body;
-  //     failedTask = (await failTask(app, startedTask.task._id).expect(200)).body;
-  //   });
-  //
-  //   it('should fail task', () => {
-  //     // expect
-  //     expect(failedTask.status).toEqual(TaskStatus.Failed);
-  //     expect(failedTask.endedAt).toBeTruthy();
-  //     expect(failedTask.duration).toBeTruthy();
-  //   });
-  //
-  //   it('should abort run', () => {
-  //     expect(failedTask.run.status).toEqual(RunStatus.Failed);
-  //   });
-  //
-  //   it('should not continue', async () => {
-  //     // act
-  //     const data: StartTaskResponseDto = (await startTask(app, run._id, startTaskDto).expect(200)).body;
-  //     // expect
-  //     expect(data.continue).toBe(false);
-  //   });
-  //
-  //   it('should not create new tasks', async () => {
-  //     // act
-  //     const res = await createTasks(app, run._id, createTasksDto).expect(500);
-  //     // expect
-  //     expect(res.body.reason).toEqual("Run with FAILED status can't accept new tasks");
-  //   });
-  // });
+
+  describe('one task has failed', () => {
+    let run: Run;
+    let tasks: Task[];
+    let startedTask: StartTaskResponseDto;
+    let failedTask: Task;
+
+    beforeEach(async () => {
+      // arrange
+      run = (await createRun(app, createRunDto)).body;
+      tasks = (await createTasks(app, run.id, createTasksDto)).body;
+      startedTask = (await startTask(app, run.id, startTaskDto)).body;
+      failedTask = (await failTask(app, startedTask.task.id).expect(200)).body;
+    });
+
+    it('should fail task', () => {
+      // expect
+      expect(failedTask.status).toEqual(TaskStatus.Failed);
+      expect(failedTask.endedAt).toBeTruthy();
+      expect(failedTask.duration).toBeTruthy();
+    });
+
+    it('should abort run', () => {
+      expect(failedTask.run.status).toEqual(RunStatus.Failed);
+    });
+
+    it('should not continue', async () => {
+      // act
+      const data: StartTaskResponseDto = (await startTask(app, run.id, startTaskDto).expect(200)).body;
+      // expect
+      expect(data.continue).toBe(false);
+    });
+
+    it('should not create new tasks', async () => {
+      // act
+      const res = await createTasks(app, run.id, createTasksDto).expect(500);
+      // expect
+      expect(res.body.reason).toEqual("Run with FAILED status can't accept new tasks");
+    });
+  });
   //
   // describe('run has been closed', () => {
   //   let run: Run;

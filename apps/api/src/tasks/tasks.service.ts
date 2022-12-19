@@ -87,14 +87,21 @@ export class TasksService {
     return task;
   }
 
-  // async fail(taskId: string): Promise<TaskEntity> {
-  //   const task = await this.taskModel.findOne({ _id: taskId }).populate('run').exec();
-  //   if (!task) throw new Error(`Task id: ${taskId} can't be found.`);
-  //
-  //   const failedTask = await task.fail().save();
-  //   await this.updateRunStatus(task.run);
-  //   return failedTask;
-  // }
+  async fail(taskId: number): Promise<TaskEntity> {
+    const task = await this.tasksRepository.findOne({
+      where: { id: taskId },
+      relations: { run: true },
+    });
+
+    if (!task) {
+      throw new Error(`Task id: ${taskId} can't be found.`);
+    }
+
+    task.fail();
+    await this.tasksRepository.save(task);
+    await this.updateRunStatus(task.run);
+    return task;
+  }
 
   private async updateRunStatus(run: RunEntity): Promise<RunEntity> {
     const allTasks = await this.tasksRepository.find({
