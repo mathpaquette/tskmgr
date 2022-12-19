@@ -5,4 +5,6 @@ curl -X POST http://localhost:3333/api/runs
 
 drop table task cascade;
 drop table run cascade;
-drop table pull_request cascade;
+drop table file cascade;
+
+Usage: curl -vv -F file=@dump_2022-08-06.gz http://localhost:3333/api/runs/1/files

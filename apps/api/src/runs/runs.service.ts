@@ -107,18 +107,11 @@ export class RunsService {
   async findById(runId: number): Promise<RunEntity> {
     return this.runsRepository.findOneBy({ id: runId });
   }
-  //
-  // async findAll(): Promise<Run[]> {
-  //   return this.runModel
-  //     .find() //
-  //     .sort({ updatedAt: -1 })
-  //     .limit(100)
-  //     .exec();
-  // }
-  //
-  // async hasAllTasksCompleted(run: Run): Promise<boolean> {
-  //   const allTasks = await this.taskModel.find({ run: { _id: run._id } });
-  //   const completedTasks = await this.taskModel.find({ run: { _id: run._id }, status: TaskStatus.Completed });
-  //   return allTasks.length === completedTasks.length;
-  // }
+
+  async findAll(): Promise<RunEntity[]> {
+    return this.runsRepository.find({
+      order: { createdAt: 'DESC' },
+      take: 100,
+    });
+  }
 }

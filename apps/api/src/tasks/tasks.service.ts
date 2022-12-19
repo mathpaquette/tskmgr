@@ -12,6 +12,7 @@ import {
 } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
+import { Express } from 'express';
 
 @Injectable()
 export class TasksService {
@@ -101,6 +102,28 @@ export class TasksService {
     await this.tasksRepository.save(task);
     await this.updateRunStatus(task.run);
     return task;
+  }
+
+  async createFile(
+    taskId: number,
+    file: Express.Multer.File,
+    createFileRequestDto: CreateFileRequestDto
+  ): Promise<FileEntity> {
+    const task = await this.tasksRepository.findOneBy({ id: taskId });
+    if (!task) {
+      throw new Error(`Unable run find task id: ${taskId}`);
+    }
+
+    const fileEntity = this.filesRepository.create({
+      task: task,
+      status: createFileRequestDto.status,
+      description: createFileRequestDto.description,
+      originName: file.originalname,
+      filename: file.filename,
+      mimeType: file.mimetype,
+    });
+
+    return this.filesRepository.save(fileEntity);
   }
 
   private async updateRunStatus(run: RunEntity): Promise<RunEntity> {

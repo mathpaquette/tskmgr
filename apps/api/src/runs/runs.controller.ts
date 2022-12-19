@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Headers, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UseInterceptors, UploadedFile } from '@nestjs/common';
 import {
   CreateRunRequestDto,
   CreateTasksDto,
@@ -14,9 +14,8 @@ import { RunEntity } from './run.entity';
 import { TasksService } from '../tasks/tasks.service';
 import { TaskEntity } from '../tasks/task.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
-import { Multer } from 'multer';
-import { PendingTasksService } from '../tasks/pending-tasks.service'; // required by Express.Multer.File
+import { PendingTasksService } from '../tasks/pending-tasks.service';
+import { FileEntity } from '../files/file.entity';
 
 @Controller('runs')
 export class RunsController {
@@ -54,36 +53,25 @@ export class RunsController {
     return this.runsService.findById(runId);
   }
 
-  // @Get()
-  // async findAll(): Promise<RunEntity[]> {
-  //   return this.runsService.findAll();
-  // }
+  @Get()
+  async findAll(): Promise<RunEntity[]> {
+    return this.runsService.findAll();
+  }
 
   @Post(':id/tasks')
   async createTasks(@Param('id') runId: number, @Body() createTaskDto: CreateTasksDto): Promise<TaskEntity[]> {
     return this.tasksService.createTasks(runId, createTaskDto);
   }
 
-  /**
-   * Usage: curl -vv -F file=@dump_2022-08-06.gz http://localhost:3333/api/runs/1/files
-   * @param file
-   */
   @UseInterceptors(FileInterceptor('file'))
   @Post(':id/files')
-  uploadFile(
+  createFile(
     @Param('id') runId: number,
-    @Body() body: CreateFileRequestDto,
+    @Body() createFileRequestDto: CreateFileRequestDto,
     @UploadedFile() file: Express.Multer.File
-  ) {
-    return this.runsService.createFile(runId, file, body);
+  ): Promise<FileEntity> {
+    return this.runsService.createFile(runId, file, createFileRequestDto);
   }
-
-  //
-  // @Get(':id/tasks')
-  // findAllTasks(@Param('id') runId: string): Promise<Task[]> {
-  //   return this.tasksService.findByRunId(runId);
-  // }
-  //
 
   @Put(':id/tasks/start')
   async startTask(
