@@ -5,7 +5,7 @@ import { Component, OnInit } from '@angular/core';
   template: `
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">tskmgr</a>
+        <a class="navbar-brand" href="https://github.com/mathpaquette/tskmgr">tskmgr</a>
         <button
           class="navbar-toggler"
           type="button"

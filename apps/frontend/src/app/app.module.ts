@@ -15,7 +15,7 @@ import { HeaderComponent } from './common/header/header.component';
     HttpClientModule,
     RouterModule.forRoot(
       [
-        { path: 'tasks', loadChildren: () => import('./tasks/tasks.module').then((m) => m.TasksModule) },
+        { path: '', redirectTo: 'runs', pathMatch: 'full' },
         { path: 'runs', loadChildren: () => import('./runs/runs.module').then((m) => m.RunsModule) },
       ],
       { initialNavigation: 'enabledBlocking' }

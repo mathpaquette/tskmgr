@@ -52,25 +52,25 @@ export class RunsComponent {
     onGridReady: this.onGridReady.bind(this),
     onRowDoubleClicked: this.onRowDoubleClicked.bind(this),
     getRowNodeId: (data) => data._id,
-    getRowClass: (params) => (params.data._id === this.id ? 'highlight-row' : undefined),
+   // getRowClass: (params) => (params.data._id === this.id ? 'highlight-row' : undefined),
   };
 
   columnDefs: ColDef[] = [
-    { field: '_id', headerName: 'Id' },
+    { field: 'id', headerName: 'Id' },
     { field: 'name', cellRenderer: urlCellRenderer },
     { field: 'type' },
-    { field: 'runners' },
-    { field: 'runnerAffinity', cellRenderer: checkboxCellRenderer },
-    { field: 'failFast', cellRenderer: checkboxCellRenderer },
-    { field: 'closed', cellRenderer: checkboxCellRenderer },
-    { field: 'leaderId' },
-    { field: 'prioritization' },
+    { field: 'status' },
+    { field: 'duration', valueFormatter: durationValueFormatter },
+
+    // { field: 'affinity', cellRenderer: checkboxCellRenderer },
+    // { field: 'failFast', cellRenderer: checkboxCellRenderer },
+    // { field: 'closed', cellRenderer: checkboxCellRenderer },
+    // { field: 'leaderId' },
+    // { field: 'prioritization' },
     { field: 'createdAt', valueFormatter: timeValueFormatter },
     { field: 'updatedAt', valueFormatter: timeValueFormatter },
     { field: 'endedAt', valueFormatter: timeValueFormatter },
-    { field: 'duration', valueFormatter: durationValueFormatter },
-    { field: 'status' },
-    { field: '_id', headerName: 'Tasks', cellRenderer: TasksCellRendererComponent },
+   // { field: '_id', headerName: 'Tasks', cellRenderer: TasksCellRendererComponent },
   ];
 
   ngOnInit(): void {
