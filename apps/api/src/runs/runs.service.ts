@@ -2,16 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Like, Repository } from 'typeorm';
 import { RunEntity } from './run.entity';
-import {
-  CreateFileRequestDto,
-  CreateRunRequestDto,
-  SearchRunDto,
-  SetLeaderRequestDto,
-  SetLeaderResponseDto,
-} from '@tskmgr/common';
+import { CreateFileRequestDto, CreateRunRequestDto, SetLeaderRequestDto, SetLeaderResponseDto } from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
 import { Express } from 'express';
-import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 
 @Injectable()
 export class RunsService {
@@ -93,7 +86,7 @@ export class RunsService {
       await this.runsRepository.save(run);
     }
 
-    return { isLeader: !!run, run: run };
+    return { leader: !!run, run: run };
   }
 
   async findById(runId: number): Promise<RunEntity> {

@@ -172,7 +172,7 @@ describe('Runs', () => {
       // act
       const setLeaderResponseDto: SetLeaderResponseDto = (await setLeader(app, run.id, { runnerId }).expect(200)).body;
       // assert
-      expect(setLeaderResponseDto.isLeader).toBe(true);
+      expect(setLeaderResponseDto.leader).toBe(true);
       expect(setLeaderResponseDto.run).toBeTruthy();
       expect(setLeaderResponseDto.run.leaderId).toBe(runnerId);
     });
@@ -183,7 +183,7 @@ describe('Runs', () => {
       // act
       const setLeaderResponseDto: SetLeaderResponseDto = (await setLeader(app, run.id, { runnerId }).expect(200)).body;
       // assert
-      expect(setLeaderResponseDto.isLeader).toBe(false);
+      expect(setLeaderResponseDto.leader).toBe(false);
       expect(setLeaderResponseDto.run).toBeFalsy();
     });
   });

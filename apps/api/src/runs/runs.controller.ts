@@ -7,7 +7,6 @@ import {
   SetLeaderRequestDto,
   SetLeaderResponseDto,
   CreateFileRequestDto,
-  SearchRunDto,
 } from '@tskmgr/common';
 import { RunsService } from './runs.service';
 import { RunEntity } from './run.entity';
