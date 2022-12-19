@@ -64,12 +64,12 @@ export class RunsService {
     return this.filesRepository.save(fileEntity);
   }
 
-  //
-  // async close(id: string): Promise<Run> {
-  //   const run = await this.runModel.findById(id).exec();
-  //   return run.close().save();
-  // }
-  //
+  async close(id: number): Promise<RunEntity> {
+    const run = await this.runsRepository.findOneBy({ id: id });
+    run.close();
+    return this.runsRepository.save(run);
+  }
+
   async abort(id: number): Promise<RunEntity> {
     const run = await this.runsRepository.findOneBy({ id: id });
     run.abort();

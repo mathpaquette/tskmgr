@@ -227,40 +227,40 @@ describe('Runs', () => {
       expect(res.body.reason).toEqual("Run with FAILED status can't accept new tasks");
     });
   });
-  //
-  // describe('run has been closed', () => {
-  //   let run: Run;
-  //   let tasks: Task[];
-  //   let startedTask: StartTaskResponseDto;
-  //   let closedRun: Run;
-  //
-  //   beforeEach(async () => {
-  //     // arrange
-  //     run = (await createRun(app, createRunDto)).body;
-  //     tasks = (await createTasks(app, run._id, createTasksDto)).body;
-  //     startedTask = (await startTask(app, run._id, startTaskDto)).body;
-  //     closedRun = (await closeRun(app, run._id)).body;
-  //   });
-  //
-  //   it('should close run', () => {
-  //     // expect
-  //     expect(closedRun.closed).toEqual(true);
-  //   });
-  //
-  //   it('should complete run when task complete', async () => {
-  //     // act
-  //     const task: Task = (await completeTask(app, startedTask.task._id).expect(200)).body;
-  //     // expect
-  //     expect(task.run.status).toEqual(RunStatus.Completed);
-  //   });
-  //
-  //   it('should not create new task', async () => {
-  //     // act
-  //     const res = await createTasks(app, run._id, createTasksDto).expect(500);
-  //     // expect
-  //     expect(res.body.reason).toEqual("Closed run can't accept new tasks");
-  //   });
-  // });
+
+  describe('run has been closed', () => {
+    let run: Run;
+    let tasks: Task[];
+    let startedTask: StartTaskResponseDto;
+    let closedRun: Run;
+
+    beforeEach(async () => {
+      // arrange
+      run = (await createRun(app, createRunDto)).body;
+      tasks = (await createTasks(app, run.id, createTasksDto)).body;
+      startedTask = (await startTask(app, run.id, startTaskDto)).body;
+      closedRun = (await closeRun(app, run.id).expect(200)).body;
+    });
+
+    it('should close run', () => {
+      // expect
+      expect(closedRun.closed).toEqual(true);
+    });
+
+    it('should complete run when task complete', async () => {
+      // act
+      const task: Task = (await completeTask(app, startedTask.task.id).expect(200)).body;
+      // expect
+      expect(task.run.status).toEqual(RunStatus.Completed);
+    });
+
+    it('should not create new task', async () => {
+      // act
+      const res = await createTasks(app, run.id, createTasksDto).expect(500);
+      // expect
+      expect(res.body.reason).toEqual("Closed run can't accept new tasks");
+    });
+  });
 
   afterAll(async () => {
     await app.close();
@@ -281,6 +281,7 @@ class DtoUtils {
       failFast: true,
     };
   }
+
   public static getShortId(size: number): string {
     const hexString = uuid().replace(/-/g, '');
     const base64String = Buffer.from(hexString, 'hex').toString('base64');

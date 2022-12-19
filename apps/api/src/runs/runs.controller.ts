@@ -36,11 +36,11 @@ export class RunsController {
     return this.runsService.searchRun(searchRunDto);
   }
 
-  // @Put(':id/close')
-  // async closeRun(@Param('id') runId: string): Promise<Run> {
-  //   return this.runsService.close(runId);
-  // }
-  //
+  @Put(':id/close')
+  async closeRun(@Param('id') runId: number): Promise<RunEntity> {
+    return this.runsService.close(runId);
+  }
+
   @Put(':id/leader')
   async setLeader(
     @Param('id') runId: number,
@@ -53,9 +53,9 @@ export class RunsController {
   async findById(@Param('id') runId: number): Promise<RunEntity> {
     return this.runsService.findById(runId);
   }
-  //
+
   // @Get()
-  // async findAll(): Promise<Run[]> {
+  // async findAll(): Promise<RunEntity[]> {
   //   return this.runsService.findAll();
   // }
 
