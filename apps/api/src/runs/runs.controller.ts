@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
 import {
   CreateRunRequestDto,
   CreateTasksDto,
@@ -16,6 +16,7 @@ import { TaskEntity } from '../tasks/task.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PendingTasksService } from '../tasks/pending-tasks.service';
 import { FileEntity } from '../files/file.entity';
+import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
 
 @Controller('runs')
 export class RunsController {
@@ -28,11 +29,6 @@ export class RunsController {
   @Post()
   createRun(@Body() createRunDto: CreateRunRequestDto): Promise<RunEntity> {
     return this.runsService.createRun(createRunDto);
-  }
-
-  @Post('search')
-  searchRun(@Body() searchRunDto: SearchRunDto): Promise<RunEntity[]> {
-    return this.runsService.searchRun(searchRunDto);
   }
 
   @Put(':id/close')
@@ -54,8 +50,10 @@ export class RunsController {
   }
 
   @Get()
-  async findAll(): Promise<RunEntity[]> {
-    return this.runsService.findAll();
+  @ApiImplicitQuery({ name: 'search', required: false, type: String })
+  async findAll(@Query('search') search: string): Promise<RunEntity[]> {
+    console.log(search);
+    return this.runsService.findAll(search);
   }
 
   @Post(':id/tasks')

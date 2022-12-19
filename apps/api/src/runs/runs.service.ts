@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, Like, Repository } from 'typeorm';
 import { RunEntity } from './run.entity';
 import {
   CreateFileRequestDto,
@@ -11,6 +11,7 @@ import {
 } from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
 import { Express } from 'express';
+import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 
 @Injectable()
 export class RunsService {
@@ -31,15 +32,6 @@ export class RunsService {
     });
 
     return this.runsRepository.save(runEntity);
-  }
-
-  async searchRun(dto: SearchRunDto): Promise<RunEntity[]> {
-    return this.runsRepository
-      .createQueryBuilder('run')
-      .where('name LIKE :name', { name: `%${dto.name}%` })
-      .where('parameters::text LIKE :name', { name: `%${dto.name}%` })
-      .limit(dto.limit)
-      .getMany();
   }
 
   async createFile(
@@ -108,8 +100,9 @@ export class RunsService {
     return this.runsRepository.findOneBy({ id: runId });
   }
 
-  async findAll(): Promise<RunEntity[]> {
+  async findAll(search: string): Promise<RunEntity[]> {
     return this.runsRepository.find({
+      where: search ? { name: Like(`%${search}%`) } : {},
       order: { createdAt: 'DESC' },
       take: 100,
     });
