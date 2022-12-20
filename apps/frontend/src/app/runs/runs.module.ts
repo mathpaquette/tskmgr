@@ -6,6 +6,7 @@ import { RunsComponent } from './runs.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { TasksCellRendererComponent } from './cell-renderers/tasks-cell-renderer.component';
 import { RunDetailsComponent } from './run-details/run-details.component';
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [RunsComponent, TasksCellRendererComponent, RunDetailsComponent],
@@ -13,6 +14,7 @@ import { RunDetailsComponent } from './run-details/run-details.component';
     CommonModule, //
     RunsRoutingModule,
     AgGridModule.withComponents(TasksCellRendererComponent),
+    NgbAccordionModule,
   ],
 })
 export class RunsModule {}
