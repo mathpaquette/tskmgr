@@ -102,7 +102,7 @@ export class RunsService {
   async findAll(search: string): Promise<RunEntity[]> {
     return this.runsRepository.find({
       where: search ? { name: Like(`%${search}%`) } : {},
-      order: { createdAt: 'DESC' },
+      order: { id: 'DESC' },
       take: 100,
     });
   }
