@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { API_URL_TOKEN } from '../common/api-url.token';
-import { ApiUrl, Run, Task } from '@tskmgr/common';
+import { ApiUrl, Run } from '@tskmgr/common';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -18,8 +18,8 @@ export class RunsService {
     return this.http.get<Run[]>(url);
   }
 
-  public findTasks(id: number): Observable<Task[]> {
-    const url = this.apiUrl.createTasksUrl(id);
-    return this.http.get<Task[]>(url);
+  public findById(id: number): Observable<Run> {
+    const url = this.apiUrl.getRunUrl(id);
+    return this.http.get<Run>(url);
   }
 }
