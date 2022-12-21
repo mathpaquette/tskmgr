@@ -2,7 +2,7 @@ import { GridOptions, ICellRendererParams, ValueFormatterParams } from 'ag-grid-
 import { format } from 'date-fns';
 
 export const dateValueFormatter = (params: ValueFormatterParams): string => {
-  return params.value ? format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss.SSS') : '';
+  return params.value ? format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss') : '';
 };
 
 export const timeValueFormatter = (params: ValueFormatterParams): string => {

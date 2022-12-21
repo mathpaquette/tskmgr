@@ -4,12 +4,10 @@ import { Run } from '@tskmgr/common';
 import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ColDef, GridOptions, GridReadyEvent, RowDoubleClickedEvent, RowNode } from 'ag-grid-community';
-import { TasksCellRendererComponent } from './cell-renderers/tasks-cell-renderer.component';
 import {
-  checkboxCellRenderer,
+  dateValueFormatter,
   defaultGridOptions,
   durationValueFormatter,
-  timeValueFormatter,
   urlCellRenderer,
 } from '../common/ag-grid.util';
 
@@ -67,9 +65,9 @@ export class RunsComponent {
     // { field: 'closed', cellRenderer: checkboxCellRenderer },
     // { field: 'leaderId' },
     // { field: 'prioritization' },
-    { field: 'createdAt', valueFormatter: timeValueFormatter },
-    { field: 'updatedAt', valueFormatter: timeValueFormatter },
-    { field: 'endedAt', valueFormatter: timeValueFormatter },
+    { field: 'createdAt', valueFormatter: dateValueFormatter },
+    { field: 'updatedAt', valueFormatter: dateValueFormatter },
+    { field: 'endedAt', valueFormatter: dateValueFormatter },
     // { field: '_id', headerName: 'Tasks', cellRenderer: TasksCellRendererComponent },
   ];
 
