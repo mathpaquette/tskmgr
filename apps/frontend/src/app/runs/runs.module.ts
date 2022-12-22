@@ -13,7 +13,7 @@ import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
   imports: [
     CommonModule, //
     RunsRoutingModule,
-    AgGridModule.withComponents(TasksCellRendererComponent),
+    AgGridModule,
     NgbAccordionModule,
   ],
 })

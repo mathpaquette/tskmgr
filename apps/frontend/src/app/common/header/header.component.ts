@@ -1,11 +1,15 @@
 import { Component } from '@angular/core';
+import { HeaderService } from './header.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'tskmgr-header',
   template: `
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="https://github.com/mathpaquette/tskmgr">tskmgr</a>
+        <a class="navbar-brand" href="https://github.com/mathpaquette/tskmgr"
+          >tskmgr <span class="version">v1.0.0</span></a
+        >
         <button
           class="navbar-toggler collapsed"
           type="button"
@@ -27,12 +31,32 @@ import { Component } from '@angular/core';
             </li>
           </ul>
           <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              [ngModel]="headerService.search$ | async"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="headerService.setSearch($event)"
+            />
           </form>
         </div>
       </div>
     </nav>
   `,
-  styles: [``],
+  styles: [
+    `
+      .version {
+        font-size: 10px;
+      }
+    `,
+  ],
 })
-export class HeaderComponent {}
+export class HeaderComponent {
+  readonly search$: Observable<string>;
+
+  constructor(public headerService: HeaderService) {
+    this.search$ = headerService.search$;
+  }
+}
