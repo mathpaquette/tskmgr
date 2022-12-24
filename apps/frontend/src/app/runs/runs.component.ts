@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ColDef, GridOptions, GridReadyEvent, RowClickedEvent, RowDoubleClickedEvent } from 'ag-grid-community';
@@ -6,6 +6,7 @@ import {
   checkboxCellRenderer,
   defaultGridOptions,
   durationValueFormatter,
+  runIdCellRenderer,
   urlCellRenderer,
 } from '../common/ag-grid.util';
 import { HeaderService } from '../common/header/header.service';
@@ -59,7 +60,7 @@ import { HeaderService } from '../common/header/header.service';
     `,
   ],
 })
-export class RunsComponent implements OnInit, OnDestroy {
+export class RunsComponent implements OnDestroy {
   constructor(
     private readonly runsService: RunsService, //
     private activatedRoute: ActivatedRoute,
@@ -73,9 +74,11 @@ export class RunsComponent implements OnInit, OnDestroy {
     onRowDoubleClicked: this.onRowDoubleClicked.bind(this),
     onRowClicked: this.onRowClicked.bind(this),
     getRowId: (params) => params.data.id,
+    paginationAutoPageSize: true,
+    pagination: true,
   };
   readonly columnDefs: ColDef[] = [
-    { field: 'id', width: 100, suppressSizeToFit: true },
+    { field: 'id', width: 100, suppressSizeToFit: true, cellRenderer: runIdCellRenderer },
     { field: 'name', width: 400, cellRenderer: urlCellRenderer, suppressSizeToFit: true },
     { field: 'type' },
     { field: 'status' },
@@ -84,11 +87,6 @@ export class RunsComponent implements OnInit, OnDestroy {
     { field: 'failFast', cellRenderer: checkboxCellRenderer },
     { field: 'closed', cellRenderer: checkboxCellRenderer },
     { field: 'duration', headerName: 'Duration (sec)', valueFormatter: durationValueFormatter },
-
-    // { field: 'leaderId' },
-    // { field: 'createdAt', valueFormatter: dateValueFormatter },
-    // { field: 'updatedAt', valueFormatter: dateValueFormatter },
-    // { field: 'endedAt', valueFormatter: dateValueFormatter },
   ];
 
   @HostListener('window:resize', ['$event'])
@@ -96,12 +94,8 @@ export class RunsComponent implements OnInit, OnDestroy {
     this.gridOptions.api?.sizeColumnsToFit();
   }
 
-  ngOnInit(): void {
-    this.headerService.search$.subscribe((x) => console.log(x));
-  }
-
-  updateData(): void {
-    this.runsService.findAll().subscribe((x) => {
+  updateData(search?: string): void {
+    this.runsService.findAll(search).subscribe((x) => {
       this.gridOptions.api?.setRowData(x);
     });
   }
@@ -111,8 +105,7 @@ export class RunsComponent implements OnInit, OnDestroy {
   }
 
   onGridReady(event: GridReadyEvent): void {
-    this.updateData();
-    this.headerService.refreshData$.subscribe(() => this.updateData());
+    this.headerService.search$.subscribe((x) => this.updateData(x));
     event.api.sizeColumnsToFit();
   }
 

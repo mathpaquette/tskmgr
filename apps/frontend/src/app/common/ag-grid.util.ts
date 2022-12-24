@@ -27,6 +27,10 @@ export const urlCellRenderer = (params: ICellRendererParams) => {
     : params.value;
 };
 
+export const runIdCellRenderer = (params: ICellRendererParams) => {
+  return `<a href="/runs/${params.value}">${params.value}</a>`;
+};
+
 export const checkboxCellRenderer = (params: ICellRendererParams) => {
   return `<input type='checkbox' onclick="return false" ${params.value ? 'checked' : ''} />`;
 };

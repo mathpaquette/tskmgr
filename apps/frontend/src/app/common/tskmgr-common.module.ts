@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from './header/header.component';
 import { SettingsComponent } from './settings/settings.component';
-import { RouterLinkWithHref } from '@angular/router';
+import { RouterLinkActive, RouterLinkWithHref } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -14,6 +14,7 @@ import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
     RouterLinkWithHref,
     FormsModule,
     NgbTooltipModule,
+    RouterLinkActive,
   ],
 })
 export class TskmgrCommonModule {}

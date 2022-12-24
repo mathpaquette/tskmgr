@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HeaderService } from './header.service';
 import { Observable } from 'rxjs';
+import { IsActiveMatchOptions } from '@angular/router';
 
 @Component({
   selector: 'tskmgr-header',
@@ -24,13 +25,20 @@ import { Observable } from 'rxjs';
         <div class="navbar-collapse collapse" id="navbarCollapse" style="">
           <ul ngbNav class="navbar-nav me-auto mb-2 mb-md-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" routerLink="/runs" href="">Runs</a>
+              <a
+                class="nav-link"
+                aria-current="page"
+                routerLink="/runs"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="options"
+                >Runs</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" routerLink="/settings">Settings</a>
+              <a class="nav-link" aria-current="page" routerLink="/settings" routerLinkActive="active">Settings</a>
             </li>
           </ul>
-          <form class="d-flex" role="search">
+          <form class="d-flex" role="search" *ngIf="headerService.searchEnable$ | async">
             <input
               class="form-control me-2"
               type="search"
@@ -55,6 +63,12 @@ import { Observable } from 'rxjs';
 })
 export class HeaderComponent {
   readonly search$: Observable<string>;
+  readonly options: IsActiveMatchOptions = {
+    queryParams: 'ignored',
+    paths: 'exact',
+    matrixParams: 'exact',
+    fragment: 'exact',
+  };
 
   constructor(public headerService: HeaderService) {
     this.search$ = headerService.search$;

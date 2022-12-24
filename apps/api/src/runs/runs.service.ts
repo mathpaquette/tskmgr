@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Like, Repository } from 'typeorm';
+import { ILike, IsNull, Repository } from 'typeorm';
 import { RunEntity } from './run.entity';
 import { CreateFileRequestDto, CreateRunRequestDto, SetLeaderRequestDto, SetLeaderResponseDto } from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
@@ -101,7 +101,7 @@ export class RunsService {
 
   async findAll(search: string): Promise<RunEntity[]> {
     return this.runsRepository.find({
-      where: search ? { name: Like(`%${search}%`) } : {},
+      where: search ? { name: ILike(`%${search}%`) } : {},
       order: { id: 'DESC' },
       take: 100,
     });

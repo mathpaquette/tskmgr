@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { API_URL_TOKEN } from '../common/api-url.token';
 import { ApiUrl, Run } from '@tskmgr/common';
 import { Observable } from 'rxjs';
@@ -13,9 +13,10 @@ export class RunsService {
     @Inject(API_URL_TOKEN) private readonly apiUrl: ApiUrl
   ) {}
 
-  public findAll(): Observable<Run[]> {
+  public findAll(search?: string): Observable<Run[]> {
     const url = this.apiUrl.createRunUrl();
-    return this.http.get<Run[]>(url);
+    const params = search ? new HttpParams().set('search', search) : new HttpParams();
+    return this.http.get<Run[]>(url, { params });
   }
 
   public findById(id: number): Observable<Run> {
