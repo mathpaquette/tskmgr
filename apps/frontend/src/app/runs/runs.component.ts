@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ColDef, GridOptions, GridReadyEvent, RowClickedEvent, RowDoubleClickedEvent } from 'ag-grid-community';
@@ -6,10 +6,10 @@ import {
   checkboxCellRenderer,
   defaultGridOptions,
   durationValueFormatter,
-  runIdCellRenderer,
   urlCellRenderer,
 } from '../common/ag-grid.util';
 import { HeaderService } from '../common/header/header.service';
+import { RunCellRendererComponent } from './cell-renderers/run-cell-renderer.component';
 
 @Component({
   selector: 'tskmgr-runs',
@@ -60,7 +60,7 @@ import { HeaderService } from '../common/header/header.service';
     `,
   ],
 })
-export class RunsComponent implements OnDestroy {
+export class RunsComponent implements OnInit, OnDestroy {
   constructor(
     private readonly runsService: RunsService, //
     private activatedRoute: ActivatedRoute,
@@ -78,7 +78,7 @@ export class RunsComponent implements OnDestroy {
     pagination: true,
   };
   readonly columnDefs: ColDef[] = [
-    { field: 'id', width: 100, suppressSizeToFit: true, cellRenderer: runIdCellRenderer },
+    { field: 'id', width: 100, suppressSizeToFit: true, cellRenderer: RunCellRendererComponent },
     { field: 'name', width: 400, cellRenderer: urlCellRenderer, suppressSizeToFit: true },
     { field: 'type' },
     { field: 'status' },
@@ -89,6 +89,14 @@ export class RunsComponent implements OnDestroy {
     { field: 'duration', headerName: 'Duration (sec)', valueFormatter: durationValueFormatter },
   ];
 
+  ngOnInit(): void {
+    this.headerService.enableSearch();
+  }
+
+  ngOnDestroy() {
+    console.log('destroy');
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
     this.gridOptions.api?.sizeColumnsToFit();
@@ -98,10 +106,6 @@ export class RunsComponent implements OnDestroy {
     this.runsService.findAll(search).subscribe((x) => {
       this.gridOptions.api?.setRowData(x);
     });
-  }
-
-  ngOnDestroy() {
-    console.log('destroy');
   }
 
   onGridReady(event: GridReadyEvent): void {

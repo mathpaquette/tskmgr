@@ -1,21 +1,20 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Params, Router, RouterEvent } from '@angular/router';
-import { BehaviorSubject, filter, interval, map, Observable, tap } from 'rxjs';
+import { ActivatedRoute, ActivationStart, Params, Router } from '@angular/router';
+import { BehaviorSubject, filter, interval, map, Observable, Subject, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HeaderService {
-  readonly searchEnable$: Observable<boolean>;
   readonly refreshData$: Observable<number>;
 
   readonly _search = new BehaviorSubject<string>('');
   readonly search$: Observable<string> = this._search.asObservable();
 
-  constructor(
-    private router: Router, //
-    private activatedRoute: ActivatedRoute
-  ) {
+  readonly _searchEnabled = new Subject<boolean>();
+  readonly searchEnable$ = this._searchEnabled.asObservable();
+
+  constructor(private router: Router, private activatedRoute: ActivatedRoute) {
     this.activatedRoute.queryParamMap
       .pipe(
         map((x) => {
@@ -29,10 +28,9 @@ export class HeaderService {
       )
       .subscribe();
 
-    this.searchEnable$ = this.router.events.pipe(
-      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-      map((x) => x.url === '' || x.url === '/runs' || x.url.startsWith('/runs?'))
-    );
+    this.router.events
+      .pipe(filter((event): event is ActivationStart => event instanceof ActivationStart))
+      .subscribe(() => this._searchEnabled.next(false));
 
     this.refreshData$ = interval(1000 * 10);
   }
@@ -40,5 +38,9 @@ export class HeaderService {
   setSearch(name: string): Promise<boolean> {
     const queryParams: Params = name === '' ? {} : { search: name };
     return this.router.navigate([], { queryParams, replaceUrl: true });
+  }
+
+  enableSearch(): void {
+    this._searchEnabled.next(true);
   }
 }
