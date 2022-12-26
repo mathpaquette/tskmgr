@@ -80,9 +80,9 @@ export class RunsComponent implements OnInit, OnDestroy {
   readonly columnDefs: ColDef[] = [
     { field: 'id', width: 100, suppressSizeToFit: true, cellRenderer: RunCellRendererComponent },
     { field: 'name', width: 400, cellRenderer: urlCellRenderer, suppressSizeToFit: true },
-    { field: 'type' },
-    { field: 'status' },
-    { field: 'prioritization' },
+    { field: 'type', filter: true },
+    { field: 'status', filter: true },
+    { field: 'prioritization', filter: true },
     { field: 'affinity', cellRenderer: checkboxCellRenderer },
     { field: 'failFast', cellRenderer: checkboxCellRenderer },
     { field: 'closed', cellRenderer: checkboxCellRenderer },

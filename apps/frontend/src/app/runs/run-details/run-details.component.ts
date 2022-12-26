@@ -1,8 +1,7 @@
-import { Component, OnInit, Optional } from '@angular/core';
-import { RunsService } from '../runs.service';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
 import { Run } from '@tskmgr/common';
+import { RunDetailsService } from './run-details.service';
 
 @Component({
   selector: 'tskmgr-run-details',
@@ -30,25 +29,17 @@ import { Run } from '@tskmgr/common';
       <router-outlet></router-outlet>
     </div>
   `,
-  styleUrls: ['./run-details.component.scss'],
+  styles: [],
+  providers: [RunDetailsService],
 })
 export class RunDetailsComponent implements OnInit {
-  constructor(private runService: RunsService, private activatedRoute: ActivatedRoute) {}
-
   run: Run | null;
 
+  constructor(private runDetailsService: RunDetailsService, private activatedRoute: ActivatedRoute) {}
+
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe((x) => {
-      const id = x.get('id');
-      if (!id) {
-        return;
-      }
-
-      this.fetchData(Number(id));
-    });
-  }
-
-  async fetchData(id: number): Promise<void> {
-    this.run = await firstValueFrom(this.runService.findById(id));
+    this.runDetailsService.run$.subscribe((x) => (this.run = x));
+    const runId = Number(this.activatedRoute.snapshot.paramMap.get('id'));
+    this.runDetailsService.fetchRun(runId);
   }
 }

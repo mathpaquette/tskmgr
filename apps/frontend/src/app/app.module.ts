@@ -18,7 +18,7 @@ import { SettingsComponent } from './common/settings/settings.component';
     TskmgrCommonModule,
     RouterModule.forRoot(
       [
-        { path: '', redirectTo: 'runs', pathMatch: 'full' },
+        { path: '', redirectTo: '/runs', pathMatch: 'full' },
         { path: 'runs', loadChildren: () => import('./runs/runs.module').then((m) => m.RunsModule) },
         { path: 'settings', component: SettingsComponent },
       ],

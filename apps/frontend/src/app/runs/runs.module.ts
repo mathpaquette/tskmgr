@@ -7,8 +7,8 @@ import { AgGridModule } from 'ag-grid-angular';
 import { RunCellRendererComponent } from './cell-renderers/run-cell-renderer.component';
 import { RunDetailsComponent } from './run-details/run-details.component';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
-import { RunDetailsTasksComponent } from './run-details/run-details-tasks.component';
-import { RunDetailsDetailsComponent } from './run-details/run-details-details.component';
+import { RunDetailsTasksComponent } from './run-details/tasks/run-details-tasks.component';
+import { RunDetailsDetailsComponent } from './run-details/details/run-details-details.component';
 
 @NgModule({
   declarations: [
