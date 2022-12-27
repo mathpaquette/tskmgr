@@ -70,7 +70,7 @@ export class RunsComponent implements OnInit, OnDestroy {
     onRowDoubleClicked: this.onRowDoubleClicked.bind(this),
     getRowId: (params) => params.data.id,
     paginationAutoPageSize: true,
-    pagination: true,
+    pagination: true
   };
 
   readonly columnDefs: ColDef[] = [
@@ -93,7 +93,8 @@ export class RunsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    console.log('destroy');
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   @HostListener('window:resize', ['$event'])

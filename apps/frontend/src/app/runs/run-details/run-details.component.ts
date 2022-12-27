@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Run } from '@tskmgr/common';
 import { RunDetailsService } from './run-details.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'tskmgr-run-details',
@@ -43,14 +44,22 @@ import { RunDetailsService } from './run-details.service';
   ],
   providers: [RunDetailsService],
 })
-export class RunDetailsComponent implements OnInit {
+export class RunDetailsComponent implements OnInit, OnDestroy {
   run: Run | undefined;
+
+  readonly destroy$ = new Subject<void>();
 
   constructor(private runDetailsService: RunDetailsService, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.runDetailsService.run$.subscribe((x) => (this.run = x));
+    this.runDetailsService.run$.pipe(takeUntil(this.destroy$)).subscribe((x) => (this.run = x));
     const runId = Number(this.activatedRoute.snapshot.paramMap.get('id'));
     this.runDetailsService.fetchRun(runId);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    console.log('destroyed');
   }
 }

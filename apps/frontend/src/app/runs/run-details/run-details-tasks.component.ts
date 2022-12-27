@@ -9,31 +9,21 @@ import { Subject, takeUntil } from 'rxjs';
   template: `
     <div class="d-flex flex-column w-100">
       <div class="d-flex flex-row justify-content-end m-2">
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
-          <label class="form-check-label" for="inlineRadio1">All ({{ this.counts['ALL'] }})</label>
-        </div>
-
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2" />
-          <label class="form-check-label" for="inlineRadio2">Pending</label>
-        </div>
-
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" />
-          <label class="form-check-label" for="inlineRadio3">Running</label>
-        </div>
-
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" />
-          <label class="form-check-label" for="inlineRadio3">Completed</label>
-        </div>
-
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" />
-          <label class="form-check-label" for="inlineRadio3">Failed</label>
+        <div class="form-check form-check-inline" *ngFor="let taskFilter of taskFilters; let i = index">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="inlineRadioOptions"
+            id="inlineRadio{{ i }}"
+            value="option{{ i }}"
+            (change)="onCheckboxChange(taskFilter)"
+          />
+          <label class="form-check-label" for="inlineRadio{{ i }}"
+            >{{ taskFilter.name }} ({{ taskFilter.count }})</label
+          >
         </div>
       </div>
+
       <div class="d-flex h-100">
         <ag-grid-angular
           class="ag-theme-alpine"
@@ -67,15 +57,15 @@ export class RunDetailsTasksComponent implements OnInit, OnDestroy {
     // { field: 'options' },
     { field: 'runnerId' },
     // { field: 'runnerInfo' },
-    { field: 'status' },
+    { field: 'status', filter: true },
     { field: 'cached', cellRenderer: checkboxCellRenderer },
-    { field: 'duration', headerName: 'Duration (sec)' },
-    { field: 'avgDuration', headerName: 'Avg Duration (sec)' },
     { field: 'priority' },
-    { field: 'createdAt', cellRenderer: timeValueFormatter },
+    //{ field: 'createdAt', cellRenderer: timeValueFormatter },
     { field: 'startedAt', cellRenderer: timeValueFormatter },
-    { field: 'updatedAt', cellRenderer: timeValueFormatter },
+    // { field: 'updatedAt', cellRenderer: timeValueFormatter },
     { field: 'endedAt', cellRenderer: timeValueFormatter },
+    { field: 'avgDuration', headerName: 'Avg Duration (sec)' },
+    { field: 'duration', headerName: 'Duration (sec)' },
     { field: 'files' },
   ];
 
@@ -87,13 +77,13 @@ export class RunDetailsTasksComponent implements OnInit, OnDestroy {
 
   readonly destroy$ = new Subject<void>();
 
-  readonly counts = {
-    ALL: 0,
-    [TaskStatus.Pending]: 0,
-    [TaskStatus.Running]: 0,
-    [TaskStatus.Completed]: 0,
-    [TaskStatus.Failed]: 0,
-  };
+  readonly taskFilters: TaskFilter[] = [
+    { name: 'All', count: 0 },
+    { name: 'Pending', filter: TaskStatus.Pending, count: 0 },
+    { name: 'Running', filter: TaskStatus.Running, count: 0 },
+    { name: 'Completed', filter: TaskStatus.Completed, count: 0 },
+    { name: 'Failed', filter: TaskStatus.Failed, count: 0 },
+  ];
 
   constructor(private readonly runDetailsService: RunDetailsService) {}
 
@@ -123,11 +113,13 @@ export class RunDetailsTasksComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.counts['ALL'] = run.tasks.length;
-    this.counts[TaskStatus.Pending] = run.tasks.filter((x) => x.status === TaskStatus.Pending).length;
-    this.counts[TaskStatus.Running] = run.tasks.filter((x) => x.status === TaskStatus.Running).length;
-    this.counts[TaskStatus.Completed] = run.tasks.filter((x) => x.status === TaskStatus.Completed).length;
-    this.counts[TaskStatus.Failed] = run.tasks.filter((x) => x.status === TaskStatus.Failed).length;
+    for (const taskFilter of this.taskFilters) {
+      if (!taskFilter.filter) {
+        taskFilter.count = run.tasks.length;
+        continue;
+      }
+      taskFilter.count = run.tasks.filter((x) => x.status === taskFilter.filter).length;
+    }
   }
 
   onGridReady(event: GridReadyEvent): void {
@@ -136,4 +128,19 @@ export class RunDetailsTasksComponent implements OnInit, OnDestroy {
       this.updateCounts(x);
     });
   }
+
+  onCheckboxChange(taskFilter: TaskFilter): void {
+    if (!taskFilter.filter) {
+      this.gridOptions.api?.setFilterModel({});
+      return;
+    }
+
+    this.gridOptions.api?.setFilterModel({ status: { filterType: 'text', type: 'equals', filter: taskFilter.filter } });
+  }
+}
+
+interface TaskFilter {
+  name: string;
+  filter?: TaskStatus;
+  count: number;
 }
