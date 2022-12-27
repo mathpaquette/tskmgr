@@ -2,25 +2,21 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ColDef, GridOptions, GridReadyEvent, RowClickedEvent, RowDoubleClickedEvent } from 'ag-grid-community';
-import {
-  checkboxCellRenderer,
-  defaultGridOptions,
-  durationValueFormatter,
-  urlCellRenderer,
-} from '../common/ag-grid.util';
+import { checkboxCellRenderer, dateValueFormatter, defaultGridOptions, urlCellRenderer } from '../common/ag-grid.util';
 import { HeaderService } from '../common/header/header.service';
 import { RunCellRendererComponent } from './cell-renderers/run-cell-renderer.component';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'tskmgr-runs',
   template: `
-    <div class="container-test">
-      <div class="first-row" *ngIf="false">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" />
-          <label class="form-check-label" for="defaultCheck1"> Only failed </label>
-        </div>
-      </div>
+    <div class="container-fs">
+      <!--      <div class="first-row">-->
+      <!--        <div class="form-check">-->
+      <!--          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"/>-->
+      <!--          <label class="form-check-label" for="defaultCheck1"> Only failed </label>-->
+      <!--        </div>-->
+      <!--      </div>-->
       <div class="second-row">
         <ag-grid-angular
           class="ag-theme-alpine"
@@ -42,7 +38,7 @@ import { RunCellRendererComponent } from './cell-renderers/run-cell-renderer.com
         display: flex;
       }
 
-      .container-test {
+      .container-fs {
         display: flex;
         flex-direction: column;
         height: 100%;
@@ -72,11 +68,11 @@ export class RunsComponent implements OnInit, OnDestroy {
     ...defaultGridOptions,
     onGridReady: this.onGridReady.bind(this),
     onRowDoubleClicked: this.onRowDoubleClicked.bind(this),
-    onRowClicked: this.onRowClicked.bind(this),
     getRowId: (params) => params.data.id,
     paginationAutoPageSize: true,
     pagination: true,
   };
+
   readonly columnDefs: ColDef[] = [
     { field: 'id', width: 100, suppressSizeToFit: true, cellRenderer: RunCellRendererComponent },
     { field: 'name', width: 400, cellRenderer: urlCellRenderer, suppressSizeToFit: true },
@@ -86,8 +82,11 @@ export class RunsComponent implements OnInit, OnDestroy {
     { field: 'affinity', cellRenderer: checkboxCellRenderer },
     { field: 'failFast', cellRenderer: checkboxCellRenderer },
     { field: 'closed', cellRenderer: checkboxCellRenderer },
-    { field: 'duration', headerName: 'Duration (sec)', valueFormatter: durationValueFormatter },
+    { field: 'updatedAt', cellRenderer: dateValueFormatter },
   ];
+
+  private search: string | undefined = undefined;
+  private readonly destroy$ = new Subject<void>();
 
   ngOnInit(): void {
     this.headerService.enableSearch();
@@ -102,19 +101,20 @@ export class RunsComponent implements OnInit, OnDestroy {
     this.gridOptions.api?.sizeColumnsToFit();
   }
 
-  updateData(search?: string): void {
-    this.runsService.findAll(search).subscribe((x) => {
+  refreshData(): void {
+    this.runsService.findAll(this.search).subscribe((x) => {
       this.gridOptions.api?.setRowData(x);
     });
   }
 
   onGridReady(event: GridReadyEvent): void {
-    this.headerService.search$.subscribe((x) => this.updateData(x));
-    event.api.sizeColumnsToFit();
-  }
+    this.headerService.search$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
+      this.search = x;
+      this.refreshData();
+    });
 
-  onRowClicked(event: RowClickedEvent): void {
-    console.log('sd');
+    this.headerService.refreshData$.pipe(takeUntil(this.destroy$)).subscribe(() => this.refreshData());
+    event.api.sizeColumnsToFit();
   }
 
   onRowDoubleClicked(event: RowDoubleClickedEvent): void {

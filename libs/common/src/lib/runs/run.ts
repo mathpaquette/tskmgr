@@ -1,4 +1,6 @@
 import { TaskPriority } from '../tasks/task-priority';
+import { Task } from '../tasks/task';
+import { File } from '../files/file';
 
 export interface Run {
   id: number;
@@ -16,4 +18,6 @@ export interface Run {
   createdAt: Date;
   updatedAt: Date;
   endedAt: Date;
+  tasks: Task[];
+  files: File[];
 }

@@ -82,7 +82,7 @@ export class TaskEntity implements Task {
     }
 
     this.startedAt = new Date();
-    this.status = TaskStatus.Started;
+    this.status = TaskStatus.Running;
     this.runnerId = runnerId;
     this.runnerInfo = runnerInfo;
   }

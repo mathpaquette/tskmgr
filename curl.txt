@@ -2,6 +2,10 @@ curl -X POST http://localhost:3333/api/runs
    -H 'Content-Type: application/json'
    -d '{"login":"my_login","password":"my_password"}'
 
+sudo -u postgres psql
+
+\l
+\c tskmgr_dev
 
 drop table task cascade;
 drop table run cascade;

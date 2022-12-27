@@ -6,7 +6,7 @@ export const dateValueFormatter = (params: ValueFormatterParams): string => {
 };
 
 export const timeValueFormatter = (params: ValueFormatterParams): string => {
-  return params.value ? format(new Date(params.value), 'HH:mm:ss.SSS') : '';
+  return params.value ? format(new Date(params.value), 'HH:mm:ss') : '';
 };
 
 export const durationValueFormatter = (params: ValueFormatterParams) => {

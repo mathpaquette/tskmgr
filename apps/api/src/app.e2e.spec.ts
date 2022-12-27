@@ -87,7 +87,7 @@ describe('Runs', () => {
     expect(res.status).toEqual(200);
     expect(data.continue).toEqual(true);
     expect(data.task).toBeTruthy();
-    expect(data.task.status).toEqual(TaskStatus.Started);
+    expect(data.task.status).toEqual(TaskStatus.Running);
     expect(data.task.startedAt).toBeTruthy();
   });
 

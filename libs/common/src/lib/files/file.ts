@@ -4,6 +4,5 @@ export interface File {
   filename: string;
   createdAt: Date;
   mimeType: string;
-  status: string;
   description: string;
 }

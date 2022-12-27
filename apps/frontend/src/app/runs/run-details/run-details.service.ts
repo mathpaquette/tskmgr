@@ -6,7 +6,7 @@ import { HeaderService } from '../../common/header/header.service';
 
 @Injectable()
 export class RunDetailsService {
-  readonly _run = new BehaviorSubject<Run | null>(null);
+  readonly _run = new BehaviorSubject<Run | undefined>(undefined);
   readonly run$ = this._run.asObservable();
 
   runId: number;

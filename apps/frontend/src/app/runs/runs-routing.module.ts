@@ -2,8 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { RunsComponent } from './runs.component';
 import { RunDetailsComponent } from './run-details/run-details.component';
-import { RunDetailsTasksComponent } from './run-details/tasks/run-details-tasks.component';
-import { RunDetailsDetailsComponent } from './run-details/details/run-details-details.component';
+import { RunDetailsTasksComponent } from './run-details/run-details-tasks.component';
+import { RunDetailsDetailsComponent } from './run-details/run-details-details.component';
+import { RunDetailsFilesComponent } from './run-details/run-details-files.component';
 
 const routes: Routes = [
   { path: '', component: RunsComponent },
@@ -13,6 +14,7 @@ const routes: Routes = [
     component: RunDetailsComponent,
     children: [
       { path: 'tasks', component: RunDetailsTasksComponent },
+      { path: 'files', component: RunDetailsFilesComponent },
       { path: 'details', component: RunDetailsDetailsComponent },
     ],
   },

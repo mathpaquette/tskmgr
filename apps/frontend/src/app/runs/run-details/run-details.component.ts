@@ -6,7 +6,7 @@ import { RunDetailsService } from './run-details.service';
 @Component({
   selector: 'tskmgr-run-details',
   template: `
-    <div class="container mt-2">
+    <div class="container-fluid mt-2 d-flex flex-column">
       <nav
         style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);"
         aria-label="breadcrumb"
@@ -23,17 +23,28 @@ import { RunDetailsService } from './run-details.service';
         </li>
 
         <li class="nav-item">
+          <a class="nav-link" routerLink="files" routerLinkActive="active">Files</a>
+        </li>
+
+        <li class="nav-item">
           <a class="nav-link" routerLink="details" routerLinkActive="active">Details</a>
         </li>
       </ul>
       <router-outlet></router-outlet>
     </div>
   `,
-  styles: [],
+  styles: [
+    `
+      :host {
+        display: flex;
+        flex: 1;
+      }
+    `,
+  ],
   providers: [RunDetailsService],
 })
 export class RunDetailsComponent implements OnInit {
-  run: Run | null;
+  run: Run | undefined;
 
   constructor(private runDetailsService: RunDetailsService, private activatedRoute: ActivatedRoute) {}
 
