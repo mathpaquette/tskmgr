@@ -49,7 +49,7 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class RunDetailsTasksComponent implements OnInit, OnDestroy {
   readonly columnDefs: ColDef[] = [
-    // { field: 'id' },
+    { field: 'id' },
     { field: 'name' },
     { field: 'type' },
     { field: 'command' },

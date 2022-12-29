@@ -1,7 +1,84 @@
-import { Component } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
+import { AgGridEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
+import { dateValueFormatter } from '../../common/ag-grid.util';
+import { RunDetailsService } from './run-details.service';
+import { Subject, takeUntil } from 'rxjs';
+import { Run } from '@tskmgr/common';
 
 @Component({
-  selector: 'tskmgr-run-details-tasks',
-  template: ``,
+  template: `
+    <div class="d-flex flex-column w-100">
+      <div class="d-flex flex-row justify-content-end m-2">
+        <!-- PLACEHOLDER -->
+      </div>
+
+      <div class="d-flex h-100">
+        <ag-grid-angular
+          class="ag-theme-alpine"
+          [columnDefs]="columnDefs"
+          [gridOptions]="gridOptions"
+        ></ag-grid-angular>
+      </div>
+    </div>
+  `,
+  selector: 'tskmgr-run-details-files',
+  styles: [
+    `
+      ag-grid-angular {
+        width: 100%;
+      }
+
+      :host {
+        display: flex;
+        flex: 1;
+      }
+    `,
+  ],
 })
-export class RunDetailsFilesComponent {}
+export class RunDetailsFilesComponent implements OnDestroy {
+  readonly columnDefs: ColDef[] = [
+    { field: 'id' },
+    { field: 'description' },
+    { field: 'status' },
+    { field: 'originName' },
+    { field: 'mimeType' },
+    { field: 'task.id' },
+    { field: 'run.id' },
+    { field: 'createdAt', cellRenderer: dateValueFormatter },
+  ];
+
+  readonly gridOptions: GridOptions = {
+    onGridReady: this.onGridReady.bind(this),
+    paginationAutoPageSize: true,
+    pagination: true,
+  };
+
+  readonly destroy$ = new Subject<void>();
+
+  constructor(private readonly runDetailsService: RunDetailsService) {}
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.gridOptions.api?.sizeColumnsToFit();
+  }
+
+  onGridReady(event: GridReadyEvent): void {
+    this.runDetailsService.run$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
+      this.refreshData(x, event);
+    });
+  }
+
+  refreshData(run: Run | undefined, event: AgGridEvent): void {
+    if (!run) {
+      return;
+    }
+
+    event.api.setRowData(run.files);
+    event.api.sizeColumnsToFit();
+  }
+}
