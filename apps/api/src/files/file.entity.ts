@@ -22,13 +22,13 @@ export class FileEntity implements File {
   @JoinColumn({ name: 'task_id' })
   task: TaskEntity;
 
-  @Column()
+  @Column({ name: 'origin_name' })
   originName: string;
 
   @Column()
   filename: string;
 
-  @Column()
+  @Column({ name: 'mime_type' })
   mimeType: string;
 
   @CreateDateColumn({ name: 'created_at' })

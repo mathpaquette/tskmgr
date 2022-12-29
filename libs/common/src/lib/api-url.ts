@@ -18,13 +18,12 @@ export class ApiUrl {
   setLeaderUrl = (id: number) => this.getUrl(`/runs/${id}/leader`);
   createTasksUrl = (id: number) => this.getUrl(`/runs/${id}/tasks`);
   startTaskUrl = (id: number) => this.getUrl(`/runs/${id}/tasks/start`);
+  createFileRunUrl = (id: number) => this.getUrl(`/runs/${id}/files`);
 
   // tasks
   completeTaskUrl = (id: number) => this.getUrl(`/tasks/${id}/complete`);
   failTaskUrl = (id: number) => this.getUrl(`/tasks/${id}/fail`);
-
-  // pull-requests
-  findAllPullRequestsUrl = () => this.getUrl(`/pull-requests`);
+  createFileTaskUrl = (id: number) => this.getUrl(`/tasks/${id}/files`);
 
   getUrl = (url: string): string => {
     if (this.prefix) {

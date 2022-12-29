@@ -14,6 +14,8 @@ import {
   SetLeaderResponseDto,
   Run,
   Task,
+  File,
+  CreateFileRequestDto,
 } from '@tskmgr/common';
 import { AppModule } from './app.module';
 
@@ -35,9 +37,7 @@ describe('Runs', () => {
 
   beforeEach(() => {
     createRunDto = DtoUtils.createRunDto();
-    createTasksDto = {
-      tasks: [{ name: 'test', type: 'lint', command: 'nx', arguments: ['a1', 'a2'], options: { shell: true } }],
-    };
+    createTasksDto = DtoUtils.createTasksDto();
     startTaskDto = { runnerId: '1' };
   });
 
@@ -103,6 +103,41 @@ describe('Runs', () => {
     expect(data.endedAt).toBeTruthy();
     expect(data.duration).toBeTruthy();
     expect(data.run.status).toEqual(RunStatus.Started);
+  });
+
+  describe('files', () => {
+    let run: Run;
+    let tasks: Task[];
+
+    beforeAll(async () => {
+      // arrange
+      const createRunDto = DtoUtils.createRunDto();
+      const createTasksDto = DtoUtils.createTasksDto();
+      run = (await createRun(app, createRunDto)).body;
+      tasks = (await createTasks(app, run.id, createTasksDto)).body;
+    });
+
+    it('should create run file', async () => {
+      // arrange
+      const createFileDto: CreateFileRequestDto = { status: 'STATUS', description: 'DESC' };
+      // act
+      const file: File = (await createFileRun(app, run.id, createFileDto, './README.md')).body;
+      // assert
+      expect(file.status).toBe(createFileDto.status);
+      expect(file.description).toBe(createFileDto.description);
+      expect(file.run.id).toEqual(run.id);
+    });
+
+    it('should add task file', async () => {
+      // arrange
+      const createFileDto: CreateFileRequestDto = { status: 'STATUS', description: 'DESC' };
+      // act
+      const file: File = (await createFileTask(app, tasks[0].id, createFileDto, './README.md')).body;
+      // assert
+      expect(file.status).toBe(createFileDto.status);
+      expect(file.description).toBe(createFileDto.description);
+      expect(file.task.id).toEqual(tasks[0].id);
+    });
   });
 
   describe('abort run', () => {
@@ -282,6 +317,12 @@ class DtoUtils {
     };
   }
 
+  public static createTasksDto(): CreateTasksDto {
+    return {
+      tasks: [{ name: 'test', type: 'lint', command: 'nx', arguments: ['l1', 'l2'], options: { shell: true } }],
+    };
+  }
+
   public static getShortId(size: number): string {
     const hexString = uuid().replace(/-/g, '');
     const base64String = Buffer.from(hexString, 'hex').toString('base64');
@@ -315,6 +356,22 @@ function setLeader(app: INestApplication, runId: number, data: SetLeaderRequestD
 
 function createTasks(app: INestApplication, runId: number, data: CreateTasksDto): request.Test {
   return request(app.getHttpServer()).post(ApiUrl.createNoPrefix().createTasksUrl(runId)).send(data);
+}
+
+function createFileRun(app: INestApplication, runId: number, data: CreateFileRequestDto, file: string): request.Test {
+  return request(app.getHttpServer())
+    .post(ApiUrl.createNoPrefix().createFileRunUrl(runId))
+    .attach('file', file)
+    .field('status', data.status)
+    .field('description', data.description);
+}
+
+function createFileTask(app: INestApplication, taskId: number, data: CreateFileRequestDto, file: string): request.Test {
+  return request(app.getHttpServer())
+    .post(ApiUrl.createNoPrefix().createFileTaskUrl(taskId))
+    .attach('file', file)
+    .field('status', data.status)
+    .field('description', data.description);
 }
 
 function startTask(app: INestApplication, runId: number, data: StartTaskDto): request.Test {

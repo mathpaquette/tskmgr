@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  template: ` files `,
+  selector: 'tskmgr-run-details-tasks',
+  template: ``,
 })
 export class RunDetailsFilesComponent {}

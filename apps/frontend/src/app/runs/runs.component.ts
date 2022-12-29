@@ -70,7 +70,7 @@ export class RunsComponent implements OnInit, OnDestroy {
     onRowDoubleClicked: this.onRowDoubleClicked.bind(this),
     getRowId: (params) => params.data.id,
     paginationAutoPageSize: true,
-    pagination: true
+    pagination: true,
   };
 
   readonly columnDefs: ColDef[] = [

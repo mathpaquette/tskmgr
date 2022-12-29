@@ -66,7 +66,7 @@ export class RunDetailsTasksComponent implements OnInit, OnDestroy {
     { field: 'endedAt', cellRenderer: timeValueFormatter },
     { field: 'avgDuration', headerName: 'Avg Duration (sec)' },
     { field: 'duration', headerName: 'Duration (sec)' },
-    { field: 'files' },
+    // { field: 'files' },
   ];
 
   readonly gridOptions: GridOptions = {
