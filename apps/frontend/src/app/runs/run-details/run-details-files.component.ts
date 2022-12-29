@@ -1,6 +1,6 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { AgGridEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
-import { dateValueFormatter } from '../../common/ag-grid.util';
+import { dateValueFormatter, defaultGridOptions } from '../../common/ag-grid.util';
 import { RunDetailsService } from './run-details.service';
 import { Subject, takeUntil } from 'rxjs';
 import { Run } from '@tskmgr/common';
@@ -48,6 +48,7 @@ export class RunDetailsFilesComponent implements OnDestroy {
   ];
 
   readonly gridOptions: GridOptions = {
+    ...defaultGridOptions,
     onGridReady: this.onGridReady.bind(this),
     paginationAutoPageSize: true,
     pagination: true,

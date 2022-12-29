@@ -2,7 +2,7 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
 import { Run, TaskStatus } from '@tskmgr/common';
 import { AgGridEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
-import { checkboxCellRenderer, timeValueFormatter } from '../../common/ag-grid.util';
+import { checkboxCellRenderer, defaultGridOptions, timeValueFormatter } from '../../common/ag-grid.util';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -51,7 +51,7 @@ export class RunDetailsTasksComponent implements OnInit, OnDestroy {
   readonly columnDefs: ColDef[] = [
     { field: 'id' },
     { field: 'name' },
-    { field: 'type' },
+    { field: 'type', filter: true },
     { field: 'command' },
     { field: 'arguments' },
     // { field: 'options' },
@@ -70,6 +70,7 @@ export class RunDetailsTasksComponent implements OnInit, OnDestroy {
   ];
 
   readonly gridOptions: GridOptions = {
+    ...defaultGridOptions,
     onGridReady: this.onGridReady.bind(this),
     paginationAutoPageSize: true,
     pagination: true,
