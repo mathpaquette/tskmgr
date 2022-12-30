@@ -43,7 +43,7 @@ export class TaskEntity implements Task {
   runnerId: string;
 
   @Column({ type: 'jsonb', name: 'runner_info', nullable: true })
-  runnerInfo: object;
+  runnerInfo: { [key: string]: string };
 
   @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.Pending })
   status: TaskStatus;
@@ -76,7 +76,7 @@ export class TaskEntity implements Task {
     return !!this.endedAt;
   }
 
-  public start(runnerId: string, runnerInfo: object): void {
+  public start(runnerId: string, runnerInfo: { [key: string]: string }): void {
     if (this.startedAt) {
       throw new Error(`Can't start already started task.`);
     }

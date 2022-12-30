@@ -10,6 +10,7 @@ import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
 import { RunDetailsTasksComponent } from './run-details/run-details-tasks.component';
 import { RunDetailsDetailsComponent } from './run-details/run-details-details.component';
 import { RunDetailsFilesComponent } from './run-details/run-details-files.component';
+import { TskmgrCommonModule } from '../common/tskmgr-common.module';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { RunDetailsFilesComponent } from './run-details/run-details-files.compon
     RunsRoutingModule,
     AgGridModule,
     NgbAccordionModule,
+    TskmgrCommonModule,
   ],
 })
 export class RunsModule {}

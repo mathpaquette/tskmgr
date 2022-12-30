@@ -13,7 +13,7 @@ export interface Run {
   leaderId: string;
   affinity: boolean;
   failFast: boolean;
-  parameters: object;
+  parameters: { [key: string]: string };
   duration: number;
   createdAt: Date;
   updatedAt: Date;

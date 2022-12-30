@@ -30,7 +30,7 @@ export class RunEntity implements Run {
   prioritization: TaskPriority[];
 
   @Column({ type: 'jsonb', nullable: true })
-  parameters: object;
+  parameters: { [key: string]: string };
 
   @Column({ default: false })
   affinity: boolean;
