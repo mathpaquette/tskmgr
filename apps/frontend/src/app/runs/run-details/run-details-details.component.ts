@@ -108,14 +108,18 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
   }
 
   private setInformation(run: Run): void {
-    const ignoredKeys = ['tasks', 'parameters', 'files'];
     this.infoEntries = [];
     Object.entries(run).forEach((x) => {
-      const key = x[0];
-      const value = x[1];
+      let key = x[0];
+      let value = x[1];
 
-      if (ignoredKeys.indexOf(key) !== -1) {
+      if (key === 'parameters') {
         return;
+      }
+
+      if (key === 'files' || key === 'tasks') {
+        key = `${key}Size`;
+        value = value.length;
       }
 
       this.infoEntries.push({ key, value });
