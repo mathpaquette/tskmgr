@@ -83,7 +83,7 @@ import { Run } from '@tskmgr/common';
 })
 export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
   infoEntries: { key: string; value: string }[] = [];
-  paramEntries: { key: string; value: string }[] = [];
+  paramEntries: { key: string; value: never }[] = [];
   run: Run | undefined;
 
   readonly destroy$ = new Subject<void>();
@@ -125,7 +125,7 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
   private setParameters(run: Run): void {
     this.paramEntries = [];
     const keys = Object.keys(run.parameters);
-    keys.forEach((key: string) => {
+    keys.forEach((key) => {
       const value = run.parameters[key];
       this.paramEntries.push({ key, value });
     });

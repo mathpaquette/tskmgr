@@ -1,6 +1,7 @@
 import { TaskPriority } from '../tasks/task-priority';
 import { Task } from '../tasks/task';
 import { File } from '../files/file';
+import { RunParameters } from './run-parameters';
 
 export interface Run {
   id: number;
@@ -13,7 +14,7 @@ export interface Run {
   leaderId: string;
   affinity: boolean;
   failFast: boolean;
-  parameters: { [key: string]: string };
+  parameters: RunParameters;
   duration: number;
   createdAt: Date;
   updatedAt: Date;

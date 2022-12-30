@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { DateUtil, Task, TaskPriority, TaskStatus } from '@tskmgr/common';
+import { DateUtil, RunnerInfo, Task, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
 
@@ -43,7 +43,7 @@ export class TaskEntity implements Task {
   runnerId: string;
 
   @Column({ type: 'jsonb', name: 'runner_info', nullable: true })
-  runnerInfo: { [key: string]: string };
+  runnerInfo: RunnerInfo;
 
   @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.Pending })
   status: TaskStatus;
@@ -76,7 +76,7 @@ export class TaskEntity implements Task {
     return !!this.endedAt;
   }
 
-  public start(runnerId: string, runnerInfo: { [key: string]: string }): void {
+  public start(runnerId: string, runnerInfo: RunnerInfo): void {
     if (this.startedAt) {
       throw new Error(`Can't start already started task.`);
     }

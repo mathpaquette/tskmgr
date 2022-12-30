@@ -1,5 +1,6 @@
 import { Run } from '../runs/run';
 import { TaskPriority } from './task-priority';
+import { RunnerInfo } from './runner-info';
 
 export interface Task {
   id: number;
@@ -10,7 +11,7 @@ export interface Task {
   arguments: string[];
   options: object;
   runnerId: string;
-  runnerInfo: { [key: string]: string };
+  runnerInfo: RunnerInfo;
   status: string;
   cached: boolean;
   duration: number;

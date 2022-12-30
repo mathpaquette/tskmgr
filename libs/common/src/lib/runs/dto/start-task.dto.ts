@@ -1,4 +1,6 @@
+import { RunnerInfo } from '../../tasks/runner-info';
+
 export class StartTaskDto {
   readonly runnerId: string;
-  readonly runnerInfo?: { [key: string]: string };
+  readonly runnerInfo?: RunnerInfo;
 }
