@@ -17,7 +17,7 @@ import { Run } from '@tskmgr/common';
               aria-expanded="true"
               aria-controls="collapseOne"
             >
-              Information
+              Run information
             </button>
           </h2>
           <div
@@ -48,7 +48,7 @@ import { Run } from '@tskmgr/common';
               aria-expanded="false"
               aria-controls="collapseTwo"
             >
-              Parameters
+              Run parameters
             </button>
           </h2>
           <div
