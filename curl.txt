@@ -1,0 +1,14 @@
+curl -X POST http://localhost:3333/api/runs
+   -H 'Content-Type: application/json'
+   -d '{"login":"my_login","password":"my_password"}'
+
+sudo -u postgres psql
+
+\l
+\c tskmgr_dev
+
+drop table task cascade;
+drop table run cascade;
+drop table file cascade;
+
+Usage: curl -vv -F file=@dump_2022-08-06.gz http://localhost:3333/api/runs/1/files

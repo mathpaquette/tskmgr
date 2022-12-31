@@ -1,25 +1,24 @@
 import { Run } from '../runs/run';
-import { PullRequest } from '../pull-requests/pull-request';
 import { TaskPriority } from './task-priority';
+import { RunnerInfo } from './runner-info';
 
 export interface Task {
-  _id: string | any;
+  id: number;
   run: Run;
-  pullRequest: PullRequest;
   name: string;
   type: string;
   command: string;
   arguments: string[];
   options: object;
   runnerId: string;
-  runnerHost: string;
+  runnerInfo: RunnerInfo;
   status: string;
-  createdAt: Date;
-  updatedAt: Date;
-  startedAt: Date;
-  endedAt: Date;
   cached: boolean;
   duration: number;
   avgDuration: number;
   priority: TaskPriority;
+  createdAt: Date;
+  updatedAt: Date;
+  startedAt: Date;
+  endedAt: Date;
 }

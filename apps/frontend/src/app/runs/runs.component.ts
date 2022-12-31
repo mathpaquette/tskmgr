@@ -1,30 +1,50 @@
-import { Component } from '@angular/core';
-import { EMPTY, Observable } from 'rxjs';
-import { Run } from '@tskmgr/common';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ColDef, GridOptions, GridReadyEvent, RowDoubleClickedEvent, RowNode } from 'ag-grid-community';
-import { TasksCellRendererComponent } from './cell-renderers/tasks-cell-renderer.component';
-import {
-  checkboxCellRenderer,
-  defaultGridOptions,
-  durationValueFormatter,
-  timeValueFormatter,
-  urlCellRenderer,
-} from '../common/ag-grid.util';
+import { ColDef, GridOptions, GridReadyEvent, RowClickedEvent, RowDoubleClickedEvent } from 'ag-grid-community';
+import { checkboxCellRenderer, dateValueFormatter, defaultGridOptions, urlCellRenderer } from '../common/ag-grid.util';
+import { HeaderService } from '../common/header/header.service';
+import { RunCellRendererComponent } from './cell-renderers/run-cell-renderer.component';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'tskmgr-runs',
   template: `
-    <ag-grid-angular
-      class="ag-theme-alpine"
-      [rowData]="runs$ | async"
-      [columnDefs]="columnDefs"
-      [gridOptions]="gridOptions"
-    ></ag-grid-angular>
+    <div class="container-fs">
+      <!--      <div class="first-row">-->
+      <!--        <div class="form-check">-->
+      <!--          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"/>-->
+      <!--          <label class="form-check-label" for="defaultCheck1"> Only failed </label>-->
+      <!--        </div>-->
+      <!--      </div>-->
+      <div class="second-row">
+        <ag-grid-angular
+          class="ag-theme-alpine"
+          [columnDefs]="columnDefs"
+          [gridOptions]="gridOptions"
+        ></ag-grid-angular>
+      </div>
+    </div>
   `,
   styles: [
     `
+      .first-row {
+        display: flex;
+      }
+
+      .second-row {
+        flex: 1; /*  added, fix for IE  */
+        min-height: 0; /*  added, fix for Firefox  */
+        display: flex;
+      }
+
+      .container-fs {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+      }
+
       ag-grid-angular {
         width: 100%;
       }
@@ -36,59 +56,69 @@ import {
     `,
   ],
 })
-export class RunsComponent {
+export class RunsComponent implements OnInit, OnDestroy {
   constructor(
     private readonly runsService: RunsService, //
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private headerService: HeaderService
   ) {}
 
-  runs$: Observable<Run[]> = EMPTY;
-  id = '';
-
-  gridOptions: GridOptions = {
+  readonly gridOptions: GridOptions = {
     ...defaultGridOptions,
-
     onGridReady: this.onGridReady.bind(this),
     onRowDoubleClicked: this.onRowDoubleClicked.bind(this),
-    getRowNodeId: (data) => data._id,
-    getRowClass: (params) => (params.data._id === this.id ? 'highlight-row' : undefined),
+    getRowId: (params) => params.data.id,
+    paginationAutoPageSize: true,
+    pagination: true,
   };
 
-  columnDefs: ColDef[] = [
-    { field: '_id', headerName: 'Id' },
-    { field: 'name', cellRenderer: urlCellRenderer },
-    { field: 'type' },
-    { field: 'runners' },
-    { field: 'runnerAffinity', cellRenderer: checkboxCellRenderer },
+  readonly columnDefs: ColDef[] = [
+    { field: 'id', width: 100, suppressSizeToFit: true, cellRenderer: RunCellRendererComponent },
+    { field: 'name', width: 400, cellRenderer: urlCellRenderer, suppressSizeToFit: true },
+    { field: 'type', filter: true },
+    { field: 'status', filter: true },
+    { field: 'prioritization', filter: true },
+    { field: 'affinity', cellRenderer: checkboxCellRenderer },
     { field: 'failFast', cellRenderer: checkboxCellRenderer },
     { field: 'closed', cellRenderer: checkboxCellRenderer },
-    { field: 'leaderId' },
-    { field: 'prioritization' },
-    { field: 'createdAt', valueFormatter: timeValueFormatter },
-    { field: 'updatedAt', valueFormatter: timeValueFormatter },
-    { field: 'endedAt', valueFormatter: timeValueFormatter },
-    { field: 'duration', valueFormatter: durationValueFormatter },
-    { field: 'status' },
-    { field: '_id', headerName: 'Tasks', cellRenderer: TasksCellRendererComponent },
+    { field: 'updatedAt', cellRenderer: dateValueFormatter },
   ];
 
+  private search: string | undefined = undefined;
+  private readonly destroy$ = new Subject<void>();
+
   ngOnInit(): void {
-    this.runs$ = this.runsService.findAll();
-    this.id = this.activatedRoute.snapshot.params['id'];
+    this.headerService.enableSearch();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.gridOptions.api?.sizeColumnsToFit();
+  }
+
+  refreshData(): void {
+    this.runsService.findAll(this.search).subscribe((x) => {
+      this.gridOptions.api?.setRowData(x);
+    });
   }
 
   onGridReady(event: GridReadyEvent): void {
+    this.headerService.search$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
+      this.search = x;
+      this.refreshData();
+    });
+
+    this.headerService.refreshData$.pipe(takeUntil(this.destroy$)).subscribe(() => this.refreshData());
     event.api.sizeColumnsToFit();
   }
 
   onRowDoubleClicked(event: RowDoubleClickedEvent): void {
-    const previousNode = event.api.getRowNode(this.id);
-    if (previousNode === event.node) return;
-
-    this.id = event.data._id;
-    this.router.navigate(['runs', this.id]);
-
-    event.api.redrawRows({ rowNodes: [previousNode as RowNode, event.node] });
+    this.router.navigate(['runs', event.data.id]);
   }
 }

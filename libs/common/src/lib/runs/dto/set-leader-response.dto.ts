@@ -1,6 +1,6 @@
 import { Run } from '../run';
 
 export class SetLeaderResponseDto {
-  isLeader: boolean;
+  leader: boolean;
   run: Run;
 }

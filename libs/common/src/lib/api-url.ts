@@ -11,20 +11,19 @@ export class ApiUrl {
 
   // runs
   createRunUrl = () => this.getUrl(`/runs`);
-  getRunUrl = (id: string) => this.getUrl(`/runs/${id}`);
-  abortRunUrl = (id: string) => this.getUrl(`/runs/${id}/abort`);
-  failRunUrl = (id: string) => this.getUrl(`/runs/${id}/fail`);
-  closeRunUrl = (id: string) => this.getUrl(`/runs/${id}/close`);
-  setLeaderUrl = (id: string) => this.getUrl(`/runs/${id}/leader`);
-  createTasksUrl = (id: string) => this.getUrl(`/runs/${id}/tasks`);
-  startTaskUrl = (id: string) => this.getUrl(`/runs/${id}/tasks/start`);
+  getRunUrl = (id: number) => this.getUrl(`/runs/${id}`);
+  abortRunUrl = (id: number) => this.getUrl(`/runs/${id}/abort`);
+  failRunUrl = (id: number) => this.getUrl(`/runs/${id}/fail`);
+  closeRunUrl = (id: number) => this.getUrl(`/runs/${id}/close`);
+  setLeaderUrl = (id: number) => this.getUrl(`/runs/${id}/leader`);
+  createTasksUrl = (id: number) => this.getUrl(`/runs/${id}/tasks`);
+  startTaskUrl = (id: number) => this.getUrl(`/runs/${id}/tasks/start`);
+  createFileRunUrl = (id: number) => this.getUrl(`/runs/${id}/files`);
 
   // tasks
-  completeTaskUrl = (id: string) => this.getUrl(`/tasks/${id}/complete`);
-  failTaskUrl = (id: string) => this.getUrl(`/tasks/${id}/fail`);
-
-  // pull-requests
-  findAllPullRequestsUrl = () => this.getUrl(`/pull-requests`);
+  completeTaskUrl = (id: number) => this.getUrl(`/tasks/${id}/complete`);
+  failTaskUrl = (id: number) => this.getUrl(`/tasks/${id}/fail`);
+  createFileTaskUrl = (id: number) => this.getUrl(`/tasks/${id}/files`);
 
   getUrl = (url: string): string => {
     if (this.prefix) {

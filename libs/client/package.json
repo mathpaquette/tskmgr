@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "dependencies": {
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "systeminformation": "^5.16.6"
   }
 }

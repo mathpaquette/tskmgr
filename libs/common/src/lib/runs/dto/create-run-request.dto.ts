@@ -2,13 +2,11 @@ import { TaskPriority } from '../../tasks/task-priority';
 
 export class CreateRunRequestDto {
   readonly name: string;
-  readonly url?: string;
-  readonly pullRequestName: string;
-  readonly pullRequestUrl?: string;
   readonly type: string;
+  readonly url?: string;
+  readonly parameters?: object;
   readonly prioritization?: TaskPriority[];
-  readonly runners?: number;
-  /** runnerAffinity will reschedule tasks from one pull request on previous runner. Default: true */
-  readonly runnerAffinity?: boolean;
+  /** affinity will try to reschedule task on previous runner id */
+  readonly affinity?: boolean;
   readonly failFast?: boolean;
 }

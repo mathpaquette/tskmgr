@@ -3,12 +3,30 @@ import { CommonModule } from '@angular/common';
 
 import { RunsRoutingModule } from './runs-routing.module';
 import { RunsComponent } from './runs.component';
-import { TasksComponent } from './tasks/tasks.component';
 import { AgGridModule } from 'ag-grid-angular';
-import { TasksCellRendererComponent } from './cell-renderers/tasks-cell-renderer.component';
+import { RunCellRendererComponent } from './cell-renderers/run-cell-renderer.component';
+import { RunDetailsComponent } from './run-details/run-details.component';
+import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { RunDetailsTasksComponent } from './run-details/run-details-tasks.component';
+import { RunDetailsDetailsComponent } from './run-details/run-details-details.component';
+import { RunDetailsFilesComponent } from './run-details/run-details-files.component';
+import { TskmgrCommonModule } from '../common/tskmgr-common.module';
 
 @NgModule({
-  declarations: [RunsComponent, TasksComponent, TasksCellRendererComponent],
-  imports: [CommonModule, RunsRoutingModule, AgGridModule.withComponents(TasksCellRendererComponent)],
+  declarations: [
+    RunsComponent, //
+    RunCellRendererComponent,
+    RunDetailsComponent,
+    RunDetailsTasksComponent,
+    RunDetailsDetailsComponent,
+    RunDetailsFilesComponent,
+  ],
+  imports: [
+    CommonModule, //
+    RunsRoutingModule,
+    AgGridModule,
+    NgbAccordionModule,
+    TskmgrCommonModule,
+  ],
 })
 export class RunsModule {}

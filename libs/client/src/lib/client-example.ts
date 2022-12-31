@@ -32,21 +32,20 @@ const client = ClientFactory.createNew('http://localhost:3333', 'RUNNER_1', opti
     const newRun = await client.createRun({
       name: uuid(),
       type: '123',
-      pullRequestName: '123',
       prioritization: [TaskPriority.Longest],
     });
     console.log(newRun);
 
-    const res = await client.setLeader(newRun._id);
-    if (res.isLeader) {
-      const createdTasks = await client.createTasks(newRun._id, { tasks });
+    const res = await client.setLeader(newRun.id);
+    if (res.leader) {
+      const createdTasks = await client.createTasks(newRun.id, { tasks });
       console.log(createdTasks);
 
-      const closeRun = await client.closeRun(newRun._id);
+      const closeRun = await client.closeRun(newRun.id);
       console.log(closeRun);
     }
 
-    const result = await client.runTasks(newRun._id);
+    const result = await client.runTasks(newRun.id);
     if (result.failed) {
       process.exit(1);
     }
