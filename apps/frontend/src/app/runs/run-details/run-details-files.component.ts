@@ -39,7 +39,7 @@ export class RunDetailsFilesComponent implements OnDestroy {
   readonly columnDefs: ColDef[] = [
     { field: 'id' },
     { field: 'description' },
-    { field: 'status' },
+    { field: 'type' },
     { field: 'originName' },
     { field: 'mimeType' },
     { field: 'task.id' },

@@ -116,7 +116,7 @@ export class TasksService {
 
     const fileEntity = this.filesRepository.create({
       task: task,
-      status: createFileRequestDto.status,
+      type: createFileRequestDto.type,
       description: createFileRequestDto.description,
       originName: file.originalname,
       filename: file.filename,

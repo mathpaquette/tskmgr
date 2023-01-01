@@ -119,22 +119,22 @@ describe('Runs', () => {
 
     it('should create run file', async () => {
       // arrange
-      const createFileDto: CreateFileRequestDto = { status: 'STATUS', description: 'DESC' };
+      const createFileDto: CreateFileRequestDto = { type: 'TYPE', description: 'DESC' };
       // act
       const file: File = (await createFileRun(app, run.id, createFileDto, './README.md')).body;
       // assert
-      expect(file.status).toBe(createFileDto.status);
+      expect(file.type).toBe(createFileDto.type);
       expect(file.description).toBe(createFileDto.description);
       expect(file.run.id).toEqual(run.id);
     });
 
     it('should add task file', async () => {
       // arrange
-      const createFileDto: CreateFileRequestDto = { status: 'STATUS', description: 'DESC' };
+      const createFileDto: CreateFileRequestDto = { type: 'TYPE', description: 'DESC' };
       // act
       const file: File = (await createFileTask(app, tasks[0].id, createFileDto, './README.md')).body;
       // assert
-      expect(file.status).toBe(createFileDto.status);
+      expect(file.type).toBe(createFileDto.type);
       expect(file.description).toBe(createFileDto.description);
       expect(file.task.id).toEqual(tasks[0].id);
     });
@@ -362,7 +362,7 @@ function createFileRun(app: INestApplication, runId: number, data: CreateFileReq
   return request(app.getHttpServer())
     .post(ApiUrl.createNoPrefix().createFileRunUrl(runId))
     .attach('file', file)
-    .field('status', data.status)
+    .field('type', data.type)
     .field('description', data.description);
 }
 
@@ -370,7 +370,7 @@ function createFileTask(app: INestApplication, taskId: number, data: CreateFileR
   return request(app.getHttpServer())
     .post(ApiUrl.createNoPrefix().createFileTaskUrl(taskId))
     .attach('file', file)
-    .field('status', data.status)
+    .field('type', data.type)
     .field('description', data.description);
 }
 

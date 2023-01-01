@@ -7,7 +7,7 @@ export interface File {
   filename: string;
   createdAt: Date;
   mimeType: string;
-  status: string;
+  type: string;
   description: string;
   run: Run;
   task: Task;

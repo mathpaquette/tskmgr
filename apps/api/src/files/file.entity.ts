@@ -12,7 +12,7 @@ export class FileEntity implements File {
   description: string;
 
   @Column({ nullable: true })
-  status: string;
+  type: string;
 
   @ManyToOne(() => RunEntity, (run) => run.id, { nullable: true })
   @JoinColumn({ name: 'run_id' })

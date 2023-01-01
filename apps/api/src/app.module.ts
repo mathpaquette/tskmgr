@@ -11,6 +11,8 @@ import { PendingTasksService } from './tasks/pending-tasks.service';
 import { TasksController } from './tasks/tasks.controller';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './config/all-exceptions.filter';
+import { FilesController } from './files/files.controller';
+import { FilesService } from './files/files.service';
 
 @Module({
   imports: [
@@ -36,10 +38,12 @@ import { AllExceptionsFilter } from './config/all-exceptions.filter';
   controllers: [
     RunsController, //
     TasksController,
+    FilesController,
   ],
   providers: [
-    RunsService, //
+    RunsService,
     TasksService,
+    FilesService,
     PendingTasksService,
     {
       provide: APP_FILTER,

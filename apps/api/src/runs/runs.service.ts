@@ -39,7 +39,7 @@ export class RunsService {
 
     const fileEntity = this.filesRepository.create({
       run: run,
-      status: createFileRequestDto.status,
+      type: createFileRequestDto.type,
       description: createFileRequestDto.description,
       originName: file.originalname,
       filename: file.filename,
