@@ -4,6 +4,7 @@ import { Run, TaskStatus } from '@tskmgr/common';
 import { AgGridEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { checkboxCellRenderer, defaultGridOptions, timeValueFormatter } from '../../common/ag-grid.util';
 import { Subject, takeUntil } from 'rxjs';
+import { FilesCellRendererComponent } from '../cell-renderers/files-cell-renderer.component';
 
 @Component({
   template: `
@@ -66,7 +67,7 @@ export class RunDetailsTasksComponent implements OnInit, OnDestroy {
     { field: 'endedAt', cellRenderer: timeValueFormatter },
     { field: 'avgDuration', headerName: 'Avg Duration (sec)' },
     { field: 'duration', headerName: 'Duration (sec)' },
-    // { field: 'files' },
+    { field: 'files', cellRenderer: FilesCellRendererComponent },
   ];
 
   readonly gridOptions: GridOptions = {

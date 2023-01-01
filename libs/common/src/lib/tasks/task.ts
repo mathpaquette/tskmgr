@@ -1,6 +1,7 @@
 import { Run } from '../runs/run';
 import { TaskPriority } from './task-priority';
 import { RunnerInfo } from './runner-info';
+import { File } from '../files/file';
 
 export interface Task {
   id: number;
@@ -21,4 +22,5 @@ export interface Task {
   updatedAt: Date;
   startedAt: Date;
   endedAt: Date;
+  files: File[];
 }

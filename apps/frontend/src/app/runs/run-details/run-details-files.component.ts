@@ -4,6 +4,7 @@ import { dateValueFormatter, defaultGridOptions } from '../../common/ag-grid.uti
 import { RunDetailsService } from './run-details.service';
 import { Subject, takeUntil } from 'rxjs';
 import { Run } from '@tskmgr/common';
+import { FileIdCellRendererComponent } from '../cell-renderers/file-id-cell-renderer.component';
 
 @Component({
   template: `
@@ -37,7 +38,7 @@ import { Run } from '@tskmgr/common';
 })
 export class RunDetailsFilesComponent implements OnDestroy {
   readonly columnDefs: ColDef[] = [
-    { field: 'id' },
+    { field: 'id', cellRenderer: FileIdCellRendererComponent },
     { field: 'description' },
     { field: 'type' },
     { field: 'originName' },

@@ -119,7 +119,7 @@ describe('Runs', () => {
 
     it('should create run file', async () => {
       // arrange
-      const createFileDto: CreateFileRequestDto = { type: 'TYPE', description: 'DESC' };
+      const createFileDto: CreateFileRequestDto = { type: 'log', description: 'desc' };
       // act
       const file: File = (await createFileRun(app, run.id, createFileDto, './README.md')).body;
       // assert
@@ -130,7 +130,7 @@ describe('Runs', () => {
 
     it('should add task file', async () => {
       // arrange
-      const createFileDto: CreateFileRequestDto = { type: 'TYPE', description: 'DESC' };
+      const createFileDto: CreateFileRequestDto = { type: 'log', description: 'desc' };
       // act
       const file: File = (await createFileTask(app, tasks[0].id, createFileDto, './README.md')).body;
       // assert

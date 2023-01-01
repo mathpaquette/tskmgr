@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ColDef, GridOptions, GridReadyEvent, RowClickedEvent, RowDoubleClickedEvent } from 'ag-grid-community';
 import { checkboxCellRenderer, dateValueFormatter, defaultGridOptions, urlCellRenderer } from '../common/ag-grid.util';
 import { HeaderService } from '../common/header/header.service';
-import { RunCellRendererComponent } from './cell-renderers/run-cell-renderer.component';
+import { RunIdCellRendererComponent } from './cell-renderers/run-id-cell-renderer.component';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -74,7 +74,7 @@ export class RunsComponent implements OnInit, OnDestroy {
   };
 
   readonly columnDefs: ColDef[] = [
-    { field: 'id', width: 100, suppressSizeToFit: true, cellRenderer: RunCellRendererComponent },
+    { field: 'id', width: 100, suppressSizeToFit: true, cellRenderer: RunIdCellRendererComponent },
     { field: 'name', width: 400, cellRenderer: urlCellRenderer, suppressSizeToFit: true },
     { field: 'type', filter: true },
     { field: 'status', filter: true },
