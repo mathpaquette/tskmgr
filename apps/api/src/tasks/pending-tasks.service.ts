@@ -33,7 +33,7 @@ export class PendingTasksService {
 
     const startedTask = await this.getPendingTask(runId, startTaskDto, run.prioritization);
     if (!startedTask) {
-      const waitingForTasks = !run.closed;
+      const waitingForTasks = !run.closed; // until run is closed, we need to wait for new incoming tasks.
       return { continue: waitingForTasks, run };
     }
 

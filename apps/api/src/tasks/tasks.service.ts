@@ -173,11 +173,12 @@ export class TasksService {
   }
 
   private async getAverageTaskDuration(createTaskDto: CreateTaskDto): Promise<number> {
+    const args = createTaskDto.arguments ? In(createTaskDto.arguments) : IsNull();
     const previousTasks = await this.tasksRepository.find({
       where: {
         type: createTaskDto.type,
         command: createTaskDto.command,
-        arguments: In(createTaskDto.arguments || []),
+        arguments: args,
         options: createTaskDto.options,
         status: TaskStatus.Completed,
         cached: false,
@@ -191,6 +192,7 @@ export class TasksService {
   }
 
   private async getRunnerAffinityId(run: RunEntity, createTaskDto: CreateTaskDto): Promise<string> {
+    const args = createTaskDto.arguments ? In(createTaskDto.arguments) : IsNull();
     const task = await this.tasksRepository.findOne({
       where: {
         run: { id: run.id },
@@ -198,7 +200,7 @@ export class TasksService {
         status: TaskStatus.Completed,
         type: createTaskDto.type,
         command: createTaskDto.command,
-        arguments: In(createTaskDto.arguments || []),
+        arguments: args,
         options: createTaskDto.options,
       },
       order: { endedAt: 'DESC' },
