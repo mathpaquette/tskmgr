@@ -14,7 +14,7 @@ export class FileEntity implements File {
   @Column({ nullable: true })
   type: string;
 
-  @ManyToOne(() => RunEntity, (run) => run.id, { nullable: true })
+  @ManyToOne(() => RunEntity, (run) => run.id, { nullable: false })
   @JoinColumn({ name: 'run_id' })
   run: RunEntity;
 

@@ -109,12 +109,13 @@ export class TasksService {
     file: Express.Multer.File,
     createFileRequestDto: CreateFileRequestDto
   ): Promise<FileEntity> {
-    const task = await this.tasksRepository.findOneBy({ id: taskId });
+    const task = await this.tasksRepository.findOne({ where: { id: taskId }, relations: { run: true } });
     if (!task) {
       throw new Error(`Unable run find task id: ${taskId}`);
     }
 
     const fileEntity = this.filesRepository.create({
+      run: task.run,
       task: task,
       type: createFileRequestDto.type,
       description: createFileRequestDto.description,

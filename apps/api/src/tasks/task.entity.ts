@@ -17,7 +17,7 @@ export class TaskEntity implements Task {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => RunEntity, (run) => run.id)
+  @ManyToOne((type) => RunEntity, (run) => run.id, { nullable: false })
   @JoinColumn({ name: 'run_id' })
   run: RunEntity;
 

@@ -2,7 +2,9 @@ curl -X POST http://localhost:3333/api/runs
    -H 'Content-Type: application/json'
    -d '{"login":"my_login","password":"my_password"}'
 
-sudo -u postgres psql
+sudo -u postgres psql # linux
+psql postgres         # macos
+
 
 \l
 \c tskmgr_dev

@@ -44,7 +44,6 @@ export class RunDetailsFilesComponent implements OnDestroy {
     { field: 'originName' },
     { field: 'mimeType' },
     { field: 'task.id' },
-    { field: 'run.id' },
     { field: 'createdAt', cellRenderer: dateValueFormatter },
   ];
 

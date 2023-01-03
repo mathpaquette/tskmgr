@@ -118,7 +118,7 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
       }
 
       if (key === 'files' || key === 'tasks') {
-        key = `${key}Size`;
+        key = `${key}Count`;
         value = value.length;
       }
 

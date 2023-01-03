@@ -117,7 +117,7 @@ describe('Runs', () => {
       tasks = (await createTasks(app, run.id, createTasksDto)).body;
     });
 
-    it('should create run file', async () => {
+    it('should add file to run', async () => {
       // arrange
       const createFileDto: CreateFileRequestDto = { type: 'log', description: 'desc' };
       // act
@@ -128,7 +128,7 @@ describe('Runs', () => {
       expect(file.run.id).toEqual(run.id);
     });
 
-    it('should add task file', async () => {
+    it('should add file to task', async () => {
       // arrange
       const createFileDto: CreateFileRequestDto = { type: 'log', description: 'desc' };
       // act
