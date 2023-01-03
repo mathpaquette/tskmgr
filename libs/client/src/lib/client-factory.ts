@@ -1,4 +1,5 @@
-import { Client, ClientOptions } from './client';
+import { Client } from './client';
+import { ClientOptions } from './client-options';
 import { ApiUrl } from '@tskmgr/common';
 
 export class ClientFactory {

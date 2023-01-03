@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-import { ChildProcess, spawn, SpawnOptionsWithoutStdio } from 'child_process';
+import { ChildProcess } from 'child_process';
 import {
   ApiUrl,
   Run,
@@ -9,26 +8,25 @@ import {
   StartTaskDto,
   StartTaskResponseDto,
   Task,
+  File as File_,
   SetLeaderRequestDto,
   SetLeaderResponseDto,
+  CreateFileRequestDto,
 } from '@tskmgr/common';
 import fetch from 'node-fetch';
-import { createInterface } from 'readline';
-
-export interface ClientOptions {
-  parallel?: number;
-  dataCallback?: (task: Task, data: string, cached: () => void) => void;
-  errorCallback?: (task: Task, data: string) => void;
-  pollingDelayMs?: number;
-  retryDelayMs?: number;
-  retryCount?: number;
-  spawnOptions?: SpawnOptionsWithoutStdio;
-}
+import * as FormData from 'form-data';
+import { checkStatus, delay, getTaskLogFilename, spawnAsync } from './utils';
+import { RunTasksResult } from './run-tasks-result';
+import { TaskResult } from './task-result';
+import { ClientOptions } from './client-options';
+import { createReadStream, createWriteStream, unlinkSync } from 'fs';
 
 export class Client {
   public static readonly DefaultOptions: ClientOptions = {
     parallel: 1,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     dataCallback: (task, data, cached) => {},
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     errorCallback: (task, data) => {},
     pollingDelayMs: 1000,
     retryDelayMs: 5000,
@@ -36,7 +34,7 @@ export class Client {
   };
 
   constructor(
-    private readonly apiUrl: ApiUrl, //
+    private readonly apiUrl: ApiUrl,
     private readonly runnerId: string,
     private readonly options: ClientOptions
   ) {}
@@ -51,7 +49,7 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async closeRun(runId: string): Promise<Run> {
+  public async closeRun(runId: number): Promise<Run> {
     const res = await fetch(this.apiUrl.closeRunUrl(runId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
@@ -60,7 +58,7 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async abortRun(runId: string): Promise<Run> {
+  public async abortRun(runId: number): Promise<Run> {
     const res = await fetch(this.apiUrl.abortRunUrl(runId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
@@ -69,7 +67,7 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async failRun(runId: string): Promise<Run> {
+  public async failRun(runId: number): Promise<Run> {
     const res = await fetch(this.apiUrl.failRunUrl(runId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
@@ -78,7 +76,7 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async setLeader(runId: string): Promise<SetLeaderResponseDto> {
+  public async setLeader(runId: number): Promise<SetLeaderResponseDto> {
     const params: SetLeaderRequestDto = { runnerId: this.runnerId };
     const res = await fetch(this.apiUrl.setLeaderUrl(runId), {
       headers: { 'Content-Type': 'application/json' },
@@ -89,7 +87,7 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async createTasks(runId: string, params: CreateTasksDto): Promise<Task[]> {
+  public async createTasks(runId: number, params: CreateTasksDto): Promise<Task[]> {
     const res = await fetch(this.apiUrl.createTasksUrl(runId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'POST',
@@ -99,7 +97,7 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async startTask(runId: string, params: StartTaskDto): Promise<StartTaskResponseDto> {
+  public async startTask(runId: number, params: StartTaskDto): Promise<StartTaskResponseDto> {
     const res = await fetch(this.apiUrl.startTaskUrl(runId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
@@ -109,7 +107,7 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async runTasks(runId: string): Promise<RunTasksResult> {
+  public async runTasks(runId: number): Promise<RunTasksResult> {
     const taskRunners: Promise<TaskResult[]>[] = [];
 
     for (let i = 0; i < this.options.parallel; i++) {
@@ -120,7 +118,7 @@ export class Client {
     return new RunTasksResult(taskResults.flatMap((x) => x));
   }
 
-  public async completeTask(taskId: string, params: CompleteTaskDto): Promise<Task> {
+  public async completeTask(taskId: number, params: CompleteTaskDto): Promise<Task> {
     const res = await fetch(this.apiUrl.completeTaskUrl(taskId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
@@ -130,7 +128,7 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  public async failTask(taskId: string): Promise<Task> {
+  public async failTask(taskId: number): Promise<Task> {
     const res = await fetch(this.apiUrl.failTaskUrl(taskId), {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
@@ -139,7 +137,38 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  private async defaultTaskRunner(runId: string): Promise<TaskResult[]> {
+  public async uploadRunFile(runId: number, path: string, params: CreateFileRequestDto): Promise<File_> {
+    return this.uploadFile(this.apiUrl.createFileRunUrl(runId), path, params);
+  }
+
+  public async uploadTaskFile(taskId: number, path: string, params: CreateFileRequestDto): Promise<File_> {
+    return this.uploadFile(this.apiUrl.createFileTaskUrl(taskId), path, params);
+  }
+
+  private async uploadFile(url: string, path: string, params: CreateFileRequestDto): Promise<File_> {
+    // https://github.com/node-fetch/node-fetch/tree/2.x#post-with-form-data-detect-multipart
+    // https://github.com/form-data/form-data#readme
+
+    const formData = new FormData();
+    formData.append('file', createReadStream(path));
+
+    if (params.type) {
+      formData.append('type', params.type);
+    }
+
+    if (params.description) {
+      formData.append('description', params.description);
+    }
+
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData,
+    });
+
+    return await checkStatus(res).json();
+  }
+
+  private async defaultTaskRunner(runId: number): Promise<TaskResult[]> {
     const taskResults: TaskResult[] = [];
     let _continue = true;
 
@@ -148,13 +177,11 @@ export class Client {
 
       if (!response.continue) {
         _continue = false;
-      }
-
-      if (!response.continue && !response.task) {
         continue;
       }
 
       if (!response.task) {
+        // TODO: this should output only once per runner
         console.log(`polling for a new task in: ${this.options.pollingDelayMs} ms`);
         await delay(this.options.pollingDelayMs);
         continue;
@@ -165,6 +192,9 @@ export class Client {
       let hasCompleted = true;
       let childProcess: ChildProcess;
       let error: Error;
+
+      const taskLogFilename = getTaskLogFilename(task.id);
+      const writeStream = createWriteStream(taskLogFilename);
 
       const dataHandler = (data: string): void => {
         this.options.dataCallback(task, data, () => (cached = true));
@@ -178,102 +208,42 @@ export class Client {
         childProcess = await spawnAsync(
           task.command,
           task.arguments,
-          { ...task.options, ...this.options.spawnOptions },
-          dataHandler,
-          errorHandler
+          {
+            ...task.options,
+            ...this.options.spawnOptions,
+          },
+          {
+            writeStream,
+            dataCallback: dataHandler,
+            errorCallback: errorHandler,
+          }
         );
       } catch (err) {
         error = err;
         hasCompleted = false;
+
         if (run.failFast) {
+          // TODO: should abort all running tasks by current client
           throw err;
         }
       } finally {
         taskResults.push({ run, task, childProcess, hasCompleted, error });
+
         if (hasCompleted) {
-          await this.completeTask(task._id, { cached });
+          await this.completeTask(task.id, { cached });
         } else {
-          await this.failTask(task._id);
+          await this.failTask(task.id);
         }
+
+        writeStream.close();
+        await this.uploadTaskFile(task.id, taskLogFilename, {
+          type: 'log',
+          description: `Log for task ${task.id}`,
+        });
+        unlinkSync(taskLogFilename);
       }
     }
 
     return taskResults;
-  }
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
-export async function spawnAsync(
-  command: string,
-  args?: ReadonlyArray<string>,
-  options?: SpawnOptionsWithoutStdio,
-  dataCallback?: (data: string) => void,
-  errorCallback?: (data: string) => void
-): Promise<ChildProcess> {
-  return new Promise((resolve, reject) => {
-    const childProcess = spawn(command, args, options);
-
-    const readlineStdout = createInterface({ input: childProcess.stdout });
-    const readlineStderr = createInterface({ input: childProcess.stderr });
-
-    readlineStdout.on('line', dataCallback);
-    readlineStderr.on('line', errorCallback);
-
-    childProcess.on('close', (code) => {
-      if (code === 0) {
-        resolve(childProcess);
-      } else {
-        reject(childProcess);
-      }
-    });
-
-    childProcess.on('error', (err: Error) => {
-      reject(childProcess); // TODO: try to return error message
-    });
-  });
-}
-
-class HTTPResponseError extends Error {
-  constructor(public readonly response) {
-    super(`HTTP Error Response: ${response.status} ${response.statusText}`);
-    this.response = response;
-  }
-}
-
-const checkStatus = (response) => {
-  if (response.ok) {
-    // response.status >= 200 && response.status < 300
-    return response;
-  } else {
-    throw new HTTPResponseError(response);
-  }
-};
-
-export interface TaskResult {
-  run: Run;
-  task: Task;
-  childProcess: ChildProcess;
-  hasCompleted: boolean;
-  error?: Error;
-}
-
-export class RunTasksResult {
-  public readonly completedTasks: TaskResult[];
-  public readonly failedTasks: TaskResult[];
-
-  public readonly completed: boolean;
-  public readonly failed: boolean;
-
-  constructor(public readonly tasks: TaskResult[]) {
-    this.completedTasks = tasks.filter((x) => x.hasCompleted);
-    this.failedTasks = tasks.filter((x) => !x.hasCompleted);
-
-    this.completed = this.failedTasks.length === 0;
-    this.failed = this.failedTasks.length > 0;
   }
 }

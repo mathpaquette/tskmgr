@@ -48,7 +48,7 @@ import { FilesCellRendererComponent } from '../cell-renderers/files-cell-rendere
     `,
   ],
 })
-export class RunDetailsTasksComponent implements OnInit, OnDestroy {
+export class RunDetailsTasksComponent implements OnDestroy {
   readonly columnDefs: ColDef[] = [
     { field: 'id' },
     { field: 'name' },
@@ -98,8 +98,6 @@ export class RunDetailsTasksComponent implements OnInit, OnDestroy {
   onResize(event: any) {
     this.gridOptions.api?.sizeColumnsToFit();
   }
-
-  ngOnInit(): void {}
 
   refreshData(run: Run | undefined, event: AgGridEvent): void {
     if (!run) {
