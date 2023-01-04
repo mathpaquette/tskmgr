@@ -1,6 +1,6 @@
 # tskmgr
 
-tskmgr (task manager) is a minimalistic distributed task system that aims to offer an opensource on-prem installable alternative to Nx Cloud.
+tskmgr (task manager) is a minimalist distributed task system that aims to offer an opensource on-prem installable alternative to Nx Cloud.
 
 ## Features
 
@@ -9,7 +9,6 @@ tskmgr (task manager) is a minimalistic distributed task system that aims to off
 - leader election
 - runner cache affinity
 - dockerized
-- metrics
 
 ![tskmgr architecture](./docs/assets/tskmgr.drawio.svg)
 
