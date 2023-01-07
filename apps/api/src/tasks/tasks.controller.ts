@@ -16,7 +16,7 @@ export class TasksController {
 
   @Put(':id/fail')
   fail(@Param('id') id: number): Promise<TaskEntity> {
-    return this.tasksService.fail(id);
+    return this.tasksService.failTask(id);
   }
 
   @UseInterceptors(FileInterceptor('file'))

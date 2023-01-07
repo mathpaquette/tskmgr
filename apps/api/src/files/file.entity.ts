@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { File } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { TaskEntity } from '../tasks/task.entity';
@@ -14,10 +14,12 @@ export class FileEntity implements File {
   @Column({ nullable: true })
   type: string;
 
+  @Index()
   @ManyToOne(() => RunEntity, (run) => run.id, { nullable: false })
   @JoinColumn({ name: 'run_id' })
   run: RunEntity;
 
+  @Index()
   @ManyToOne(() => TaskEntity, (task) => task.id, { nullable: true })
   @JoinColumn({ name: 'task_id' })
   task: TaskEntity;

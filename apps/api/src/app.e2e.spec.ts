@@ -1,7 +1,6 @@
 import * as request from 'supertest';
 import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { v4 as uuid } from 'uuid';
 import {
   ApiUrl,
   RunStatus,
@@ -18,6 +17,7 @@ import {
   CreateFileRequestDto,
 } from '@tskmgr/common';
 import { AppModule } from './app.module';
+import { TestDtoUtils } from './utils/test-dto-utils';
 
 describe('Runs', () => {
   let app: INestApplication;
@@ -35,9 +35,13 @@ describe('Runs', () => {
     await app.init();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   beforeEach(() => {
-    createRunDto = DtoUtils.createRunDto();
-    createTasksDto = DtoUtils.createTasksDto();
+    createRunDto = TestDtoUtils.createRunDto();
+    createTasksDto = TestDtoUtils.createTasksDto(1);
     startTaskDto = { runnerId: '1' };
   });
 
@@ -111,8 +115,8 @@ describe('Runs', () => {
 
     beforeAll(async () => {
       // arrange
-      const createRunDto = DtoUtils.createRunDto();
-      const createTasksDto = DtoUtils.createTasksDto();
+      const createRunDto = TestDtoUtils.createRunDto();
+      const createTasksDto = TestDtoUtils.createTasksDto(1);
       run = (await createRun(app, createRunDto)).body;
       tasks = (await createTasks(app, run.id, createTasksDto)).body;
     });
@@ -145,7 +149,7 @@ describe('Runs', () => {
 
     beforeAll(async () => {
       // arrange
-      const createRunDto = DtoUtils.createRunDto();
+      const createRunDto = TestDtoUtils.createRunDto();
       run = (await createRun(app, createRunDto)).body;
     });
 
@@ -171,7 +175,7 @@ describe('Runs', () => {
 
     beforeAll(async () => {
       // arrange
-      const createRunDto = DtoUtils.createRunDto();
+      const createRunDto = TestDtoUtils.createRunDto();
       run = (await createRun(app, createRunDto)).body;
     });
 
@@ -197,7 +201,7 @@ describe('Runs', () => {
 
     beforeAll(async () => {
       // arrange
-      const createRunDto = DtoUtils.createRunDto();
+      const createRunDto = TestDtoUtils.createRunDto();
       run = (await createRun(app, createRunDto)).body;
     });
 
@@ -296,39 +300,7 @@ describe('Runs', () => {
       expect(res.body.reason).toEqual("Closed run can't accept new tasks");
     });
   });
-
-  afterAll(async () => {
-    await app.close();
-  });
 });
-
-class DtoUtils {
-  public static createRunDto(): CreateRunRequestDto {
-    const id = DtoUtils.getShortId(16);
-    return {
-      name: `${id}`,
-      url: `http://${id}/`,
-      type: 'test',
-      parameters: {
-        name: `PR-${id}`,
-        runner_size: 4,
-      },
-      failFast: true,
-    };
-  }
-
-  public static createTasksDto(): CreateTasksDto {
-    return {
-      tasks: [{ name: 'test', type: 'lint', command: 'nx', arguments: ['l1', 'l2'], options: { shell: true } }],
-    };
-  }
-
-  public static getShortId(size: number): string {
-    const hexString = uuid().replace(/-/g, '');
-    const base64String = Buffer.from(hexString, 'hex').toString('base64');
-    return base64String.slice(0, size);
-  }
-}
 
 function createRun(app: INestApplication, data: CreateRunRequestDto): request.Test {
   return request(app.getHttpServer()).post(ApiUrl.createNoPrefix().createRunUrl()).send(data);
