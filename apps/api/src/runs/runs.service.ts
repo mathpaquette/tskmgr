@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, IsNull, Repository } from 'typeorm';
+import { DataSource, ILike, IsNull, Repository } from 'typeorm';
 import { RunEntity } from './run.entity';
 import { CreateFileRequestDto, CreateRunRequestDto, SetLeaderRequestDto, SetLeaderResponseDto } from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
@@ -10,7 +10,8 @@ import { Express } from 'express';
 export class RunsService {
   constructor(
     @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
-    @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>
+    @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>,
+    private readonly dataSource: DataSource
   ) {}
 
   async createRun(createRunDto: CreateRunRequestDto): Promise<RunEntity> {
@@ -68,25 +69,32 @@ export class RunsService {
   }
 
   async setLeader(runId: number, setLeaderRequestDto: SetLeaderRequestDto): Promise<SetLeaderResponseDto> {
-    // TODO: set lock
     const { runnerId } = setLeaderRequestDto;
-    const run = await this.runsRepository.findOneBy([
-      {
-        id: runId,
-        leaderId: IsNull(),
-      },
-      {
-        id: runId,
-        leaderId: runnerId,
-      },
-    ]);
 
-    if (run) {
-      run.leaderId = runnerId;
-      await this.runsRepository.save(run);
-    }
+    return this.dataSource.transaction(async (manager) => {
+      const run = await manager.findOne(RunEntity, {
+        where: [
+          {
+            id: runId,
+            leaderId: IsNull(),
+          },
+          {
+            id: runId,
+            leaderId: runnerId,
+          },
+        ],
+        lock: {
+          mode: 'pessimistic_write',
+        },
+      });
 
-    return { leader: !!run, run: run };
+      if (run) {
+        run.leaderId = runnerId;
+        await manager.save(run);
+      }
+
+      return { leader: !!run, run: run };
+    });
   }
 
   async findById(runId: number): Promise<RunEntity> {

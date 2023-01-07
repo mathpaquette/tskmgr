@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -17,6 +18,7 @@ export class TaskEntity implements Task {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index()
   @ManyToOne((type) => RunEntity, (run) => run.id, { nullable: false })
   @JoinColumn({ name: 'run_id' })
   run: RunEntity;

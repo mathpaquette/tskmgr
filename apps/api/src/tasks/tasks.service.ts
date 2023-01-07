@@ -84,11 +84,12 @@ export class TasksService {
     const { cached } = completeTaskDto;
     task.complete(cached);
     await this.tasksRepository.save(task);
+
     await this.updateRunStatus(task.run);
     return task;
   }
 
-  async fail(taskId: number): Promise<TaskEntity> {
+  async failTask(taskId: number): Promise<TaskEntity> {
     const task = await this.tasksRepository.findOne({
       where: { id: taskId },
       relations: { run: true },
@@ -100,6 +101,7 @@ export class TasksService {
 
     task.fail();
     await this.tasksRepository.save(task);
+
     await this.updateRunStatus(task.run);
     return task;
   }
@@ -127,13 +129,15 @@ export class TasksService {
     return this.filesRepository.save(fileEntity);
   }
 
-  private async updateRunStatus(run: RunEntity): Promise<RunEntity> {
+  private async updateRunStatus(run: RunEntity): Promise<void> {
     const allTasks = await this.tasksRepository.find({
       where: { run: { id: run.id } },
     });
+
     const endedTasks = allTasks.filter((x) => x.endedAt);
     const failedTasks = allTasks.filter((x) => x.status === TaskStatus.Failed);
 
+    // when fail fast enabled, we fail the run as soon we get one failed task
     if (run.failFast && failedTasks.length > 0) {
       run.fail();
     }
@@ -145,8 +149,7 @@ export class TasksService {
         run.complete();
       }
     }
-
-    return this.runsRepository.save(run);
+    await this.runsRepository.save(run);
   }
 
   private async hasRunAffinity(run: RunEntity): Promise<RunEntity> {

@@ -8,7 +8,7 @@ export class RunEntity implements Run {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @Column()

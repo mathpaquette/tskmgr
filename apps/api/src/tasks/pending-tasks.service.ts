@@ -2,23 +2,23 @@ import { Injectable } from '@nestjs/common';
 import { StartTaskDto, StartTaskResponseDto, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaskEntity } from './task.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { RunEntity } from '../runs/run.entity';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
+import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 
 @Injectable()
 export class PendingTasksService {
   constructor(
     @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
-    @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>
+    @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
+    private dataSource: DataSource
   ) {}
 
   /**
    * Get and start one pending task
    */
   async startPendingTask(runId: number, startTaskDto: StartTaskDto): Promise<StartTaskResponseDto> {
-    // TODO: need a transaction
-
     const run = await this.runsRepository.findOneBy({ id: runId });
     if (!run) {
       throw new Error(`Run id: ${runId} can't be found.`);
@@ -44,38 +44,36 @@ export class PendingTasksService {
     };
   }
 
-  private async getPendingTask(runId: number, startTaskDto: StartTaskDto, prioritization: TaskPriority[]) {
-    for (const priority of prioritization) {
-      let task: TaskEntity;
+  private async getPendingTask(
+    runId: number,
+    startTaskDto: StartTaskDto,
+    prioritization: TaskPriority[]
+  ): Promise<TaskEntity> {
+    let task: TaskEntity;
 
+    for (const priority of prioritization) {
       switch (priority) {
         case TaskPriority.Longest:
-          task = await this.getPendingTaskLongest(runId, startTaskDto);
+          task = await this.startOnePendingTask(startTaskDto, this.getLongestOptions(runId, startTaskDto));
           break;
         case TaskPriority.Shortest:
-          task = await this.getPendingTaskShortest(runId, startTaskDto);
+          task = await this.startOnePendingTask(startTaskDto, this.getShortestOptions(runId, startTaskDto));
           break;
         case TaskPriority.Newest:
-          task = await this.getPendingTaskNewest(runId, startTaskDto);
+          task = await this.startOnePendingTask(startTaskDto, this.getNewestOptions(runId, startTaskDto));
           break;
         case TaskPriority.Oldest:
-          task = await this.getPendingTaskOldest(runId, startTaskDto);
+          task = await this.startOnePendingTask(startTaskDto, this.getOldestOptions(runId, startTaskDto));
           break;
         default:
           throw Error('Unknown priority type!');
       }
-
-      if (task) {
-        const { runnerId, runnerInfo } = startTaskDto;
-        task.start(runnerId, runnerInfo);
-        return this.tasksRepository.save(task);
-      }
     }
 
-    return null;
+    return task;
   }
 
-  private async getPendingTaskLongest(runId: number, startTaskDto: StartTaskDto): Promise<TaskEntity> {
+  private getLongestOptions(runId: number, startTaskDto: StartTaskDto): FindOneOptions<TaskEntity> {
     const { runnerId } = startTaskDto;
     const query: FindOptionsWhere<TaskEntity> = {
       run: { id: runId },
@@ -83,13 +81,17 @@ export class PendingTasksService {
       priority: TaskPriority.Longest,
     };
 
-    return this.tasksRepository.findOne({
+    return {
       where: [{ ...query, runnerId }, query],
       order: { avgDuration: 'DESC' },
-    });
+      lock: {
+        mode: 'pessimistic_write',
+        tables: ['task'],
+      },
+    };
   }
 
-  private async getPendingTaskShortest(runId: number, startTaskDto: StartTaskDto): Promise<TaskEntity> {
+  private getShortestOptions(runId: number, startTaskDto: StartTaskDto): FindOneOptions<TaskEntity> {
     const { runnerId } = startTaskDto;
     const query: FindOptionsWhere<TaskEntity> = {
       run: { id: runId },
@@ -97,29 +99,18 @@ export class PendingTasksService {
       priority: TaskPriority.Shortest,
     };
 
-    return this.tasksRepository.findOne({
+    return {
       where: [{ ...query, runnerId }, query],
       order: { avgDuration: 'ASC' },
-    });
+      lock: {
+        mode: 'pessimistic_write',
+        tables: ['task'],
+      },
+    };
   }
 
   // FIFO
-  private async getPendingTaskOldest(runId: number, startTaskDto: StartTaskDto): Promise<TaskEntity> {
-    const { runnerId } = startTaskDto;
-    const query: FindOptionsWhere<TaskEntity> = {
-      run: { id: runId },
-      status: TaskStatus.Pending,
-      priority: TaskPriority.Oldest,
-    };
-
-    return this.tasksRepository.findOne({
-      where: [{ ...query, runnerId }, query],
-      order: { createdAt: 'ASC' },
-    });
-  }
-
-  // LIFO
-  private async getPendingTaskNewest(runId: number, startTaskDto: StartTaskDto): Promise<TaskEntity> {
+  private getNewestOptions(runId: number, startTaskDto: StartTaskDto): FindOneOptions<TaskEntity> {
     const { runnerId } = startTaskDto;
     const query: FindOptionsWhere<TaskEntity> = {
       run: { id: runId },
@@ -127,9 +118,49 @@ export class PendingTasksService {
       priority: TaskPriority.Newest,
     };
 
-    return this.tasksRepository.findOne({
+    return {
       where: [{ ...query, runnerId }, query],
       order: { createdAt: 'DESC' },
+      lock: {
+        mode: 'pessimistic_write',
+        tables: ['task'],
+      },
+    };
+  }
+
+  // LIFO
+  private getOldestOptions(runId: number, startTaskDto: StartTaskDto): FindOneOptions<TaskEntity> {
+    const { runnerId } = startTaskDto;
+    const query: FindOptionsWhere<TaskEntity> = {
+      run: { id: runId },
+      status: TaskStatus.Pending,
+      priority: TaskPriority.Oldest,
+    };
+
+    return {
+      where: [{ ...query, runnerId }, query],
+      order: { createdAt: 'ASC' },
+      lock: {
+        mode: 'pessimistic_write',
+        tables: ['task'],
+      },
+    };
+  }
+
+  private async startOnePendingTask(
+    startTaskDto: StartTaskDto,
+    options: FindOneOptions<TaskEntity>
+  ): Promise<TaskEntity> {
+    const { runnerId, runnerInfo } = startTaskDto;
+    return await this.dataSource.transaction(async (manager) => {
+      const task = await manager.findOne(TaskEntity, options);
+
+      if (!task) return;
+
+      task.start(runnerId, runnerInfo);
+      await manager.save(task);
+
+      return task;
     });
   }
 }
