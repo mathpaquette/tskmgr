@@ -33,6 +33,6 @@ export class FileEntity implements File {
   @Column({ name: 'mime_type' })
   mimeType: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 }

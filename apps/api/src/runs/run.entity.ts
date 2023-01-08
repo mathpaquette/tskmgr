@@ -41,13 +41,13 @@ export class RunEntity implements Run {
   @Column({ type: 'enum', enum: RunStatus, default: RunStatus.Created })
   status: RunStatus;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
 
-  @Column({ name: 'ended_at', nullable: true })
+  @Column({ name: 'ended_at', nullable: true, type: 'timestamptz' })
   endedAt: Date;
 
   @OneToMany(() => TaskEntity, (task) => task.run)

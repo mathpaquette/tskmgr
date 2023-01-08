@@ -62,16 +62,16 @@ export class TaskEntity implements Task {
   @Column({ type: 'enum', enum: TaskPriority, default: TaskPriority.Longest })
   priority: TaskPriority;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
 
-  @Column({ name: 'started_at', nullable: true })
+  @Column({ name: 'started_at', nullable: true, type: 'timestamptz' })
   startedAt: Date;
 
-  @Column({ name: 'ended_at', nullable: true })
+  @Column({ name: 'ended_at', nullable: true, type: 'timestamptz' })
   endedAt: Date;
 
   public hasEnded(): boolean {
