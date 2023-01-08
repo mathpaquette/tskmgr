@@ -105,7 +105,6 @@ export class RunDetailsTasksComponent implements OnDestroy {
     }
 
     event.api.setRowData(run.tasks);
-    event.api.sizeColumnsToFit();
   }
 
   updateCounts(run: Run | undefined): void {
@@ -127,6 +126,7 @@ export class RunDetailsTasksComponent implements OnDestroy {
       this.refreshData(x, event);
       this.updateCounts(x);
     });
+    event.api.sizeColumnsToFit();
   }
 
   onCheckboxChange(taskFilter: TaskFilter): void {

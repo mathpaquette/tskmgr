@@ -72,6 +72,7 @@ export class RunDetailsFilesComponent implements OnDestroy {
     this.runDetailsService.run$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
       this.refreshData(x, event);
     });
+    event.api.sizeColumnsToFit();
   }
 
   refreshData(run: Run | undefined, event: AgGridEvent): void {
@@ -80,6 +81,5 @@ export class RunDetailsFilesComponent implements OnDestroy {
     }
 
     event.api.setRowData(run.files);
-    event.api.sizeColumnsToFit();
   }
 }
