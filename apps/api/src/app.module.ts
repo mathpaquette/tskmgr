@@ -11,27 +11,15 @@ import { PendingTasksService } from './tasks/pending-tasks.service';
 import { TasksController } from './tasks/tasks.controller';
 import { FilesController } from './files/files.controller';
 import { FilesService } from './files/files.service';
+import { environment } from './environments/environment';
+
+const ENTITIES = [FileEntity, RunEntity, TaskEntity];
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'tskmgr',
-      password: 'tskmgr',
-      database: 'tskmgr_dev',
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
-    TypeOrmModule.forFeature([
-      RunEntity, //
-      TaskEntity,
-      FileEntity,
-    ]),
-    MulterModule.register({
-      dest: './files', // TODO: configure
-    }),
+    TypeOrmModule.forRoot(environment.datasource),
+    TypeOrmModule.forFeature(ENTITIES),
+    MulterModule.register({ ...environment.multer }),
   ],
   controllers: [
     RunsController, //
