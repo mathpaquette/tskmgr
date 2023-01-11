@@ -19,6 +19,8 @@ export class ApiUrl {
   createTasksUrl = (id: number) => this.getUrl(`/runs/${id}/tasks`);
   startTaskUrl = (id: number) => this.getUrl(`/runs/${id}/tasks/start`);
   createFileRunUrl = (id: number) => this.getUrl(`/runs/${id}/files`);
+  getTasksUrl = (id: number) => this.getUrl(`/runs/${id}/tasks`);
+  getFilesUrl = (id: number) => this.getUrl(`/runs/${id}/files`);
 
   // tasks
   completeTaskUrl = (id: number) => this.getUrl(`/tasks/${id}/complete`);

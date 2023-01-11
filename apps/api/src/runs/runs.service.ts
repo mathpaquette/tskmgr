@@ -5,12 +5,14 @@ import { RunEntity } from './run.entity';
 import { CreateFileRequestDto, CreateRunRequestDto, SetLeaderRequestDto, SetLeaderResponseDto } from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
 import { Express } from 'express';
+import { TaskEntity } from '../tasks/task.entity';
 
 @Injectable()
 export class RunsService {
   constructor(
     @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
     @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>,
+    @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
     private readonly dataSource: DataSource
   ) {}
 
@@ -100,7 +102,6 @@ export class RunsService {
   async findById(runId: number): Promise<RunEntity> {
     return this.runsRepository.findOne({
       where: { id: runId },
-      relations: ['tasks', 'tasks.files', 'files', 'files.run', 'files.task'],
     });
   }
 
@@ -109,6 +110,20 @@ export class RunsService {
       where: search ? { name: ILike(`%${search}%`) } : {},
       order: { id: 'DESC' },
       take: 100,
+    });
+  }
+
+  async findTasksById(runId: number): Promise<TaskEntity[]> {
+    return this.tasksRepository.find({
+      where: { run: { id: runId } },
+      relations: ['files'],
+    });
+  }
+
+  async findFilesById(runId: number): Promise<FileEntity[]> {
+    return this.filesRepository.find({
+      where: { run: { id: runId } },
+      relations: ['run', 'task'],
     });
   }
 }

@@ -48,6 +48,16 @@ export class RunsController {
     return this.runsService.findById(runId);
   }
 
+  @Get(':id/tasks')
+  async findTasksById(@Param('id') runId: number): Promise<TaskEntity[]> {
+    return this.runsService.findTasksById(runId);
+  }
+
+  @Get(':id/files')
+  async findFilesById(@Param('id') runId: number): Promise<FileEntity[]> {
+    return this.runsService.findFilesById(runId);
+  }
+
   @Get()
   @ApiImplicitQuery({ name: 'search', required: false, type: String })
   async findAll(@Query('search') search: string): Promise<RunEntity[]> {

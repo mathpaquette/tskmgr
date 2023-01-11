@@ -1,6 +1,6 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
-import { Run, TaskStatus } from '@tskmgr/common';
+import { TaskStatus, Task } from '@tskmgr/common';
 import { AgGridEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { checkboxCellRenderer, defaultGridOptions, timeValueFormatter } from '../../common/ag-grid.util';
 import { Subject, takeUntil } from 'rxjs';
@@ -99,33 +99,27 @@ export class RunDetailsTasksComponent implements OnDestroy {
     this.gridOptions.api?.sizeColumnsToFit();
   }
 
-  refreshData(run: Run | undefined, event: AgGridEvent): void {
-    if (!run) {
-      return;
-    }
-
-    event.api.setRowData(run.tasks);
+  refreshData(tasks: Task[], event: AgGridEvent): void {
+    event.api.setRowData(tasks);
   }
 
-  updateCounts(run: Run | undefined): void {
-    if (!run) {
-      return;
-    }
-
+  updateCounts(tasks: Task[]): void {
     for (const taskFilter of this.taskFilters) {
       if (!taskFilter.filter) {
-        taskFilter.count = run.tasks.length;
+        taskFilter.count = tasks.length;
         continue;
       }
-      taskFilter.count = run.tasks.filter((x) => x.status === taskFilter.filter).length;
+
+      taskFilter.count = tasks.filter((x) => x.status === taskFilter.filter).length;
     }
   }
 
   onGridReady(event: GridReadyEvent): void {
-    this.runDetailsService.run$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
+    this.runDetailsService.tasks$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
       this.refreshData(x, event);
       this.updateCounts(x);
     });
+
     event.api.sizeColumnsToFit();
   }
 

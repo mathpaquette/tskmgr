@@ -3,7 +3,7 @@ import { AgGridEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-commun
 import { dateValueFormatter, defaultGridOptions } from '../../common/ag-grid.util';
 import { RunDetailsService } from './run-details.service';
 import { Subject, takeUntil } from 'rxjs';
-import { Run } from '@tskmgr/common';
+import { File } from '@tskmgr/common';
 import { FileIdCellRendererComponent } from '../cell-renderers/file-id-cell-renderer.component';
 
 @Component({
@@ -69,17 +69,14 @@ export class RunDetailsFilesComponent implements OnDestroy {
   }
 
   onGridReady(event: GridReadyEvent): void {
-    this.runDetailsService.run$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
+    this.runDetailsService.files$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
       this.refreshData(x, event);
     });
+
     event.api.sizeColumnsToFit();
   }
 
-  refreshData(run: Run | undefined, event: AgGridEvent): void {
-    if (!run) {
-      return;
-    }
-
-    event.api.setRowData(run.files);
+  refreshData(files: File[], event: AgGridEvent): void {
+    event.api.setRowData(files);
   }
 }

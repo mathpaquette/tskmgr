@@ -13,4 +13,7 @@ drop table task cascade;
 drop table run cascade;
 drop table file cascade;
 
+# WSL2
+sudo service postgresql start
+
 Usage: curl -vv -F file=@dump_2022-08-06.gz http://localhost:3333/api/runs/1/files

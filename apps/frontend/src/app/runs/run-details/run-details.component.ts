@@ -1,8 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { Run } from '@tskmgr/common';
 import { RunDetailsService } from './run-details.service';
-import { Subject, takeUntil } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Component({
   selector: 'tskmgr-run-details',
@@ -14,7 +13,7 @@ import { Subject, takeUntil } from 'rxjs';
       >
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a routerLink="/runs">Runs</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ run?.name }}</li>
+          <li class="breadcrumb-item active" aria-current="page">{{ (run$ | async)?.name }}</li>
         </ol>
       </nav>
 
@@ -44,22 +43,14 @@ import { Subject, takeUntil } from 'rxjs';
   ],
   providers: [RunDetailsService],
 })
-export class RunDetailsComponent implements OnInit, OnDestroy {
-  run: Run | undefined;
+export class RunDetailsComponent implements OnInit {
+  run$: Observable<Run>;
 
   readonly destroy$ = new Subject<void>();
 
-  constructor(private runDetailsService: RunDetailsService, private activatedRoute: ActivatedRoute) {}
+  constructor(private runDetailsService: RunDetailsService) {}
 
   ngOnInit(): void {
-    this.runDetailsService.run$.pipe(takeUntil(this.destroy$)).subscribe((x) => (this.run = x));
-    const runId = Number(this.activatedRoute.snapshot.paramMap.get('id'));
-    this.runDetailsService.fetchRun(runId);
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-    console.log('destroyed');
+    this.run$ = this.runDetailsService.run$;
   }
 }

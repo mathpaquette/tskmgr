@@ -1,28 +1,48 @@
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
-import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
-import { Run } from '@tskmgr/common';
+import { Injectable, OnDestroy } from '@angular/core';
+import { Observable, shareReplay, Subject, switchMap, takeUntil, takeWhile, tap, timer } from 'rxjs';
+import { Run, Task, File } from '@tskmgr/common';
 import { RunsService } from '../runs.service';
-import { HeaderService } from '../../common/header/header.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Injectable()
 export class RunDetailsService implements OnDestroy {
-  readonly _run = new BehaviorSubject<Run | undefined>(undefined);
-  readonly run$ = this._run.asObservable();
-  readonly destroy$ = new Subject<void>();
+  readonly runId: number;
 
-  runId: number;
+  readonly run$: Observable<Run>;
+  readonly tasks$: Observable<Task[]>;
+  readonly files$: Observable<File[]>;
 
-  constructor(private readonly runsService: RunsService, private readonly headerService: HeaderService) {
-    this.headerService.refreshData$.pipe(takeUntil(this.destroy$)).subscribe(() => this.refreshData());
-  }
+  private readonly destroy$ = new Subject<void>();
+  private readonly ended$ = new Subject<void>();
 
-  fetchRun(id: number): void {
-    this.runId = id;
-    this.refreshData();
-  }
+  private readonly pollingInterval$ = timer(0, 1000 * 10).pipe(takeUntil(this.destroy$));
 
-  private refreshData() {
-    this.runsService.findById(this.runId).subscribe((x) => this._run.next(x));
+  constructor(private readonly runsService: RunsService, private readonly activatedRoute: ActivatedRoute) {
+    this.runId = Number(this.activatedRoute.snapshot.paramMap.get('id'));
+
+    this.run$ = this.pollingInterval$.pipe(
+      switchMap(() => this.runsService.findById(this.runId)),
+      tap((x) => {
+        if (x.endedAt) {
+          this.ended$.next();
+          this.ended$.complete();
+        }
+      }),
+      takeWhile(() => this.ended$.closed, true),
+      shareReplay(1)
+    );
+
+    this.tasks$ = this.pollingInterval$.pipe(
+      switchMap(() => this.runsService.findTasksById(this.runId)),
+      takeWhile(() => this.ended$.closed, true),
+      shareReplay(1)
+    );
+
+    this.files$ = this.pollingInterval$.pipe(
+      switchMap(() => this.runsService.findFilesById(this.runId)),
+      takeWhile(() => this.ended$.closed, true),
+      shareReplay(1)
+    );
   }
 
   ngOnDestroy(): void {
