@@ -84,7 +84,7 @@ import { Run } from '@tskmgr/common';
 export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
   infoEntries: { key: string; value: string }[] = [];
   paramEntries: { key: string; value: never }[] = [];
-  run: Run | undefined;
+  run: Run;
 
   readonly destroy$ = new Subject<void>();
 
@@ -92,10 +92,7 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.runDetailsService.run$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
-      if (!x) {
-        return;
-      }
-
+      console.log(x);
       this.run = x;
       this.setInformation(x);
       this.setParameters(x);
@@ -110,16 +107,11 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
   private setInformation(run: Run): void {
     this.infoEntries = [];
     Object.entries(run).forEach((x) => {
-      let key = x[0];
-      let value = x[1];
+      const key = x[0];
+      const value = x[1];
 
       if (key === 'parameters') {
         return;
-      }
-
-      if (key === 'files' || key === 'tasks') {
-        key = `${key}Count`;
-        value = value.length;
       }
 
       this.infoEntries.push({ key, value });
@@ -127,6 +119,10 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
   }
 
   private setParameters(run: Run): void {
+    if (!run.parameters) {
+      return;
+    }
+
     this.paramEntries = [];
     const keys = Object.keys(run.parameters);
     keys.forEach((key) => {
