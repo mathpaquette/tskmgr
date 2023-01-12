@@ -5,6 +5,7 @@
   "scripts": {
     "clean": "sh scripts/clean.sh",
     "start": "nx serve",
+    "start:dev": "nx run-many --target=serve --projects=frontend,api",
     "build": "nx build",
     "test": "nx test",
     "postinstall": "ngcc --properties es2020 browser module main"
