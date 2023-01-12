@@ -92,7 +92,6 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.runDetailsService.run$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
-      console.log(x);
       this.run = x;
       this.setInformation(x);
       this.setParameters(x);

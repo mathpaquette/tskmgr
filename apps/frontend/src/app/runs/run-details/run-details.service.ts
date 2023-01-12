@@ -13,7 +13,7 @@ export class RunDetailsService implements OnDestroy {
   readonly files$: Observable<File[]>;
 
   private readonly destroy$ = new Subject<void>();
-  private readonly ended$ = new Subject<void>();
+  private running = true;
 
   private readonly pollingInterval$ = timer(0, 1000 * 10).pipe(takeUntil(this.destroy$));
 
@@ -24,24 +24,21 @@ export class RunDetailsService implements OnDestroy {
       switchMap(() => this.runsService.findById(this.runId)),
       tap((x) => {
         if (x.endedAt) {
-          this.ended$.next();
-          this.ended$.complete();
+          this.running = false;
         }
       }),
-      takeWhile(() => this.ended$.closed, true),
+      takeWhile(() => this.running, true),
       shareReplay(1)
     );
 
     this.tasks$ = this.pollingInterval$.pipe(
       switchMap(() => this.runsService.findTasksById(this.runId)),
-      takeWhile(() => this.ended$.closed, true),
-      shareReplay(1)
+      takeWhile(() => this.running, true)
     );
 
     this.files$ = this.pollingInterval$.pipe(
       switchMap(() => this.runsService.findFilesById(this.runId)),
-      takeWhile(() => this.ended$.closed, true),
-      shareReplay(1)
+      takeWhile(() => this.running, true)
     );
   }
 
