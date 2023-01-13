@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { StartTaskDto, StartTaskResponseDto, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaskEntity } from './task.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, IsNull, Repository } from 'typeorm';
 import { RunEntity } from '../runs/run.entity';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
@@ -82,7 +82,10 @@ export class PendingTasksService {
     };
 
     return {
-      where: [{ ...query, runnerId }, query],
+      where: [
+        { ...query, runnerId },
+        { ...query, runnerId: IsNull() },
+      ],
       order: { avgDuration: 'DESC' },
       lock: {
         mode: 'pessimistic_write',
@@ -100,7 +103,10 @@ export class PendingTasksService {
     };
 
     return {
-      where: [{ ...query, runnerId }, query],
+      where: [
+        { ...query, runnerId },
+        { ...query, runnerId: IsNull() },
+      ],
       order: { avgDuration: 'ASC' },
       lock: {
         mode: 'pessimistic_write',
@@ -119,7 +125,10 @@ export class PendingTasksService {
     };
 
     return {
-      where: [{ ...query, runnerId }, query],
+      where: [
+        { ...query, runnerId },
+        { ...query, runnerId: IsNull() },
+      ],
       order: { createdAt: 'DESC' },
       lock: {
         mode: 'pessimistic_write',
@@ -138,7 +147,10 @@ export class PendingTasksService {
     };
 
     return {
-      where: [{ ...query, runnerId }, query],
+      where: [
+        { ...query, runnerId },
+        { ...query, runnerId: IsNull() },
+      ],
       order: { createdAt: 'ASC' },
       lock: {
         mode: 'pessimistic_write',
