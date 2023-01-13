@@ -10,6 +10,7 @@ export * from './lib/runs/dto/set-leader-request.dto';
 export * from './lib/runs/dto/set-leader-response.dto';
 export * from './lib/runs/run-status';
 export * from './lib/runs/run-parameters';
+export * from './lib/runs/run-info';
 
 // tasks
 export * from './lib/tasks/task';

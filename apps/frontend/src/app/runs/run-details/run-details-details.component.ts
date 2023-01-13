@@ -7,8 +7,9 @@ import { Run } from '@tskmgr/common';
   template: `
     <div class="d-flex flex-column w-100 m-3">
       <div class="accordion" id="accordionExample">
+        <!-- DETAILS -->
         <div class="accordion-item">
-          <h2 class="accordion-header" id="headingOne">
+          <h2 class="accordion-header">
             <button
               class="accordion-button"
               type="button"
@@ -17,7 +18,7 @@ import { Run } from '@tskmgr/common';
               aria-expanded="true"
               aria-controls="collapseOne"
             >
-              Run information
+              Run details
             </button>
           </h2>
           <div
@@ -29,17 +30,18 @@ import { Run } from '@tskmgr/common';
             <div class="accordion-body">
               <table class="table">
                 <tbody>
-                  <tr *ngFor="let info of infoEntries; let i = index">
-                    <th scope="row">{{ info.key | camelCaseToWords }}</th>
-                    <td>{{ info.value }}</td>
+                  <tr *ngFor="let detail of detailsEntries; let i = index">
+                    <th scope="row">{{ detail.key | camelCaseToWords }}</th>
+                    <td><span [outerHTML]="detail.value | urlify"></span></td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
         </div>
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingTwo">
+        <!-- INFO -->
+        <div class="accordion-item" *ngIf="infoEntries.length > 0">
+          <h2 class="accordion-header">
             <button
               class="accordion-button collapsed"
               type="button"
@@ -48,7 +50,7 @@ import { Run } from '@tskmgr/common';
               aria-expanded="false"
               aria-controls="collapseTwo"
             >
-              Run parameters
+              Run info
             </button>
           </h2>
           <div
@@ -60,7 +62,39 @@ import { Run } from '@tskmgr/common';
             <div class="accordion-body">
               <table class="table">
                 <tbody>
-                  <tr *ngFor="let param of paramEntries; let i = index">
+                  <tr *ngFor="let info of infoEntries; let i = index">
+                    <th scope="row">{{ info.key }}</th>
+                    <td><span [outerHTML]="info.value | urlify"></span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- PARAMETERS -->
+        <div class="accordion-item" *ngIf="paramsEntries.length > 0">
+          <h2 class="accordion-header" id="headingThree">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapseThree"
+              aria-expanded="false"
+              aria-controls="collapseThree"
+            >
+              Run parameters
+            </button>
+          </h2>
+          <div
+            id="collapseThree"
+            class="accordion-collapse collapse"
+            aria-labelledby="headingThree"
+            data-bs-parent="#accordionExample"
+          >
+            <div class="accordion-body">
+              <table class="table">
+                <tbody>
+                  <tr *ngFor="let param of paramsEntries; let i = index">
                     <th scope="row">{{ param.key }}</th>
                     <td>{{ param.value }}</td>
                   </tr>
@@ -82,8 +116,9 @@ import { Run } from '@tskmgr/common';
   ],
 })
 export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
+  detailsEntries: { key: string; value: string }[] = [];
   infoEntries: { key: string; value: string }[] = [];
-  paramEntries: { key: string; value: never }[] = [];
+  paramsEntries: { key: string; value: never }[] = [];
   run: Run;
 
   readonly destroy$ = new Subject<void>();
@@ -93,7 +128,8 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.runDetailsService.run$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
       this.run = x;
-      this.setInformation(x);
+      this.setDetails(x);
+      this.setInfo(x);
       this.setParameters(x);
     });
   }
@@ -103,16 +139,29 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private setInformation(run: Run): void {
-    this.infoEntries = [];
+  private setDetails(run: Run): void {
+    this.detailsEntries = [];
     Object.entries(run).forEach((x) => {
       const key = x[0];
       const value = x[1];
 
-      if (key === 'parameters') {
+      if (key === 'parameters' || key == 'info') {
         return;
       }
 
+      this.detailsEntries.push({ key, value });
+    });
+  }
+
+  private setInfo(run: Run): void {
+    if (!run.info) {
+      return;
+    }
+
+    this.infoEntries = [];
+    const keys = Object.keys(run.info);
+    keys.forEach((key) => {
+      const value = run.info[key];
       this.infoEntries.push({ key, value });
     });
   }
@@ -122,11 +171,11 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.paramEntries = [];
+    this.paramsEntries = [];
     const keys = Object.keys(run.parameters);
     keys.forEach((key) => {
       const value = run.parameters[key];
-      this.paramEntries.push({ key, value });
+      this.paramsEntries.push({ key, value });
     });
   }
 }

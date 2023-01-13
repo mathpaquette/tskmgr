@@ -21,6 +21,7 @@ export class RunsService {
       name: createRunDto.name,
       type: createRunDto.type,
       url: createRunDto.url,
+      info: createRunDto.info,
       parameters: createRunDto.parameters,
       prioritization: createRunDto.prioritization,
       affinity: createRunDto.affinity,

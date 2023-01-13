@@ -6,10 +6,11 @@ import { RouterLinkActive, RouterLinkWithHref } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { CamelCaseToWordsPipe } from './camel-case.pipe';
+import { UrlifyPipe } from './urlify.pipe';
 
 @NgModule({
-  declarations: [HeaderComponent, SettingsComponent, CamelCaseToWordsPipe],
-  exports: [HeaderComponent, SettingsComponent, CamelCaseToWordsPipe],
+  declarations: [HeaderComponent, SettingsComponent, CamelCaseToWordsPipe, UrlifyPipe],
+  exports: [HeaderComponent, SettingsComponent, CamelCaseToWordsPipe, UrlifyPipe],
   imports: [
     CommonModule, //
     RouterLinkWithHref,
