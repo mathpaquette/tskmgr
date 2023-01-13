@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, IsNull, Not, Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
 import {
+  CompleteTaskDto,
+  CreateFileRequestDto,
   CreateTaskDto,
   CreateTasksDto,
   RunStatus,
   TaskStatus,
-  CreateFileRequestDto,
-  CompleteTaskDto,
 } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
@@ -39,8 +39,8 @@ export class TasksService {
       throw new Error(`Run with ${run.status} status can't accept new tasks`);
     }
 
+    const hasAffinity = !!run.affinityId;
     const tasks: TaskEntity[] = [];
-    const runAffinity = await this.hasRunAffinity(run);
 
     for (const createTaskDto of createTasksDto.tasks) {
       const avgDuration = await this.getAverageTaskDuration(createTaskDto);
@@ -56,8 +56,8 @@ export class TasksService {
         avgDuration: avgDuration,
       });
 
-      if (runAffinity) {
-        task.runnerId = await this.getRunnerAffinityId(runAffinity, createTaskDto);
+      if (hasAffinity) {
+        task.runnerId = await this.getRunnerIdFromAffinity(run, createTaskDto);
       }
 
       tasks.push(task);
@@ -152,36 +152,12 @@ export class TasksService {
     await this.runsRepository.save(run);
   }
 
-  private async hasRunAffinity(run: RunEntity): Promise<RunEntity> {
-    if (!run.affinity) {
-      return null;
-    }
-
-    if (!run.parameters) {
-      return null;
-    }
-
-    await this.getPreviousMatchingRun(run);
-  }
-
-  private async getPreviousMatchingRun(currentRun: RunEntity): Promise<RunEntity> {
-    return this.runsRepository.findOne({
-      where: {
-        id: Not(currentRun.id),
-        parameters: currentRun.parameters,
-        status: RunStatus.Completed,
-      },
-      order: { endedAt: 'DESC' },
-    });
-  }
-
   private async getAverageTaskDuration(createTaskDto: CreateTaskDto): Promise<number> {
-    const args = createTaskDto.arguments ? In(createTaskDto.arguments) : IsNull();
     const previousTasks = await this.tasksRepository.find({
       where: {
         type: createTaskDto.type,
         command: createTaskDto.command,
-        arguments: args,
+        arguments: createTaskDto.arguments?.toString(),
         options: createTaskDto.options,
         status: TaskStatus.Completed,
         cached: false,
@@ -194,18 +170,20 @@ export class TasksService {
     return sum / previousTasks.length || undefined;
   }
 
-  private async getRunnerAffinityId(run: RunEntity, createTaskDto: CreateTaskDto): Promise<string> {
-    const args = createTaskDto.arguments ? In(createTaskDto.arguments) : IsNull();
+  private async getRunnerIdFromAffinity(run: RunEntity, createTaskDto: CreateTaskDto): Promise<string> {
     const task = await this.tasksRepository.findOne({
       where: {
-        run: { id: run.id },
-        runnerId: Not(IsNull()),
+        run: {
+          affinityId: run.affinityId,
+          parameters: run.parameters,
+        },
         status: TaskStatus.Completed,
         type: createTaskDto.type,
         command: createTaskDto.command,
-        arguments: args,
+        arguments: createTaskDto.arguments?.toString(),
         options: createTaskDto.options,
       },
+      relations: { run: true },
       order: { endedAt: 'DESC' },
     });
 

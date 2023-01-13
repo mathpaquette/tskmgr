@@ -32,8 +32,8 @@ export class RunEntity implements Run {
   @Column({ type: 'jsonb', nullable: true })
   parameters: RunParameters;
 
-  @Column({ default: false })
-  affinity: boolean;
+  @Column({ nullable: true })
+  affinityId: string;
 
   @Column({ type: 'real', nullable: true })
   duration: number;

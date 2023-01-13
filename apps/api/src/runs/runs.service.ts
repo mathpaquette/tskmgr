@@ -23,7 +23,7 @@ export class RunsService {
       url: createRunDto.url,
       parameters: createRunDto.parameters,
       prioritization: createRunDto.prioritization,
-      affinity: createRunDto.affinity,
+      affinityId: createRunDto.affinityId,
       failFast: createRunDto.failFast,
     });
 

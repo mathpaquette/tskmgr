@@ -7,6 +7,6 @@ export class CreateRunRequestDto {
   readonly parameters?: object;
   readonly prioritization?: TaskPriority[];
   /** affinity will try to reschedule task on previous runner id */
-  readonly affinity?: boolean;
+  readonly affinityId?: string;
   readonly failFast?: boolean;
 }
