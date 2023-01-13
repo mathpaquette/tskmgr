@@ -82,6 +82,7 @@ export class RunsComponent implements OnInit, OnDestroy {
     { field: 'affinity', cellRenderer: checkboxCellRenderer },
     { field: 'failFast', cellRenderer: checkboxCellRenderer },
     { field: 'closed', cellRenderer: checkboxCellRenderer },
+    { field: 'duration', headerName: 'Duration (sec)' },
     { field: 'updatedAt', cellRenderer: dateValueFormatter },
   ];
 
