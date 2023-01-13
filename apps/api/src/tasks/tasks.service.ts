@@ -39,7 +39,7 @@ export class TasksService {
       throw new Error(`Run with ${run.status} status can't accept new tasks`);
     }
 
-    const hasAffinity = !!run.affinityId;
+    const hasAffinity = run.affinity;
     const tasks: TaskEntity[] = [];
 
     for (const createTaskDto of createTasksDto.tasks) {
@@ -174,14 +174,15 @@ export class TasksService {
     const task = await this.tasksRepository.findOne({
       where: {
         run: {
-          affinityId: run.affinityId,
-          parameters: run.parameters,
+          affinity: true,
+          parameters: run.parameters || {}, // must match all parameters from current run
         },
         status: TaskStatus.Completed,
         type: createTaskDto.type,
         command: createTaskDto.command,
         arguments: createTaskDto.arguments?.toString(),
         options: createTaskDto.options,
+        // TODO: maximum one month old to limit scan
       },
       relations: { run: true },
       order: { endedAt: 'DESC' },

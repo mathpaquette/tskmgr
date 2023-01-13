@@ -23,7 +23,7 @@ export class RunsService {
       url: createRunDto.url,
       parameters: createRunDto.parameters,
       prioritization: createRunDto.prioritization,
-      affinityId: createRunDto.affinityId,
+      affinity: createRunDto.affinity,
       failFast: createRunDto.failFast,
     });
 
@@ -116,14 +116,19 @@ export class RunsService {
   async findTasksById(runId: number): Promise<TaskEntity[]> {
     return this.tasksRepository.find({
       where: { run: { id: runId } },
-      relations: ['files'],
+      relations: {
+        files: true,
+      },
     });
   }
 
   async findFilesById(runId: number): Promise<FileEntity[]> {
     return this.filesRepository.find({
       where: { run: { id: runId } },
-      relations: ['run', 'task'],
+      relations: {
+        run: true,
+        task: true,
+      },
     });
   }
 }

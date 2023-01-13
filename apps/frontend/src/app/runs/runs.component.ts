@@ -79,7 +79,7 @@ export class RunsComponent implements OnInit, OnDestroy {
     { field: 'type', filter: true },
     { field: 'status', filter: true },
     { field: 'prioritization', filter: true },
-    { field: 'affinityId', headerName: 'Affinity', cellRenderer: checkboxCellRenderer },
+    { field: 'affinity', cellRenderer: checkboxCellRenderer },
     { field: 'failFast', cellRenderer: checkboxCellRenderer },
     { field: 'closed', cellRenderer: checkboxCellRenderer },
     { field: 'updatedAt', cellRenderer: dateValueFormatter },

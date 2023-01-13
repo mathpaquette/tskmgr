@@ -81,7 +81,10 @@ describe('RunsController', () => {
     const run1 = await runsController.createRun({
       name: `run1-${affinityId}`,
       type: 'test',
-      affinityId,
+      affinity: true,
+      parameters: {
+        affinityId,
+      },
     });
     const createdTasksRun1 = await runsController.createTasks(run1.id, createTasks);
     const startedTaskRun1 = await runsController.startTask(run1.id, { runnerId });
@@ -91,7 +94,10 @@ describe('RunsController', () => {
     const run2 = await runsController.createRun({
       name: `run2-${affinityId}`,
       type: 'test',
-      affinityId,
+      affinity: true,
+      parameters: {
+        affinityId,
+      },
     });
     const createdTasksRun2 = await runsController.createTasks(run2.id, createTasks);
     const startedTaskRun2 = await runsController.startTask(run2.id, { runnerId });
