@@ -81,7 +81,12 @@ describe('RunsController', () => {
     const run1 = await runsController.createRun({
       name: `run1-${affinityId}`,
       type: 'test',
+      url: 'http://affinity-run',
       affinity: true,
+      info: {
+        url1: 'http://url1',
+        url2: 'http://url2',
+      },
       parameters: {
         affinityId,
       },

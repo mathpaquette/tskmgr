@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { RunStatus, TaskPriority, Run, DateUtil, RunParameters } from '@tskmgr/common';
+import { RunStatus, TaskPriority, Run, DateUtil, RunParameters, RunInfo } from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
 import { TaskEntity } from '../tasks/task.entity';
 
@@ -28,6 +28,9 @@ export class RunEntity implements Run {
 
   @Column({ type: 'simple-array', default: TaskPriority.Longest })
   prioritization: TaskPriority[];
+
+  @Column({ type: 'jsonb', nullable: true })
+  info: RunInfo;
 
   @Column({ type: 'jsonb', nullable: true })
   parameters: RunParameters;
