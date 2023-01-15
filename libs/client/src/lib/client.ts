@@ -111,7 +111,7 @@ export class Client {
     const taskRunners: Promise<TaskResult[]>[] = [];
 
     for (let i = 0; i < this.options.parallel; i++) {
-      taskRunners.push(this.defaultTaskRunner(runId));
+      taskRunners.push(this.defaultParallelTaskRunner(runId, i));
     }
 
     const taskResults = await Promise.all(taskRunners);
@@ -168,29 +168,36 @@ export class Client {
     return await checkStatus(res).json();
   }
 
-  private async defaultTaskRunner(runId: number): Promise<TaskResult[]> {
+  private async defaultParallelTaskRunner(runId: number, parallelId: number): Promise<TaskResult[]> {
+    const loggerInfo = `[tskmgr runner id: ${this.runnerId} parallel id: ${parallelId}]`;
     const taskResults: TaskResult[] = [];
     let _continue = true;
+
+    console.log(`${loggerInfo} starting parallel task runner...`);
 
     while (_continue) {
       const response = await this.startTask(runId, { runnerId: this.runnerId });
 
       if (!response.continue) {
+        console.log(`${loggerInfo} last task received.`);
         _continue = false;
       }
 
       if (!response.continue && !response.task) {
+        console.log(`${loggerInfo} run is closed and no task received.`);
         continue;
       }
 
       if (!response.task) {
         // TODO: this should output only once per runner
-        console.log(`polling for a new task in: ${this.options.pollingDelayMs} ms`);
+        console.log(`${loggerInfo} polling for a new task in: ${this.options.pollingDelayMs} ms`);
         await delay(this.options.pollingDelayMs);
         continue;
       }
 
       const { run, task } = response;
+      console.log(`${loggerInfo} task received: ${task}`);
+
       let cached = false;
       let hasCompleted = true;
       let childProcess: ChildProcess;
@@ -207,6 +214,7 @@ export class Client {
         this.options.errorCallback(task, data);
       };
 
+      console.log(`${loggerInfo} starting task: ${task.command}`);
       try {
         childProcess = await spawnAsync(
           task.command,
@@ -221,12 +229,15 @@ export class Client {
             errorCallback: errorHandler,
           }
         );
+        console.log(`${loggerInfo} executed task: ${task.command}`);
       } catch (err) {
+        console.error(`${loggerInfo} error: ${err} during task: ${task.command}`);
         error = err;
         hasCompleted = false;
 
         if (run.failFast) {
           // TODO: should abort all running tasks by current client
+          console.log(`${loggerInfo} fail fast enabled, throwing error for task: ${task.command}`);
           throw err;
         }
       } finally {
@@ -234,8 +245,10 @@ export class Client {
 
         if (hasCompleted) {
           await this.completeTask(task.id, { cached });
+          console.log(`${loggerInfo} completed task: ${task.command}`);
         } else {
           await this.failTask(task.id);
+          console.log(`${loggerInfo} failed task: ${task.command}`);
         }
 
         writeStream.close();
@@ -243,9 +256,12 @@ export class Client {
           type: 'log',
           description: `Log for task ${task.id}`,
         });
+        console.log(`${loggerInfo} uploaded file for task: ${task.command}`);
         unlinkSync(taskLogFilename);
       }
     }
+
+    console.log(`${loggerInfo} parallel task runner completed!`);
 
     return taskResults;
   }
