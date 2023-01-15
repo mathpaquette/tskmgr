@@ -177,6 +177,9 @@ export class Client {
 
       if (!response.continue) {
         _continue = false;
+      }
+
+      if (!response.continue && !response.task) {
         continue;
       }
 
