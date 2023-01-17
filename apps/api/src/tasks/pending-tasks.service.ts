@@ -24,13 +24,6 @@ export class PendingTasksService {
       throw new Error(`Run id: ${runId} can't be found.`);
     }
 
-    if (run.hasEnded()) {
-      return {
-        continue: false,
-        run,
-      };
-    }
-
     const startedTask = await this.getPendingTask(runId, startTaskDto, run.prioritization);
     if (!startedTask) {
       const waitingForTasks = !run.closed; // until run is closed, we need to wait for new incoming tasks.
@@ -49,9 +42,9 @@ export class PendingTasksService {
     startTaskDto: StartTaskDto,
     prioritization: TaskPriority[]
   ): Promise<TaskEntity> {
-    let task: TaskEntity;
-
     for (const priority of prioritization) {
+      let task: TaskEntity;
+
       switch (priority) {
         case TaskPriority.Longest:
           task = await this.startOnePendingTask(startTaskDto, this.getLongestOptions(runId, startTaskDto));
@@ -68,9 +61,13 @@ export class PendingTasksService {
         default:
           throw Error('Unknown priority type!');
       }
+
+      if (task) {
+        return task;
+      }
     }
 
-    return task;
+    return null;
   }
 
   private getLongestOptions(runId: number, startTaskDto: StartTaskDto): FindOneOptions<TaskEntity> {
