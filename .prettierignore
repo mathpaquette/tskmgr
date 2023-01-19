@@ -3,5 +3,6 @@
 /dist
 /coverage
 /.angular
+/data
 
-/apps/api/database
+/libs/db/src/migrations

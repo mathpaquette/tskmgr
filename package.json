@@ -7,11 +7,12 @@
     "start:dev": "nx run-many --target=serve --projects=frontend,api",
     "build": "nx build",
     "test": "nx test",
+    "client:example": "DEBUG=tskmgr:* TS_NODE_PROJECT=tsconfig.base.json node -r ts-node/register -r tsconfig-paths/register libs/client/src/lib/client-example.ts",
     "postinstall": "ngcc --properties es2020 browser module main",
-    "typeorm": "TS_NODE_PROJECT=apps/api/tsconfig.app.json node --require ts-node/register --require tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "typeorm:migration:generate": "npm run typeorm -- migration:generate -d apps/api/src/config/data-source.ts -o apps/api/database/migrations/tskmgr",
-    "typeorm:migration:run": "npm run typeorm -- migration:run -d apps/api/src/config/data-source.ts",
-    "typeorm:migration:show": "npm run typeorm -- migration:show -d apps/api/src/config/data-source.ts"
+    "typeorm": "TS_NODE_PROJECT=tsconfig.base.json node -r ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "typeorm:migration:generate": "npm run typeorm -- migration:generate -d libs/db/src/lib/data-source.ts -o libs/db/src/migrations/tskmgr",
+    "typeorm:migration:show": "npm run typeorm -- migration:show -d libs/db/src/lib/data-source.ts",
+    "typeorm:migration:run": "npm run typeorm -- migration:run -d libs/db/src/lib/data-source.ts"
   },
   "private": true,
   "dependencies": {

@@ -1,8 +1,8 @@
-import { AppDataSource } from '../config/data-source';
+import { AppDataSource } from '@tskmgr/db';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
 
-const { type, host, port, username, password, database, entities } = AppDataSource.options as PostgresConnectionOptions;
+const { type, host, port, username, password, database } = AppDataSource.options as PostgresConnectionOptions;
 
 export interface Environment {
   production: boolean;
@@ -24,7 +24,6 @@ export const environment: Environment = {
     database: `${database}_dev`,
     autoLoadEntities: true,
     synchronize: true,
-    entities,
   },
 
   multer: {
