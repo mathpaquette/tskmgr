@@ -9,6 +9,10 @@ DROP DATABASE tskmgr;
 CREATE DATABASE tskmgr;
 GRANT ALL PRIVILEGES ON DATABASE tskmgr TO tskmgr;
 
+DROP DATABASE tskmgr_dev;
+CREATE DATABASE tskmgr_dev;
+GRANT ALL PRIVILEGES ON DATABASE tskmgr_dev TO tskmgr;
+
 \l
 \c tskmgr
 
@@ -27,3 +31,9 @@ drop table migrations cascade;
 sudo service postgresql start
 
 Usage: curl -vv -F file=@dump_2022-08-06.gz http://localhost:3333/api/runs/1/files
+
+
+docker rm tskmgr_api_1 tskmgr_frontend_1 tskmgr_migrations_1 tskmgr_postgres_1 --force
+
+docker-compose -f docker-compose.build.yml build
+docker-compose -f docker-compose.yml up

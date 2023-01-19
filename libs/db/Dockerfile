@@ -17,8 +17,10 @@ RUN npm install
 RUN npx nx affected:build --all --configuration=production --verbose
 RUN npm install --omit dev
 
-FROM nginxinc/nginx-unprivileged
-WORKDIR /usr/share/nginx/html
+FROM node:16-alpine
+WORKDIR /app
 
-COPY --from=build /build/apps/frontend/nginx/default.conf.template /etc/nginx/templates/default.conf.template
-COPY --from=build /build/dist/apps/frontend .
+COPY --from=build /build/dist/libs/db ./dist/libs/db
+COPY --from=build --chown=node:node /build/node_modules node_modules/
+
+CMD ["npx", "typeorm", "migration:run", "-d", "dist/libs/db/src/lib/data-source.js"]

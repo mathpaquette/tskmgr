@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { HeaderService } from './header.service';
 import { Observable } from 'rxjs';
 import { IsActiveMatchOptions } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'tskmgr-header',
@@ -9,7 +10,7 @@ import { IsActiveMatchOptions } from '@angular/router';
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
       <div class="container-fluid">
         <a class="navbar-brand" href="https://github.com/mathpaquette/tskmgr"
-          >tskmgr <span class="version">v1.0.0</span></a
+          >tskmgr <span class="version">{{ version }}</span></a
         >
         <button
           class="navbar-toggler collapsed"
@@ -69,6 +70,7 @@ export class HeaderComponent {
     matrixParams: 'exact',
     fragment: 'exact',
   };
+  readonly version = environment.version;
 
   constructor(public headerService: HeaderService) {
     this.search$ = headerService.search$;

@@ -1,8 +1,22 @@
 version: '3.8'
 
 services:
-  mongo:
-    image: mongo:4.2
+  postgres:
+    image: postgres:14
+
+  migrations:
+    build:
+      dockerfile: libs/db/Dockerfile
+      context: .
+    image: mathpaquette/tskmgr-migrations:${TSKMGR_VERSION:-latest}
+    environment:
+      DB_HOST: 'localhost'
+      DB_PORT: 5432
+      DB_USERNAME: 'tskmgr'
+      DB_PASSWORD: 'tskmgr'
+      DB_DATABASE: 'tskmgr'
+    depends_on:
+      - postgres
 
   api:
     build:
@@ -10,11 +24,17 @@ services:
       context: .
     image: mathpaquette/tskmgr-api:${TSKMGR_VERSION:-latest}
     environment:
-      MONGODB_URI: 'mongodb://mongo:27017/tskmgr'
+      DB_HOST: 'localhost'
+      DB_PORT: 5432
+      DB_USERNAME: 'tskmgr'
+      DB_PASSWORD: 'tskmgr'
+      DB_DATABASE: 'tskmgr'
+    volumes:
+      - ./data/api/files:/app/files
     ports:
       - 3333:3333
     depends_on:
-      - mongo
+      - migrations
 
   frontend:
     build:

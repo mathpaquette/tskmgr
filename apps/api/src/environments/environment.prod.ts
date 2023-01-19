@@ -1,8 +1,11 @@
-import { AppDataSource } from '../config/data-source';
+import { AppDataSource } from '@tskmgr/db';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { Environment } from './environment';
+import { FileEntity } from '../files/file.entity';
+import { RunEntity } from '../runs/run.entity';
+import { TaskEntity } from '../tasks/task.entity';
 
-const { type, host, port, username, password, database, entities } = AppDataSource.options as PostgresConnectionOptions;
+const { type, host, port, username, password, database } = AppDataSource.options as PostgresConnectionOptions;
 
 export const environment: Environment = {
   production: true,
@@ -16,7 +19,7 @@ export const environment: Environment = {
     database,
     autoLoadEntities: true,
     synchronize: false,
-    entities,
+    entities: [FileEntity, RunEntity, TaskEntity],
   },
 
   multer: {

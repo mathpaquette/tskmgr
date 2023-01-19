@@ -12,7 +12,7 @@
         "tsConfig": "libs/db/tsconfig.lib.json",
         "packageJson": "libs/db/package.json",
         "main": "libs/db/src/index.ts",
-        "assets": ["libs/db/*.md"]
+        "assets": ["libs/db/*.md", "libs/db/src/migrations/*"]
       }
     },
     "lint": {
