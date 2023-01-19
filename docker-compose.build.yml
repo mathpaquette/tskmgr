@@ -1,8 +1,8 @@
 version: '3.8'
 
 services:
-  mongo:
-    image: mongo:4.2
+  postgres:
+    image: postgres:14
 
   api:
     build:
