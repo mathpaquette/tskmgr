@@ -3,8 +3,10 @@
  *  Node parameters: --require ts-node/register --require tsconfig-paths/register
  *  Environment variables: TS_NODE_PROJECT=libs/client/tsconfig.lib.json
  *
- *  Start API: nx serve api
- *  Command: nx reset && TS_NODE_PROJECT=libs/client/tsconfig.lib.json node --require ts-node/register --require tsconfig-paths/register libs/client/src/lib/client-example.ts
+ *  Start API:
+ *    nx serve api
+ *  Command:
+ *    DEBUG=tskmgr:* TS_NODE_PROJECT=libs/client/tsconfig.lib.json node --require ts-node/register --require tsconfig-paths/register libs/client/src/lib/client-example.ts
  */
 
 import { execSync } from 'child_process';
@@ -12,14 +14,15 @@ import { CreateTaskDto, Run, Task, TaskPriority } from '@tskmgr/common';
 import { ClientOptions } from './client-options';
 import { ClientFactory } from './client-factory';
 import { v4 as uuid } from 'uuid';
+import Debug from 'debug';
+const debug = Debug('tskmgr:client-example');
 
 delete process.env.TS_NODE_PROJECT;
 
-const debug = false;
 const options: ClientOptions = { parallel: 1, dataCallback, errorCallback };
 const client = ClientFactory.createNew('http://localhost:3333', 'RUNNER_1', options);
 
-let exitCode = 0;
+let completed = false;
 let run: Run;
 
 (async () => {
@@ -30,11 +33,11 @@ let run: Run;
       type: '123',
       prioritization: [TaskPriority.Longest],
     });
-    log(run);
+    debug(run);
 
     // 2. Leader should create some tasks to run
-    const res = await client.setLeader(run.id);
-    if (res.leader) {
+    const election = await client.setLeader(run.id);
+    if (election.leader) {
       const tasks = getNxTasks().map<CreateTaskDto>((nxTask) => {
         return {
           name: nxTask.target.project,
@@ -46,27 +49,27 @@ let run: Run;
       });
 
       const createdTasks = await client.createTasks(run.id, { tasks });
-      log(createdTasks);
+      debug(createdTasks);
 
       const closeRun = await client.closeRun(run.id);
-      log(closeRun);
+      debug(closeRun);
     }
 
     // 3. Execute tasks
     const result = await client.runTasks(run.id);
-    if (result.failed) {
-      // if failFast set to false, runTasks will complete without throwing errors.
-      exitCode = 1;
+    if (result.completed) {
+      // if failFast set to false, runTasks will continue without throwing errors.
+      completed = true;
     }
   } catch (e) {
-    log(e);
-    exitCode = 1;
+    console.error(e);
   } finally {
     // 4. See results
     console.log('--------------------------------------------------');
     console.log(`  tskmgr run: http://localhost:4200/runs/${run.id}`);
     console.log('--------------------------------------------------');
-    process.exit(exitCode);
+    console.log(`${completed ? 'COMPLETED!' : 'FAILED!'}`);
+    process.exit(completed ? 0 : 1);
   }
 })();
 
@@ -96,12 +99,6 @@ function dataCallback(task: Task, data: string, cached: () => void): void {
 
 function errorCallback(task: Task, data: string): void {
   console.log(`[stderr] ${data}`);
-}
-
-function log(message: any) {
-  if (debug) {
-    console.log(message);
-  }
 }
 
 interface NxTask {

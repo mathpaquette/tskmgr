@@ -20,6 +20,8 @@ import { RunTasksResult } from './run-tasks-result';
 import { TaskResult } from './task-result';
 import { ClientOptions } from './client-options';
 import { createReadStream, createWriteStream, unlinkSync } from 'fs';
+import Debug from 'debug';
+const debug = Debug('tskmgr:client');
 
 export class Client {
   public static readonly DefaultOptions: ClientOptions = {
@@ -169,37 +171,36 @@ export class Client {
   }
 
   private async defaultParallelTaskRunner(runId: number, parallelId: number): Promise<TaskResult[]> {
-    const loggerInfo = `[tskmgr runner id: ${this.runnerId} parallel id: ${parallelId}]`;
+    const logInfo = `[${this.runnerId}:${parallelId}]`;
     const taskResults: TaskResult[] = [];
     let _continue = true;
 
-    console.log(`${loggerInfo} starting parallel task runner...`);
+    debug(`${logInfo} parallel task runner started`);
 
     while (_continue) {
-      const response = await this.startTask(runId, { runnerId: this.runnerId });
+      const res = await this.startTask(runId, { runnerId: this.runnerId });
 
-      if (!response.continue) {
-        console.log(`${loggerInfo} last task received.`);
+      if (!res.continue) {
+        debug(`${logInfo} continue set to false`);
         _continue = false;
       }
 
-      if (!response.continue && !response.task) {
-        console.log(`${loggerInfo} run is closed and no task received.`);
+      if (!res.continue && !res.task) {
+        debug(`${logInfo} continue set to false and no task, exiting`);
         continue;
       }
 
-      if (!response.task) {
-        // TODO: this should output only once per runner
-        console.log(`${loggerInfo} polling for a new task in: ${this.options.pollingDelayMs} ms`);
+      if (!res.task) {
+        debug(`${logInfo} polling for new tasks in ${this.options.pollingDelayMs} ms`);
         await delay(this.options.pollingDelayMs);
         continue;
       }
 
-      const { run, task } = response;
-      console.log(`${loggerInfo} task received: ${task}`);
+      const { run, task } = res;
+      debug(`${logInfo} received task: ${task.id}`);
 
       let cached = false;
-      let hasCompleted = true;
+      let completed = false;
       let childProcess: ChildProcess;
       let error: Error;
 
@@ -214,7 +215,7 @@ export class Client {
         this.options.errorCallback(task, data);
       };
 
-      console.log(`${loggerInfo} starting task: ${task.command}`);
+      debug(`${logInfo} starting task: ${task.id}`);
       try {
         childProcess = await spawnAsync(
           task.command,
@@ -229,26 +230,26 @@ export class Client {
             errorCallback: errorHandler,
           }
         );
-        console.log(`${loggerInfo} executed task: ${task.command}`);
+        completed = true;
+        debug(`${logInfo} completed task: ${task.id}`);
       } catch (err) {
-        console.error(`${loggerInfo} error: ${err} during task: ${task.command}`);
+        console.error(`${logInfo} failed task: ${task.id} with error: ${err}`);
         error = err;
-        hasCompleted = false;
 
         if (run.failFast) {
           // TODO: should abort all running tasks by current client
-          console.log(`${loggerInfo} fail fast enabled, throwing error for task: ${task.command}`);
+          debug(`${logInfo} fail fast enabled, aborting`);
           throw err;
         }
       } finally {
-        taskResults.push({ run, task, childProcess, hasCompleted, error });
+        taskResults.push({ run, task, childProcess, completed, error });
 
-        if (hasCompleted) {
+        if (completed) {
           await this.completeTask(task.id, { cached });
-          console.log(`${loggerInfo} completed task: ${task.command}`);
+          debug(`${logInfo} completed status for task: ${task.id} sent`);
         } else {
           await this.failTask(task.id);
-          console.log(`${loggerInfo} failed task: ${task.command}`);
+          debug(`${logInfo} failed status for task: ${task.id} sent`);
         }
 
         writeStream.close();
@@ -256,12 +257,13 @@ export class Client {
           type: 'log',
           description: `Log for task ${task.id}`,
         });
-        console.log(`${loggerInfo} uploaded file for task: ${task.command}`);
+
+        debug(`${logInfo} uploaded file for task: ${task.id} sent`);
         unlinkSync(taskLogFilename);
       }
     }
 
-    console.log(`${loggerInfo} parallel task runner completed!`);
+    debug(`${logInfo} parallel task runner completed`);
 
     return taskResults;
   }
