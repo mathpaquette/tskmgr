@@ -24,17 +24,17 @@ export class PendingTasksService {
       throw new Error(`Run id: ${runId} can't be found.`);
     }
 
+    if (run.hasEnded()) {
+      return { continue: false, run };
+    }
+
     const startedTask = await this.getPendingTask(runId, startTaskDto, run.prioritization);
     if (!startedTask) {
       const waitingForTasks = !run.closed; // until run is closed, we need to wait for new incoming tasks.
       return { continue: waitingForTasks, run };
     }
 
-    return {
-      continue: true,
-      run,
-      task: startedTask,
-    };
+    return { continue: true, run, task: startedTask };
   }
 
   private async getPendingTask(
