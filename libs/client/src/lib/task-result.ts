@@ -5,6 +5,6 @@ export interface TaskResult {
   run: Run;
   task: Task;
   childProcess: ChildProcess;
-  hasCompleted: boolean;
+  completed: boolean;
   error?: Error;
 }
