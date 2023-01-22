@@ -9,8 +9,6 @@ import { FileEntity } from './files/file.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { PendingTasksService } from './tasks/pending-tasks.service';
 import { TasksController } from './tasks/tasks.controller';
-import { APP_FILTER } from '@nestjs/core';
-import { AllExceptionsFilter } from './config/all-exceptions.filter';
 import { FilesController } from './files/files.controller';
 import { FilesService } from './files/files.service';
 
@@ -41,14 +39,10 @@ import { FilesService } from './files/files.service';
     FilesController,
   ],
   providers: [
-    RunsService,
+    RunsService, //
     TasksService,
     FilesService,
     PendingTasksService,
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
   ],
 })
 export class AppModule {}
