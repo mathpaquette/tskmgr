@@ -5,13 +5,23 @@ curl -X POST http://localhost:3333/api/runs
 sudo -u postgres psql # linux
 psql postgres         # macos
 
+DROP DATABASE tskmgr;
+CREATE DATABASE tskmgr;
+GRANT ALL PRIVILEGES ON DATABASE tskmgr TO tskmgr;
 
 \l
-\c tskmgr_dev
+\c tskmgr
+
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO public;
 
 drop table task cascade;
 drop table run cascade;
 drop table file cascade;
+drop table migrations cascade;
 
 # WSL2
 sudo service postgresql start
