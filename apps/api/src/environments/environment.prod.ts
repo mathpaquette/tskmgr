@@ -1,4 +1,4 @@
-import { AppDataSource } from '../config/data-source';
+import { AppDataSource } from '../configuration/data-source';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { Environment } from './environment';
 
