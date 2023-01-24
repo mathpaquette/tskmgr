@@ -1,7 +1,8 @@
 FROM node:16-alpine
 WORKDIR /build
 
-RUN apk add g++ make py3-pip
+RUN apk add g++ make
+RUN apk add python3 py3-pip
 
 COPY ./apps ./apps
 COPY ./libs ./libs

@@ -3,10 +3,6 @@ version: '3.8'
 services:
   postgres:
     image: postgres:14
-  build-tmp:
-    build:
-      dockerfile: build.Dockerfile
-    image: mathpaquette/tskmgr-build:${TSKMGR_VERSION:-latest}
 
   api:
     build:
@@ -34,3 +30,9 @@ services:
       - 8080:8080
     depends_on:
       - api
+
+  migrations:
+    build:
+      dockerfile:
+
+
