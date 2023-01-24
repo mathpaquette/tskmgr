@@ -1,3 +1,5 @@
+#docker build -t tskmgr-build . -f build.Dockerfile
+
 docker compose -f docker-compose.build.yml build
 
 docker tag mathpaquette/tskmgr-api:$TSKMGR_VERSION mathpaquette/tskmgr-api:latest

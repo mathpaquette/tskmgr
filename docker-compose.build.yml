@@ -3,6 +3,10 @@ version: '3.8'
 services:
   postgres:
     image: postgres:14
+  build-tmp:
+    build:
+      dockerfile: build.Dockerfile
+    image: mathpaquette/tskmgr-build:${TSKMGR_VERSION:-latest}
 
   api:
     build:
@@ -10,11 +14,13 @@ services:
       context: .
     image: mathpaquette/tskmgr-api:${TSKMGR_VERSION:-latest}
     environment:
-      MONGODB_URI: 'mongodb://mongo:27017/tskmgr'
+      DB_USERNAME: 'tskmgr'
+      DB_PASSWORD: 'tskmgr'
+      DB_DATABASE: 'tskmgr'
     ports:
       - 3333:3333
     depends_on:
-      - mongo
+      - postgres
 
   frontend:
     build:
