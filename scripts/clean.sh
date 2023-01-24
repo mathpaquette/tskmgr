@@ -1,5 +1,5 @@
-npx rimraf .angular \
-            dist \
-            tmp \
-            node_modules/.cache \
-            files \
+rm -rf .angular \
+       dist \
+       tmp \
+       node_modules/.cache \
+       files \
