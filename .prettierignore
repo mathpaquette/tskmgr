@@ -4,4 +4,4 @@
 /coverage
 /.angular
 
-/apps/api/database
+/apps/api/db/migrations

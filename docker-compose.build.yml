@@ -4,6 +4,12 @@ services:
   postgres:
     image: postgres:14
 
+  migrations:
+    build:
+      dockerfile: apps/api/db/Dockerfile
+      context: .
+    image: mathpaquette/tskmgr-migrations:${TSKMGR_VERSION:-latest}
+
   api:
     build:
       dockerfile: apps/api/Dockerfile
@@ -30,9 +36,5 @@ services:
       - 8080:8080
     depends_on:
       - api
-
-  migrations:
-    build:
-      dockerfile:
 
 

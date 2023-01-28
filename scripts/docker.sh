@@ -1,9 +1,15 @@
+#!/usr/bin/env bash
+
+docker build -t tskmgr-build-dev . -f build-dev.Dockerfile
 docker build -t tskmgr-build . -f build.Dockerfile
+
 docker compose -f docker-compose.build.yml build
+
+docker image rm tskmgr-build-dev
 docker image rm tskmgr-build
 
-docker tag mathpaquette/tskmgr-api:$TSKMGR_VERSION mathpaquette/tskmgr-api:latest
-docker tag mathpaquette/tskmgr-frontend:$TSKMGR_VERSION mathpaquette/tskmgr-frontend:latest
+# docker tag mathpaquette/tskmgr-api:$TSKMGR_VERSION mathpaquette/tskmgr-api:latest
+# docker tag mathpaquette/tskmgr-frontend:$TSKMGR_VERSION mathpaquette/tskmgr-frontend:latest
 
 # docker push mathpaquette/tskmgr-api --all-tags
 # docker push mathpaquette/tskmgr-frontend --all-tags

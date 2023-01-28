@@ -3,6 +3,9 @@ import { DataSource } from 'typeorm';
 import { FileEntity } from '../files/file.entity';
 import { RunEntity } from '../runs/run.entity';
 import { TaskEntity } from '../tasks/task.entity';
+import { join } from 'path';
+
+const migrations = [`${join(__dirname, '../../db/migrations')}/*-tskmgr.js`]
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -14,6 +17,6 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   logging: false,
   entities: [FileEntity, RunEntity, TaskEntity],
-  migrations: ['apps/api/database/migrations/*.js'],
+  migrations,
   subscribers: [],
 });

@@ -1,7 +1,7 @@
 const { MigrationInterface, QueryRunner } = require("typeorm");
 
-module.exports = class tskmgr1674479566344 {
-    name = 'tskmgr1674479566344'
+module.exports = class tskmgr1674869153760 {
+    name = 'tskmgr1674869153760'
 
     async up(queryRunner) {
         await queryRunner.query(`CREATE TYPE "public"."task_status_enum" AS ENUM('PENDING', 'RUNNING', 'COMPLETED', 'FAILED')`);
