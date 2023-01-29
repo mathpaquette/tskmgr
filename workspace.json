@@ -4,6 +4,7 @@
     "api": "apps/api",
     "client": "libs/client",
     "common": "libs/common",
+    "db": "libs/db",
     "frontend": "apps/frontend",
     "frontend-e2e": "apps/frontend-e2e"
   }

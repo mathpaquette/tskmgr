@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@tskmgr/client": ["libs/client/src/index.ts"],
-      "@tskmgr/common": ["libs/common/src/index.ts"]
+      "@tskmgr/common": ["libs/common/src/index.ts"],
+      "@tskmgr/db": ["libs/db/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
