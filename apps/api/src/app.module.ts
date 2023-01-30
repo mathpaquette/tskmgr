@@ -13,6 +13,8 @@ import { FilesService } from './files/files.service';
 import { environment } from './environments/environment';
 import { FileRunEntity } from './files/file-run.entity';
 import { FileTaskEntity } from './files/file-task.entity';
+import { AllExceptionsFilter } from './config/all-exceptions.filter';
+import { APP_FILTER } from '@nestjs/core';
 
 const ENTITIES = [FileRunEntity, FileTaskEntity, RunEntity, TaskEntity];
 
@@ -32,6 +34,10 @@ const ENTITIES = [FileRunEntity, FileTaskEntity, RunEntity, TaskEntity];
     TasksService,
     FilesService,
     PendingTasksService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
   ],
 })
 export class AppModule {}

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, Res, StreamableFile } from '@nestjs/common';
+import { Controller, Get, Param, Res, StreamableFile } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { createReadStream } from 'fs';
 import type { Response } from 'express';
@@ -8,12 +8,18 @@ export class FilesController {
   constructor(private filesService: FilesService) {}
 
   @Get(':id')
-  async getFile(@Param('id') fileId: number, @Res({ passthrough: true }) res: Response): Promise<StreamableFile> {
+  async getFile(
+    @Param('id') fileId: number, //
+    @Res({ passthrough: true }) res: Response
+  ): Promise<StreamableFile> {
     return this.getStreamableFile(fileId, res, false);
   }
 
   @Get(':id/save')
-  async saveFile(@Param('id') fileId: number, @Res({ passthrough: true }) res: Response): Promise<StreamableFile> {
+  async saveFile(
+    @Param('id') fileId: number, //
+    @Res({ passthrough: true }) res: Response
+  ): Promise<StreamableFile> {
     return this.getStreamableFile(fileId, res, true);
   }
 
