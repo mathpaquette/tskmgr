@@ -22,6 +22,8 @@ export * from './lib/tasks/dto/create-tasks.dto';
 
 // files
 export * from './lib/files/file';
+export * from './lib/files/file-run';
+export * from './lib/files/file-task';
 export * from './lib/files/dto/create-file-request.dto';
 
 // utils

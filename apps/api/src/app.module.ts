@@ -5,15 +5,16 @@ import { TaskEntity } from './tasks/task.entity';
 import { RunsController } from './runs/runs.controller';
 import { RunsService } from './runs/runs.service';
 import { TasksService } from './tasks/tasks.service';
-import { FileEntity } from './files/file.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { PendingTasksService } from './tasks/pending-tasks.service';
 import { TasksController } from './tasks/tasks.controller';
 import { FilesController } from './files/files.controller';
 import { FilesService } from './files/files.service';
 import { environment } from './environments/environment';
+import { FileRunEntity } from './files/file-run.entity';
+import { FileTaskEntity } from './files/file-task.entity';
 
-const ENTITIES = [FileEntity, RunEntity, TaskEntity];
+const ENTITIES = [FileRunEntity, FileTaskEntity, RunEntity, TaskEntity];
 
 @Module({
   imports: [

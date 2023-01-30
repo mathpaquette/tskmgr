@@ -13,13 +13,14 @@ import {
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
 import { Express } from 'express';
+import { FileTaskEntity } from '../files/file-task.entity';
 
 @Injectable()
 export class TasksService {
   public constructor(
     @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
     @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
-    @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>
+    @InjectRepository(FileTaskEntity) private readonly filesRepository: Repository<FileTaskEntity>
   ) {}
   /**
    * Create new tasks in bulk
@@ -117,7 +118,6 @@ export class TasksService {
     }
 
     const fileEntity = this.filesRepository.create({
-      run: task.run,
       task: task,
       type: createFileRequestDto.type,
       description: createFileRequestDto.description,

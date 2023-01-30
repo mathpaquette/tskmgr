@@ -1,6 +1,3 @@
-import { Run } from '../runs/run';
-import { Task } from '../tasks/task';
-
 export interface File {
   id: number;
   originName: string;
@@ -9,6 +6,4 @@ export interface File {
   mimeType: string;
   type: string;
   description: string;
-  run: Run;
-  task: Task;
 }

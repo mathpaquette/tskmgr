@@ -13,8 +13,9 @@ import {
   SetLeaderResponseDto,
   Run,
   Task,
-  File,
   CreateFileRequestDto,
+  FileRun,
+  FileTask,
 } from '@tskmgr/common';
 import { AppModule } from './app.module';
 import { TestDtoUtils } from './utils/test-dto-utils';
@@ -125,7 +126,7 @@ describe('Runs', () => {
       // arrange
       const createFileDto: CreateFileRequestDto = { type: 'log', description: 'desc' };
       // act
-      const file: File = (await createFileRun(app, run.id, createFileDto, './README.md')).body;
+      const file: FileRun = (await createFileRun(app, run.id, createFileDto, './README.md')).body;
       // assert
       expect(file.type).toBe(createFileDto.type);
       expect(file.description).toBe(createFileDto.description);
@@ -136,7 +137,7 @@ describe('Runs', () => {
       // arrange
       const createFileDto: CreateFileRequestDto = { type: 'log', description: 'desc' };
       // act
-      const file: File = (await createFileTask(app, tasks[0].id, createFileDto, './README.md')).body;
+      const file: FileTask = (await createFileTask(app, tasks[0].id, createFileDto, './README.md')).body;
       // assert
       expect(file.type).toBe(createFileDto.type);
       expect(file.description).toBe(createFileDto.description);

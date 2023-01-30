@@ -9,6 +9,11 @@ DROP DATABASE tskmgr;
 CREATE DATABASE tskmgr;
 GRANT ALL PRIVILEGES ON DATABASE tskmgr TO tskmgr;
 
+DROP DATABASE tskmgr_dev;
+CREATE DATABASE tskmgr_dev;
+GRANT ALL PRIVILEGES ON DATABASE tskmgr_dev TO tskmgr;
+
+
 \l
 \c tskmgr
 

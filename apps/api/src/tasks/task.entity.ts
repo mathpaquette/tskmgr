@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { DateUtil, RunnerInfo, Task, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
-import { FileEntity } from '../files/file.entity';
+import { FileTaskEntity } from '../files/file-task.entity';
 
 @Entity({ name: 'task' })
 export class TaskEntity implements Task {
@@ -23,8 +23,8 @@ export class TaskEntity implements Task {
   @JoinColumn({ name: 'run_id' })
   run: RunEntity;
 
-  @OneToMany(() => FileEntity, (file) => file.task)
-  files: FileEntity[];
+  @OneToMany(() => FileTaskEntity, (file) => file.task)
+  files: FileTaskEntity[];
 
   @Column()
   name: string;

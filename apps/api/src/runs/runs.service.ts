@@ -3,15 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, ILike, IsNull, Repository } from 'typeorm';
 import { RunEntity } from './run.entity';
 import { CreateFileRequestDto, CreateRunRequestDto, SetLeaderRequestDto, SetLeaderResponseDto } from '@tskmgr/common';
-import { FileEntity } from '../files/file.entity';
 import { Express } from 'express';
 import { TaskEntity } from '../tasks/task.entity';
+import { FileRunEntity } from '../files/file-run.entity';
 
 @Injectable()
 export class RunsService {
   constructor(
     @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
-    @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>,
+    @InjectRepository(FileRunEntity) private readonly filesRepository: Repository<FileRunEntity>,
     @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
     private readonly dataSource: DataSource
   ) {}
@@ -35,7 +35,7 @@ export class RunsService {
     runId: number,
     file: Express.Multer.File,
     createFileRequestDto: CreateFileRequestDto
-  ): Promise<FileEntity> {
+  ): Promise<FileRunEntity> {
     const run = await this.runsRepository.findOneBy({ id: runId });
     if (!run) {
       throw new Error(`Unable run find run id: ${runId}`);
@@ -123,12 +123,11 @@ export class RunsService {
     });
   }
 
-  async findFilesById(runId: number): Promise<FileEntity[]> {
+  async findFilesById(runId: number): Promise<FileRunEntity[]> {
     return this.filesRepository.find({
       where: { run: { id: runId } },
       relations: {
         run: true,
-        task: true,
       },
     });
   }

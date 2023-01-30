@@ -1,8 +1,9 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { FileEntity } from '../files/file.entity';
 import { RunEntity } from '../runs/run.entity';
 import { TaskEntity } from '../tasks/task.entity';
+import { FileRunEntity } from '../files/file-run.entity';
+import { FileTaskEntity } from '../files/file-task.entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -13,7 +14,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_DATABASE || 'tskmgr',
   synchronize: false,
   logging: false,
-  entities: [FileEntity, RunEntity, TaskEntity],
+  entities: [FileRunEntity, FileTaskEntity, RunEntity, TaskEntity],
   migrations: ['apps/api/database/migrations/*.js'],
   subscribers: [],
 });
