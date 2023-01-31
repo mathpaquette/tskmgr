@@ -18,12 +18,12 @@ export class TaskEntity implements Task {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index()
-  @ManyToOne((type) => RunEntity, (run) => run.id, { nullable: false })
+  @ManyToOne('run', 'tasks', { nullable: false })
   @JoinColumn({ name: 'run_id' })
+  @Index()
   run: RunEntity;
 
-  @OneToMany(() => FileEntity, (file) => file.task)
+  @OneToMany('file', 'task')
   files: FileEntity[];
 
   @Column()
