@@ -12,6 +12,8 @@ import { TasksController } from './tasks/tasks.controller';
 import { FilesController } from './files/files.controller';
 import { FilesService } from './files/files.service';
 import { environment } from './environments/environment';
+import { AllExceptionsFilter } from './config/all-exceptions.filter';
+import { APP_FILTER } from '@nestjs/core';
 
 const ENTITIES = [FileEntity, RunEntity, TaskEntity];
 
@@ -31,6 +33,10 @@ const ENTITIES = [FileEntity, RunEntity, TaskEntity];
     TasksService,
     FilesService,
     PendingTasksService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
   ],
 })
 export class AppModule {}

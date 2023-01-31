@@ -166,7 +166,7 @@ describe('Runs', () => {
       const exception = (await abortRun(app, run.id)).body;
       // assert
       expect(exception.statusCode).toBe(500);
-      expect(exception.reason).toBe("Can't abort already ended run.");
+      expect(exception.message).toBe("Can't abort already ended run.");
     });
   });
 
@@ -192,7 +192,7 @@ describe('Runs', () => {
       const exception = (await failRun(app, run.id)).body;
       // assert
       expect(exception.statusCode).toBe(500);
-      expect(exception.reason).toBe("Can't fail already ended run.");
+      expect(exception.message).toBe("Can't fail already ended run.");
     });
   });
 
@@ -263,7 +263,7 @@ describe('Runs', () => {
       // act
       const res = await createTasks(app, run.id, createTasksDto).expect(500);
       // expect
-      expect(res.body.reason).toEqual("Run with FAILED status can't accept new tasks");
+      expect(res.body.message).toEqual("Run with FAILED status can't accept new tasks");
     });
   });
 
@@ -297,7 +297,7 @@ describe('Runs', () => {
       // act
       const res = await createTasks(app, run.id, createTasksDto).expect(500);
       // expect
-      expect(res.body.reason).toEqual("Closed run can't accept new tasks");
+      expect(res.body.message).toEqual("Closed run can't accept new tasks");
     });
   });
 });
