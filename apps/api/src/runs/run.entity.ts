@@ -8,6 +8,12 @@ export class RunEntity implements Run {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @OneToMany('task', 'run')
+  tasks: TaskEntity[];
+
+  @OneToMany('file', 'run')
+  files: FileEntity[];
+
   @Column({ unique: true })
   name: string;
 
@@ -52,12 +58,6 @@ export class RunEntity implements Run {
 
   @Column({ name: 'ended_at', nullable: true, type: 'timestamptz' })
   endedAt: Date;
-
-  @OneToMany(() => TaskEntity, (task) => task.run)
-  tasks: TaskEntity[];
-
-  @OneToMany(() => FileEntity, (file) => file.run)
-  files: FileEntity[];
 
   public hasEnded(): boolean {
     return !!this.endedAt;
