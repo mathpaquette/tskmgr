@@ -8,21 +8,21 @@ export class FileEntity implements File {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne('run', 'files', { nullable: false })
-  @JoinColumn({ name: 'run_id' })
-  @Index()
-  run: RunEntity;
-
-  @ManyToOne('task', 'files', { nullable: true })
-  @JoinColumn({ name: 'task_id' })
-  @Index()
-  task: TaskEntity;
-
   @Column({ nullable: true })
   description: string;
 
   @Column({ nullable: true })
   type: string;
+
+  @Index()
+  @ManyToOne(() => RunEntity, (run) => run.id, { nullable: false })
+  @JoinColumn({ name: 'run_id' })
+  run: RunEntity;
+
+  @Index()
+  @ManyToOne(() => TaskEntity, (task) => task.id, { nullable: true })
+  @JoinColumn({ name: 'task_id' })
+  task: TaskEntity;
 
   @Column({ name: 'origin_name' })
   originName: string;
