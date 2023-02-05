@@ -16,7 +16,7 @@ services:
       retries: 5
 
   migrations:
-    image: mathpaquette/tskmgr-migrations:latest
+    image: mathpaquette/tskmgr-migrations:${TSKMGR_VERSION:-latest}
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
@@ -28,7 +28,7 @@ services:
         condition: service_healthy
 
   api:
-    image: mathpaquette/tskmgr-api:latest
+    image: mathpaquette/tskmgr-api:${TSKMGR_VERSION:-latest}
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
@@ -43,7 +43,7 @@ services:
       - migrations
 
   frontend:
-    image: mathpaquette/tskmgr-frontend:latest
+    image: mathpaquette/tskmgr-frontend:${TSKMGR_VERSION:-latest}
     environment:
       PORT: 8080
       API_URL: 'http://api:3333'

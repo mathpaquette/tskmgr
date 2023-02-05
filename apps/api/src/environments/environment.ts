@@ -6,6 +6,7 @@ const { type, host, port, username, password, database } = AppDataSource.options
 
 export interface Environment {
   production: boolean;
+  version: string;
   datasource: TypeOrmModuleOptions;
   multer: {
     dest: string;
@@ -14,6 +15,7 @@ export interface Environment {
 
 export const environment: Environment = {
   production: false,
+  version: 'dev',
 
   datasource: {
     type,
@@ -27,6 +29,6 @@ export const environment: Environment = {
   },
 
   multer: {
-    dest: './files',
+    dest: './data/api/files',
   },
 };

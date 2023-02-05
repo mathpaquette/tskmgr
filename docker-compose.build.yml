@@ -22,6 +22,8 @@ services:
     build:
       dockerfile: apps/api/Dockerfile
       context: .
+      args:
+        TSKMGR_VERSION: ${TSKMGR_VERSION}
     image: mathpaquette/tskmgr-api:${TSKMGR_VERSION:-latest}
     environment:
       DB_HOST: 'localhost'
@@ -40,6 +42,8 @@ services:
     build:
       dockerfile: apps/frontend/Dockerfile
       context: .
+      args:
+        TSKMGR_VERSION: ${TSKMGR_VERSION}
     image: mathpaquette/tskmgr-frontend:${TSKMGR_VERSION:-latest}
     environment:
       PORT: 8080

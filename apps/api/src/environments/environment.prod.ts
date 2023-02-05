@@ -9,6 +9,7 @@ const { type, host, port, username, password, database } = AppDataSource.options
 
 export const environment: Environment = {
   production: true,
+  version: '__TSKMGR_VERSION__',
 
   datasource: {
     type,

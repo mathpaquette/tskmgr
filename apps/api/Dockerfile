@@ -6,6 +6,7 @@ RUN apk add --no-cache python3 make g++
 COPY ./apps ./apps
 COPY ./libs ./libs
 COPY ./tools ./tools
+COPY ./scripts ./scripts
 
 COPY package.json .
 COPY package-lock.json .
@@ -16,6 +17,9 @@ COPY tsconfig.base.json .
 RUN npm install
 RUN npx nx affected:build --all --configuration=production --verbose
 RUN npm install --omit dev
+
+ARG TSKMGR_VERSION
+RUN sh scripts/version.sh
 
 FROM node:16-alpine
 WORKDIR /app

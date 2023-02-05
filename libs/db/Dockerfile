@@ -6,6 +6,7 @@ RUN apk add --no-cache python3 make g++
 COPY ./apps ./apps
 COPY ./libs ./libs
 COPY ./tools ./tools
+COPY ./scripts ./scripts
 
 COPY package.json .
 COPY package-lock.json .
