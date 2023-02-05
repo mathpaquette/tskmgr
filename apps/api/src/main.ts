@@ -8,6 +8,7 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
+import { environment } from './environments/environment';
 
 async function bootstrap() {
   const globalPrefix = 'api';
@@ -17,7 +18,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('tskmgr')
     .setDescription('tskmgr API description')
-    .setVersion('1.0')
+    .setVersion(environment.version)
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

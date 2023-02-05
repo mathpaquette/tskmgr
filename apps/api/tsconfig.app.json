@@ -5,7 +5,8 @@
     "module": "commonjs",
     "types": ["node", "multer"],
     "emitDecoratorMetadata": true,
-    "target": "es2015"
+    "target": "es2015",
+    "resolveJsonModule": true
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "jest.config.ts"],
   "include": ["**/*.ts"]
