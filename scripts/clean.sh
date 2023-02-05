@@ -3,6 +3,7 @@ rm -rf .angular \
        tmp \
        coverage \
        node_modules/.cache \
+       files \
 
 
 

@@ -4,5 +4,6 @@
 /coverage
 /.angular
 /data
+/files
 
 /libs/db/src/migrations
