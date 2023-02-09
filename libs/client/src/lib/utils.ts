@@ -1,11 +1,9 @@
 import { ChildProcess, spawn, SpawnOptionsWithoutStdio } from 'child_process';
 import { createInterface } from 'readline';
-import { WriteStream } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
 export interface SpawnAsyncOptions {
-  writeStream?: WriteStream;
   dataCallback?: (data: string) => void;
   errorCallback?: (data: string) => void;
 }
@@ -18,11 +16,6 @@ export async function spawnAsync(
 ): Promise<ChildProcess> {
   return new Promise((resolve, reject) => {
     const childProcess = spawn(command, args, options);
-
-    if (logging.writeStream) {
-      childProcess.stdout.pipe(logging.writeStream);
-      childProcess.stderr.pipe(logging.writeStream);
-    }
 
     if (logging.dataCallback) {
       const readlineStdout = createInterface({ input: childProcess.stdout });
