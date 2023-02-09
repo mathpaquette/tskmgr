@@ -4,13 +4,13 @@ services:
   postgres:
     image: postgres:14
     environment:
-      POSTGRES_USER: tskmgr
-      POSTGRES_PASSWORD: tskmgr
-      POSTGRES_DB: tskmgr
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./data/db/postgres:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - '5432:5432'
     healthcheck:
       test: ['CMD', 'pg_isready', '-q', '-d', 'tskmgr', '-U', 'tskmgr']
       interval: 10s
@@ -20,11 +20,11 @@ services:
   migrations:
     image: mathpaquette/tskmgr-migrations:latest
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USERNAME: tskmgr
-      DB_PASSWORD: tskmgr
-      DB_DATABASE: tskmgr
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
     depends_on:
       postgres:
         condition: service_healthy
@@ -32,24 +32,24 @@ services:
   api:
     image: mathpaquette/tskmgr-api:latest
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USERNAME: tskmgr
-      DB_PASSWORD: tskmgr
-      DB_DATABASE: tskmgr
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
     volumes:
       - ./data/api/files:/app/files
     ports:
-      - "3333:3333"
+      - '3333:3333'
     depends_on:
       - migrations
 
   frontend:
     image: mathpaquette/tskmgr-frontend:latest
     environment:
-      PORT: 8080
-      API_URL: 'http://api:3333'
+      PORT: ${FRONTEND_PORT}
+      API_URL: ${API_URL}
     ports:
-      - "8080:8080"
+      - '8080:8080'
     depends_on:
       - api
