@@ -21,6 +21,7 @@ import { TaskResult } from './task-result';
 import { ClientOptions } from './client-options';
 import { createReadStream, createWriteStream, unlinkSync } from 'fs';
 import Debug from 'debug';
+
 const debug = Debug('tskmgr:client');
 
 export class Client {
@@ -201,18 +202,26 @@ export class Client {
 
       let cached = false;
       let completed = false;
+      let writable = false;
       let childProcess: ChildProcess;
       let error: Error;
 
       const taskLogFilename = getTaskLogFilename(task.id);
       const writeStream = createWriteStream(taskLogFilename);
+      writeStream.on('open', () => (writable = true));
 
       const dataHandler = (data: string): void => {
         this.options.dataCallback(task, data, () => (cached = true));
+        if (writable) {
+          writeStream.write(`[${new Date().toISOString()}] ${data}\n`);
+        }
       };
 
       const errorHandler = (data: string): void => {
         this.options.errorCallback(task, data);
+        if (writable) {
+          writeStream.write(`[${new Date().toISOString()}] ${data}\n`);
+        }
       };
 
       debug(`${logInfo} starting task: ${task.id}`);
@@ -225,7 +234,6 @@ export class Client {
             ...this.options.spawnOptions,
           },
           {
-            writeStream,
             dataCallback: dataHandler,
             errorCallback: errorHandler,
           }
@@ -252,7 +260,9 @@ export class Client {
           debug(`${logInfo} failed status for task: ${task.id} sent`);
         }
 
+        writeStream.end();
         writeStream.close();
+
         await this.uploadTaskFile(task.id, taskLogFilename, {
           type: 'log',
           description: `Log for task ${task.id}`,
