@@ -50,8 +50,6 @@ export class RunDetailsFilesComponent implements OnDestroy {
   readonly gridOptions: GridOptions = {
     ...defaultGridOptions,
     onGridReady: this.onGridReady.bind(this),
-    paginationAutoPageSize: true,
-    pagination: true,
   };
 
   readonly destroy$ = new Subject<void>();

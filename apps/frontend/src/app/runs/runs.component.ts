@@ -69,8 +69,6 @@ export class RunsComponent implements OnInit, OnDestroy {
     onGridReady: this.onGridReady.bind(this),
     onRowDoubleClicked: this.onRowDoubleClicked.bind(this),
     getRowId: (params) => params.data.id,
-    paginationAutoPageSize: true,
-    pagination: true,
   };
 
   readonly columnDefs: ColDef[] = [
