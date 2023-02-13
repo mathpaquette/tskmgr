@@ -1,9 +1,9 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
-import { TaskStatus, Task } from '@tskmgr/common';
+import { RunStatus, Task, TaskStatus } from '@tskmgr/common';
 import { AgGridEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { checkboxCellRenderer, defaultGridOptions, timeValueFormatter } from '../../common/ag-grid.util';
-import { Subject, takeUntil } from 'rxjs';
+import { first, Subject, takeUntil } from 'rxjs';
 import { FilesCellRendererComponent } from '../cell-renderers/files-cell-renderer.component';
 
 @Component({
@@ -17,6 +17,7 @@ import { FilesCellRendererComponent } from '../cell-renderers/files-cell-rendere
             name="inlineRadioOptions"
             id="inlineRadio{{ i }}"
             value="option{{ i }}"
+            [checked]="taskFilter.checked"
             (change)="onCheckboxChange(taskFilter)"
           />
           <label class="form-check-label" for="inlineRadio{{ i }}"
@@ -77,12 +78,19 @@ export class RunDetailsTasksComponent implements OnDestroy {
 
   readonly destroy$ = new Subject<void>();
 
+  private readonly taskFilterFailed: TaskFilter = {
+    name: 'Failed',
+    filter: TaskStatus.Failed,
+    count: 0,
+    checked: false,
+  };
+
   readonly taskFilters: TaskFilter[] = [
-    { name: 'All', count: 0 },
-    { name: 'Pending', filter: TaskStatus.Pending, count: 0 },
-    { name: 'Running', filter: TaskStatus.Running, count: 0 },
-    { name: 'Completed', filter: TaskStatus.Completed, count: 0 },
-    { name: 'Failed', filter: TaskStatus.Failed, count: 0 },
+    { name: 'All', count: 0, checked: false },
+    { name: 'Pending', filter: TaskStatus.Pending, count: 0, checked: false },
+    { name: 'Running', filter: TaskStatus.Running, count: 0, checked: false },
+    { name: 'Completed', filter: TaskStatus.Completed, count: 0, checked: false },
+    this.taskFilterFailed,
   ];
 
   constructor(private readonly runDetailsService: RunDetailsService) {}
@@ -113,6 +121,12 @@ export class RunDetailsTasksComponent implements OnDestroy {
   }
 
   onGridReady(event: GridReadyEvent): void {
+    this.runDetailsService.run$.pipe(first()).subscribe((x) => {
+      if (x.status === RunStatus.Failed) {
+        this.onCheckboxChange(this.taskFilterFailed);
+      }
+    });
+
     this.runDetailsService.tasks$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
       this.refreshData(x, event);
       this.updateCounts(x);
@@ -122,12 +136,15 @@ export class RunDetailsTasksComponent implements OnDestroy {
   }
 
   onCheckboxChange(taskFilter: TaskFilter): void {
+    this.taskFilters.forEach((x) => (x.checked = false));
+
     if (!taskFilter.filter) {
       this.gridOptions.api?.setFilterModel({});
       return;
     }
 
     this.gridOptions.api?.setFilterModel({ status: { filterType: 'text', type: 'equals', filter: taskFilter.filter } });
+    taskFilter.checked = true;
   }
 }
 
@@ -135,4 +152,5 @@ interface TaskFilter {
   name: string;
   filter?: TaskStatus;
   count: number;
+  checked: boolean;
 }
