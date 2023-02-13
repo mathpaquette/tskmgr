@@ -13,7 +13,9 @@ import { Observable, Subject } from 'rxjs';
       >
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a routerLink="/runs">Runs</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ (run$ | async)?.name }}</li>
+          <li class="breadcrumb-item active" aria-current="page">
+            {{ (run$ | async)?.name }} <tskmgr-run-status [run]="run$ | async"></tskmgr-run-status>
+          </li>
         </ol>
       </nav>
 

@@ -3,7 +3,7 @@ import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConne
 import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
 import { version } from '../../../../package.json';
 
-const { type, host, port, username, password, database } = AppDataSource.options as PostgresConnectionOptions;
+const { type } = AppDataSource.options as PostgresConnectionOptions;
 
 export interface Environment {
   production: boolean;
@@ -19,11 +19,11 @@ export const environment: Environment = {
   version: `${version}-dev`,
   datasource: {
     type,
-    host,
-    port,
-    username,
-    password,
-    database: `${database}_dev`,
+    host: 'localhost',
+    port: 5432,
+    username: 'tskmgr',
+    password: 'tskmgr',
+    database: `tskmgr_dev`,
     autoLoadEntities: true,
     synchronize: true,
   },

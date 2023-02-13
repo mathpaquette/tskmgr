@@ -14,6 +14,7 @@ import { TskmgrCommonModule } from '../common/tskmgr-common.module';
 import { TaskIdCellRendererComponent } from './cell-renderers/task-id-cell-renderer.component';
 import { FileIdCellRendererComponent } from './cell-renderers/file-id-cell-renderer.component';
 import { FilesCellRendererComponent } from './cell-renderers/files-cell-renderer.component';
+import { RunStatusComponent } from './run-status/run-status.component';
 
 const CELL_RENDERERS = [
   RunIdCellRendererComponent,
@@ -30,6 +31,7 @@ const CELL_RENDERERS = [
     RunDetailsTasksComponent,
     RunDetailsDetailsComponent,
     RunDetailsFilesComponent,
+    RunStatusComponent,
   ],
   imports: [
     CommonModule, //
