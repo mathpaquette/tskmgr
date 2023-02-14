@@ -18,6 +18,16 @@ export const durationValueFormatter = (params: ValueFormatterParams) => {
   return `${Math.trunc(params.value * 1000)}ms`;
 };
 
+export const updatedAtValueFormatter = (params: ValueFormatterParams) => {
+  if (!params.value) return '';
+  const duration = intervalToDuration({ start: new Date(params.value), end: new Date() });
+  if (duration.days) return `>1d ago`;
+  if (duration.hours) return `${duration.hours}h ago`;
+  if (duration.minutes) return `${duration.minutes}m ago`;
+  if (duration.seconds) return `${duration.seconds}s ago`;
+  return `${Math.trunc(params.value * 1000)}ms ago`;
+};
+
 export const defaultGridOptions: GridOptions = {
   enableCellTextSelection: true,
   defaultColDef: {

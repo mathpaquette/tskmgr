@@ -7,6 +7,7 @@ import {
   dateValueFormatter,
   defaultGridOptions,
   durationValueFormatter,
+  updatedAtValueFormatter,
   urlCellRenderer,
 } from '../common/ag-grid.util';
 import { HeaderService } from '../common/header/header.service';
@@ -87,7 +88,7 @@ export class RunsComponent implements OnInit, OnDestroy {
     { field: 'failFast', cellRenderer: checkboxCellRenderer },
     { field: 'closed', cellRenderer: checkboxCellRenderer },
     { field: 'duration', valueFormatter: durationValueFormatter },
-    { field: 'updatedAt', cellRenderer: dateValueFormatter },
+    { field: 'updatedAt', headerName: 'Last Update', cellRenderer: updatedAtValueFormatter },
   ];
 
   private search: string | undefined = undefined;
