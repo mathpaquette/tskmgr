@@ -19,7 +19,12 @@ const debug = Debug('tskmgr:client-example');
 
 delete process.env.TS_NODE_PROJECT;
 
-const options: ClientOptions = { parallel: 1, dataCallback, errorCallback };
+const options: ClientOptions = {
+  parallel: 1,
+  dataCallback,
+  errorCallback,
+  spawnOptions: { env: { ...process.env, NO_COLOR: '1' } },
+};
 const client = ClientFactory.createNew('http://localhost:3333', 'RUNNER_1', options);
 
 let completed = false;
@@ -78,7 +83,8 @@ function getNxTasks(): NxTask[] {
     // --all should be removed in CI environment. Just for demo purpose.
     ...JSON.parse(execSync('npx nx print-affected --all --target=lint').toString()).tasks,
     ...JSON.parse(execSync('npx nx print-affected --all --target=test').toString()).tasks,
-    ...JSON.parse(execSync('npx nx print-affected --all --target=build').toString()).tasks,
+    ...JSON.parse(execSync('npx nx print-affected --all --configuration=production --target=build').toString()).tasks,
+    ...JSON.parse(execSync('npx nx print-affected --all --configuration=production --target=e2e').toString()).tasks,
   ];
   return tasks;
 }
