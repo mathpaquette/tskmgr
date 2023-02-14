@@ -2,7 +2,12 @@ import { Component, HostListener, OnDestroy } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
 import { RunStatus, Task, TaskStatus } from '@tskmgr/common';
 import { AgGridEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
-import { checkboxCellRenderer, defaultGridOptions, timeValueFormatter } from '../../common/ag-grid.util';
+import {
+  checkboxCellRenderer,
+  defaultGridOptions,
+  durationValueFormatter,
+  timeValueFormatter,
+} from '../../common/ag-grid.util';
 import { first, Subject, takeUntil } from 'rxjs';
 import { FilesCellRendererComponent } from '../cell-renderers/files-cell-renderer.component';
 
@@ -66,8 +71,8 @@ export class RunDetailsTasksComponent implements OnDestroy {
     { field: 'startedAt', cellRenderer: timeValueFormatter },
     // { field: 'updatedAt', cellRenderer: timeValueFormatter },
     { field: 'endedAt', cellRenderer: timeValueFormatter },
-    { field: 'avgDuration', headerName: 'Avg Duration (sec)' },
-    { field: 'duration', headerName: 'Duration (sec)' },
+    { field: 'avgDuration', valueFormatter: durationValueFormatter },
+    { field: 'duration', valueFormatter: durationValueFormatter },
     { field: 'files', cellRenderer: FilesCellRendererComponent },
   ];
 

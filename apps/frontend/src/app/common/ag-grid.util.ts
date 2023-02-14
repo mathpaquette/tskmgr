@@ -1,5 +1,5 @@
 import { GridOptions, ICellRendererParams, ValueFormatterParams } from 'ag-grid-community';
-import { format } from 'date-fns';
+import { format, intervalToDuration } from 'date-fns';
 
 export const dateValueFormatter = (params: ValueFormatterParams): string => {
   return params.value ? format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss') : '';
@@ -10,7 +10,12 @@ export const timeValueFormatter = (params: ValueFormatterParams): string => {
 };
 
 export const durationValueFormatter = (params: ValueFormatterParams) => {
-  return params.value?.toFixed(2);
+  if (!params.value) return '';
+  const duration = intervalToDuration({ start: 0, end: params.value * 1000 });
+  if (duration.hours) return `${duration.hours}h${duration.minutes}m${duration.seconds}s`;
+  if (duration.minutes) return `${duration.minutes}m${duration.seconds}s`;
+  if (duration.seconds) return `${duration.seconds}s`;
+  return `${Math.trunc(params.value * 1000)}ms`;
 };
 
 export const defaultGridOptions: GridOptions = {

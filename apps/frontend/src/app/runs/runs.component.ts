@@ -1,8 +1,14 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ColDef, GridOptions, GridReadyEvent, RowClickedEvent, RowDoubleClickedEvent } from 'ag-grid-community';
-import { checkboxCellRenderer, dateValueFormatter, defaultGridOptions, urlCellRenderer } from '../common/ag-grid.util';
+import { ColDef, GridOptions, GridReadyEvent, RowDoubleClickedEvent } from 'ag-grid-community';
+import {
+  checkboxCellRenderer,
+  dateValueFormatter,
+  defaultGridOptions,
+  durationValueFormatter,
+  urlCellRenderer,
+} from '../common/ag-grid.util';
 import { HeaderService } from '../common/header/header.service';
 import { RunIdCellRendererComponent } from './cell-renderers/run-id-cell-renderer.component';
 import { Subject, takeUntil } from 'rxjs';
@@ -80,7 +86,7 @@ export class RunsComponent implements OnInit, OnDestroy {
     { field: 'affinity', cellRenderer: checkboxCellRenderer },
     { field: 'failFast', cellRenderer: checkboxCellRenderer },
     { field: 'closed', cellRenderer: checkboxCellRenderer },
-    { field: 'duration', headerName: 'Duration (sec)' },
+    { field: 'duration', valueFormatter: durationValueFormatter },
     { field: 'updatedAt', cellRenderer: dateValueFormatter },
   ];
 
