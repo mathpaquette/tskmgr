@@ -8,7 +8,7 @@ import { ValueFormatterParams } from 'ag-grid-community';
 @Component({
   template: `
     <div class="d-flex flex-column w-100 m-3">
-      <div class="accordion" id="accordionExample">
+      <div class="accordion" id="accordionRunDetails">
         <!-- DETAILS -->
         <div class="accordion-item">
           <h2 class="accordion-header">
@@ -23,12 +23,7 @@ import { ValueFormatterParams } from 'ag-grid-community';
               Run details
             </button>
           </h2>
-          <div
-            id="collapseOne"
-            class="accordion-collapse collapse show"
-            aria-labelledby="headingOne"
-            data-bs-parent="#accordionExample"
-          >
+          <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne">
             <div class="accordion-body">
               <table class="table">
                 <tbody>
@@ -55,12 +50,7 @@ import { ValueFormatterParams } from 'ag-grid-community';
               Run info
             </button>
           </h2>
-          <div
-            id="collapseTwo"
-            class="accordion-collapse collapse"
-            aria-labelledby="headingTwo"
-            data-bs-parent="#accordionExample"
-          >
+          <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo">
             <div class="accordion-body">
               <table class="table">
                 <tbody>
@@ -87,12 +77,7 @@ import { ValueFormatterParams } from 'ag-grid-community';
               Run parameters
             </button>
           </h2>
-          <div
-            id="collapseThree"
-            class="accordion-collapse collapse"
-            aria-labelledby="headingThree"
-            data-bs-parent="#accordionExample"
-          >
+          <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree">
             <div class="accordion-body">
               <table class="table">
                 <tbody>
