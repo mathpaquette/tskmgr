@@ -2,10 +2,7 @@
 
 set -e
 
-if [ -z "${TSKMGR_VERSION}" ]; then
-  echo "TSKMGR_VERSION variable not set!"
-  exit 1
-fi
+TSKMGR_VERSION=$(node -p "require('./package.json').version")
 
 echo "Bumping @tskmgr/common version"
 cd libs/common && npm version "${TSKMGR_VERSION}" && cd -
