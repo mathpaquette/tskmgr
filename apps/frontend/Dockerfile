@@ -17,7 +17,7 @@ RUN npm install
 RUN npx nx affected:build --all --configuration=production --verbose
 RUN npm install --omit dev
 
-FROM nginxinc/nginx-unprivileged
+FROM nginxinc/nginx-unprivileged:1-alpine
 WORKDIR /usr/share/nginx/html
 
 COPY --from=build /build/apps/frontend/nginx/default.conf.template /etc/nginx/templates/default.conf.template
