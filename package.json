@@ -44,6 +44,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "~7.5.0",
     "systeminformation": "^5.16.6",
+    "timelines-chart": "^2.12.1",
     "tslib": "^2.0.0",
     "typeorm": "^0.3.11",
     "uuid": "^9.0.0",
