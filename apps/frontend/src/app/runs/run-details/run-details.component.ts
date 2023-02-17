@@ -25,6 +25,10 @@ import { Observable, Subject } from 'rxjs';
         </li>
 
         <li class="nav-item">
+          <a class="nav-link" routerLink="execution" routerLinkActive="active">Execution</a>
+        </li>
+
+        <li class="nav-item">
           <a class="nav-link" routerLink="files" routerLinkActive="active">Files</a>
         </li>
 

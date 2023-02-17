@@ -5,6 +5,7 @@ import { RunDetailsComponent } from './run-details/run-details.component';
 import { RunDetailsTasksComponent } from './run-details/run-details-tasks.component';
 import { RunDetailsDetailsComponent } from './run-details/run-details-details.component';
 import { RunDetailsFilesComponent } from './run-details/run-details-files.component';
+import { RunDetailsExecutionComponent } from './run-details/run-details-execution.component';
 
 const routes: Routes = [
   { path: '', component: RunsComponent },
@@ -14,6 +15,7 @@ const routes: Routes = [
     component: RunDetailsComponent,
     children: [
       { path: 'tasks', component: RunDetailsTasksComponent },
+      { path: 'execution', component: RunDetailsExecutionComponent },
       { path: 'files', component: RunDetailsFilesComponent },
       { path: 'details', component: RunDetailsDetailsComponent },
     ],

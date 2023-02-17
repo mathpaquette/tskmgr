@@ -4,12 +4,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ColDef, GridOptions, GridReadyEvent, RowDoubleClickedEvent } from 'ag-grid-community';
 import {
   checkboxCellRenderer,
-  dateValueFormatter,
   defaultGridOptions,
   durationValueFormatter,
   updatedAtValueFormatter,
   urlCellRenderer,
-} from '../common/ag-grid.util';
+} from '../common/ag-grid.utils';
 import { HeaderService } from '../common/header/header.service';
 import { RunIdCellRendererComponent } from './cell-renderers/run-id-cell-renderer.component';
 import { Subject, takeUntil } from 'rxjs';
@@ -18,12 +17,6 @@ import { Subject, takeUntil } from 'rxjs';
   selector: 'tskmgr-runs',
   template: `
     <div class="container-fs">
-      <!--      <div class="first-row">-->
-      <!--        <div class="form-check">-->
-      <!--          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"/>-->
-      <!--          <label class="form-check-label" for="defaultCheck1"> Only failed </label>-->
-      <!--        </div>-->
-      <!--      </div>-->
       <div class="second-row">
         <ag-grid-angular
           class="ag-theme-alpine"
@@ -35,10 +28,6 @@ import { Subject, takeUntil } from 'rxjs';
   `,
   styles: [
     `
-      .first-row {
-        display: flex;
-      }
-
       .second-row {
         flex: 1; /*  added, fix for IE  */
         min-height: 0; /*  added, fix for Firefox  */
