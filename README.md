@@ -52,8 +52,8 @@ Check [client-example.ts](./libs/client/src/lib/client-example.ts) for more deta
 #### WSL2
 
 You may encounter file permission issues while creating your containers with WSL2.
-This has been seen with volume created for `api` to store files.
-To set permissions properly use something like: `chown $USER:$USER ./data/api/files`
+This has been seen with volume created for `api` to store files.  
+To reset permissions use: `chown $USER:$USER ./data/api/files`
 
 ## Contribute
 
