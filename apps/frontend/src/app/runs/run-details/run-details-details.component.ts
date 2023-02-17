@@ -2,8 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { RunDetailsService } from './run-details.service';
 import { Run } from '@tskmgr/common';
-import { dateValueFormatter, durationValueFormatter } from '../../common/ag-grid.util';
+import { dateValueFormatter } from '../../common/ag-grid.utils';
 import { ValueFormatterParams } from 'ag-grid-community';
+import { formatDuration } from '../../common/time.utils';
 
 @Component({
   template: `
@@ -137,7 +138,7 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
       }
 
       if (key === 'duration') {
-        value = durationValueFormatter({ value } as ValueFormatterParams);
+        value = formatDuration(run.duration);
       }
 
       if (key === 'createdAt' || key === 'updatedAt' || key === 'endedAt') {

@@ -1,6 +1,6 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { AgGridEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
-import { dateValueFormatter, defaultGridOptions } from '../../common/ag-grid.util';
+import { dateValueFormatter, defaultGridOptions } from '../../common/ag-grid.utils';
 import { RunDetailsService } from './run-details.service';
 import { Subject, takeUntil } from 'rxjs';
 import { File } from '@tskmgr/common';

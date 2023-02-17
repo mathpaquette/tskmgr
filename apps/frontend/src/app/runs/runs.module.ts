@@ -15,6 +15,7 @@ import { TaskIdCellRendererComponent } from './cell-renderers/task-id-cell-rende
 import { FileIdCellRendererComponent } from './cell-renderers/file-id-cell-renderer.component';
 import { FilesCellRendererComponent } from './cell-renderers/files-cell-renderer.component';
 import { RunStatusComponent } from './run-status/run-status.component';
+import { RunDetailsExecutionComponent } from './run-details/run-details-execution.component';
 
 const CELL_RENDERERS = [
   RunIdCellRendererComponent,
@@ -32,6 +33,7 @@ const CELL_RENDERERS = [
     RunDetailsDetailsComponent,
     RunDetailsFilesComponent,
     RunStatusComponent,
+    RunDetailsExecutionComponent,
   ],
   imports: [
     CommonModule, //

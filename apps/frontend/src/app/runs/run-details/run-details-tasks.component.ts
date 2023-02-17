@@ -7,7 +7,7 @@ import {
   defaultGridOptions,
   durationValueFormatter,
   timeValueFormatter,
-} from '../../common/ag-grid.util';
+} from '../../common/ag-grid.utils';
 import { first, Subject, takeUntil } from 'rxjs';
 import { FilesCellRendererComponent } from '../cell-renderers/files-cell-renderer.component';
 
