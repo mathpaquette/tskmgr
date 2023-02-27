@@ -34,5 +34,11 @@ Usage: curl -vv -F file=@dump_2022-08-06.gz http://localhost:3333/api/runs/1/fil
 
 docker rm tskmgr_api_1 tskmgr_frontend_1 tskmgr_migrations_1 tskmgr_postgres_1 --force
 
+# https://docs.docker.com/build/building/multi-platform/
+docker buildx create --name mybuilder --driver docker-container --bootstrap --use
+docker buildx build --push --platform linux/amd64,linux/arm64 -f apps/api/Dockerfile -t mathpaquette/tskmgr-api:latest .
+docker buildx build --push --platform linux/amd64,linux/arm64 -f apps/frontend/Dockerfile -t mathpaquette/tskmgr-frontend:latest .
+docker buildx build --push --platform linux/amd64,linux/arm64 -f libs/db/Dockerfile -t mathpaquette/tskmgr-migrations:latest .
+
 docker-compose -f docker-compose.build.yml build
 docker-compose -f docker-compose.yml up
