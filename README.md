@@ -15,13 +15,6 @@ tskmgr (task manager) is a minimalist distributed build system that aims to offe
 
 ### Quick start
 
-Currently, we do only provide docker images for amd64 architecture.  
-If you have a different use case, you'll need to create images using:
-
-```shell
-docker-compose -f docker-compose.build.yml build
-```
-
 To start all necessary containers, use:
 
 ```shell

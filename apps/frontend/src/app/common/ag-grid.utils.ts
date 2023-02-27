@@ -3,11 +3,11 @@ import { format, intervalToDuration } from 'date-fns';
 import { formatDuration } from './time.utils';
 
 export const dateValueFormatter = (params: ValueFormatterParams): string => {
-  return params.value ? format(new Date(params.value), 'yyyy-MM-dd HH:mm:ss') : '';
+  return params.value ? format(params.value, 'yyyy-MM-dd HH:mm:ss') : '';
 };
 
 export const timeValueFormatter = (params: ValueFormatterParams): string => {
-  return params.value ? format(new Date(params.value), 'HH:mm:ss') : '';
+  return params.value ? format(params.value, 'HH:mm:ss') : '';
 };
 
 export const durationValueFormatter = (params: ValueFormatterParams) => {
@@ -16,7 +16,7 @@ export const durationValueFormatter = (params: ValueFormatterParams) => {
 
 export const updatedAtValueFormatter = (params: ValueFormatterParams) => {
   if (!params.value) return '';
-  const duration = intervalToDuration({ start: new Date(params.value), end: new Date() });
+  const duration = intervalToDuration({ start: params.value, end: new Date() });
   if (duration.days) return `>1d ago`;
   if (duration.hours) return `${duration.hours}h ago`;
   if (duration.minutes) return `${duration.minutes}m ago`;

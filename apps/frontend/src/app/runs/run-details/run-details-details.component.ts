@@ -2,9 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { RunDetailsService } from './run-details.service';
 import { Run } from '@tskmgr/common';
-import { dateValueFormatter } from '../../common/ag-grid.utils';
-import { ValueFormatterParams } from 'ag-grid-community';
 import { formatDuration } from '../../common/time.utils';
+import { format } from 'date-fns';
 
 @Component({
   template: `
@@ -142,7 +141,7 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
       }
 
       if (key === 'createdAt' || key === 'updatedAt' || key === 'endedAt') {
-        value = dateValueFormatter({ value } as ValueFormatterParams);
+        value = format(value, 'yyyy-MM-dd HH:mm:ss');
       }
 
       this.detailsEntries.push({ key, value });
