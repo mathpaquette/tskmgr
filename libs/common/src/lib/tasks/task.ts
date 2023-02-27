@@ -20,7 +20,7 @@ export interface Task {
   priority: TaskPriority;
   createdAt: Date;
   updatedAt: Date;
-  startedAt: Date;
-  endedAt: Date;
+  startedAt: Date | null;
+  endedAt: Date | null;
   files: File[];
 }

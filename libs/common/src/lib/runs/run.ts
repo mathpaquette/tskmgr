@@ -20,7 +20,7 @@ export interface Run {
   duration: number;
   createdAt: Date;
   updatedAt: Date;
-  endedAt: Date;
+  endedAt: Date | null;
   tasks: Task[];
   files: File[];
 }

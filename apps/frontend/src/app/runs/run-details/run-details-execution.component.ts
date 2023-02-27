@@ -2,7 +2,8 @@ import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChil
 import { RunDetailsService } from './run-details.service';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import TimelinesChart, { Line, TimelinesChartInstance } from 'timelines-chart';
-import { round } from 'lodash';
+import { round, orderBy } from 'lodash';
+import { DateUtil } from '@tskmgr/common';
 
 @Component({
   template: `
@@ -36,17 +37,22 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
 
     this.runDetailsService.tasks$.pipe(takeUntil(this.destroy$)).subscribe(async (tasks) => {
       const run = await firstValueFrom(this.runDetailsService.run$);
+      const runDuration = DateUtil.getDurationInSeconds(run.createdAt, run.endedAt || new Date());
+
+      const startedTasks = tasks.filter((x) => !!x.startedAt);
+      const orderedTasks = orderBy(startedTasks, (x) => x.startedAt);
 
       this.timelinesChart.data([
         {
           group: 'tasks',
-          data: tasks.map<Line>((x) => {
+          data: orderedTasks.map<Line>((x) => {
+            const taskDuration = DateUtil.getDurationInSeconds(x.startedAt as Date, x.endedAt || new Date());
             return {
               label: x.command,
               data: [
                 {
-                  timeRange: [new Date(x.startedAt), new Date(x.endedAt)],
-                  val: round(run.duration ? x.duration / run.duration : x.duration, 2),
+                  timeRange: [new Date(x.startedAt as Date), new Date(x.endedAt || new Date())],
+                  val: round(taskDuration / runDuration, 2),
                 },
               ],
             };
