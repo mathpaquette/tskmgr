@@ -34,6 +34,7 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
   ngAfterViewInit() {
     this.timelinesChart = TimelinesChart()(this.el.nativeElement);
     this.timelinesChart.rightMargin(300);
+    this.timelinesChart.width(window.innerWidth);
 
     this.runDetailsService.tasks$.pipe(takeUntil(this.destroy$)).subscribe(async (tasks) => {
       const run = await firstValueFrom(this.runDetailsService.run$);

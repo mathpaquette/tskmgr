@@ -63,6 +63,15 @@ export class RunsService {
 
   public findFilesById(id: number): Observable<File[]> {
     const url = this.apiUrl.getFilesUrl(id);
-    return this.http.get<File[]>(url);
+    return this.http.get<File[]>(url).pipe(
+      map((files) =>
+        files.map((x) => {
+          return {
+            ...x,
+            createdAt: new Date(x.createdAt),
+          };
+        })
+      )
+    );
   }
 }
