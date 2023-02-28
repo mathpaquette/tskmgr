@@ -16,10 +16,10 @@ import { DateUtil } from '@tskmgr/common';
 export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
   readonly destroy$ = new Subject<void>();
 
-  @ViewChild('chart') private el: ElementRef;
+  @ViewChild('chart') private chart: ElementRef;
   private timelinesChart: TimelinesChartInstance;
 
-  constructor(private readonly runDetailsService: RunDetailsService) {}
+  constructor(private readonly runDetailsService: RunDetailsService, private readonly el: ElementRef) {}
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -28,13 +28,13 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
-    this.timelinesChart.width(event.target.innerWidth);
+    this.timelinesChart.width(this.el.nativeElement.offsetWidth);
   }
 
   ngAfterViewInit() {
-    this.timelinesChart = TimelinesChart()(this.el.nativeElement);
+    this.timelinesChart = TimelinesChart()(this.chart.nativeElement);
     this.timelinesChart.rightMargin(300);
-    this.timelinesChart.width(window.innerWidth);
+    this.timelinesChart.width(this.el.nativeElement.offsetWidth);
 
     this.runDetailsService.tasks$.pipe(takeUntil(this.destroy$)).subscribe(async (tasks) => {
       const run = await firstValueFrom(this.runDetailsService.run$);
