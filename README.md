@@ -2,6 +2,8 @@
 
 tskmgr (task manager) is a minimalist distributed build system that aims to offer an opensource on-prem installable alternative to Nx Cloud.
 
+![image info](./docs/assets/tskmgr.gif)
+
 ## Features
 
 - monitoring dashboard
