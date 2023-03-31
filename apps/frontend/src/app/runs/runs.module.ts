@@ -16,6 +16,7 @@ import { FileIdCellRendererComponent } from './cell-renderers/file-id-cell-rende
 import { FilesCellRendererComponent } from './cell-renderers/files-cell-renderer.component';
 import { RunStatusComponent } from './run-status/run-status.component';
 import { RunDetailsExecutionComponent } from './run-details/run-details-execution.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const CELL_RENDERERS = [
   RunIdCellRendererComponent,
@@ -42,6 +43,7 @@ const CELL_RENDERERS = [
     NgbAccordionModule,
     TskmgrCommonModule,
     NgbTooltipModule,
+    ReactiveFormsModule,
   ],
 })
 export class RunsModule {}

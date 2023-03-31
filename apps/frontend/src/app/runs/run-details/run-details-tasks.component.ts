@@ -8,51 +8,14 @@ import {
   durationValueFormatter,
   timeValueFormatter,
 } from '../../common/ag-grid.utils';
-import { first, Subject, takeUntil } from 'rxjs';
+import { debounceTime, distinctUntilChanged, first, map, Subject, takeUntil, tap } from 'rxjs';
 import { FilesCellRendererComponent } from '../cell-renderers/files-cell-renderer.component';
+import { FormControl } from '@angular/forms';
 
 @Component({
-  template: `
-    <div class="d-flex flex-column w-100">
-      <div class="d-flex flex-row justify-content-end m-2">
-        <div class="form-check form-check-inline" *ngFor="let taskFilter of taskFilters; let i = index">
-          <input
-            class="form-check-input"
-            type="radio"
-            name="inlineRadioOptions"
-            id="inlineRadio{{ i }}"
-            value="option{{ i }}"
-            [checked]="taskFilter.checked"
-            (change)="onCheckboxChange(taskFilter)"
-          />
-          <label class="form-check-label" for="inlineRadio{{ i }}"
-            >{{ taskFilter.name }} ({{ taskFilter.count }})</label
-          >
-        </div>
-      </div>
-
-      <div class="d-flex h-100">
-        <ag-grid-angular
-          class="ag-theme-alpine"
-          [columnDefs]="columnDefs"
-          [gridOptions]="gridOptions"
-        ></ag-grid-angular>
-      </div>
-    </div>
-  `,
   selector: 'tskmgr-run-details-tasks',
-  styles: [
-    `
-      ag-grid-angular {
-        width: 100%;
-      }
-
-      :host {
-        display: flex;
-        flex: 1;
-      }
-    `,
-  ],
+  templateUrl: 'run-details-tasks.component.html',
+  styleUrls: ['run-details-tasks.component.scss'],
 })
 export class RunDetailsTasksComponent implements OnDestroy {
   readonly columnDefs: ColDef[] = [
@@ -60,21 +23,23 @@ export class RunDetailsTasksComponent implements OnDestroy {
     { field: 'name', filter: true },
     { field: 'type', filter: true },
     { field: 'command', filter: true },
-    { field: 'arguments', filter: true },
+    { field: 'files', cellRenderer: FilesCellRendererComponent },
     // { field: 'options' },
-    { field: 'runnerId', filter: true },
+    { field: 'arguments', filter: true },
     // { field: 'runnerInfo' },
+    { field: 'runnerId', filter: true },
     { field: 'status', filter: true },
     { field: 'cached', cellRenderer: checkboxCellRenderer },
-    { field: 'priority', filter: true },
     //{ field: 'createdAt', cellRenderer: timeValueFormatter },
-    { field: 'startedAt', cellRenderer: timeValueFormatter },
+    { field: 'priority', filter: true },
     // { field: 'updatedAt', cellRenderer: timeValueFormatter },
+    { field: 'startedAt', cellRenderer: timeValueFormatter },
     { field: 'endedAt', cellRenderer: timeValueFormatter },
     { field: 'avgDuration', valueFormatter: durationValueFormatter },
     { field: 'duration', valueFormatter: durationValueFormatter },
-    { field: 'files', cellRenderer: FilesCellRendererComponent },
   ];
+
+  readonly quickFilter = new FormControl('');
 
   readonly gridOptions: GridOptions = {
     ...defaultGridOptions,
@@ -137,6 +102,17 @@ export class RunDetailsTasksComponent implements OnDestroy {
       this.updateCounts(x);
     });
 
+    this.quickFilter.valueChanges
+      .pipe(
+        takeUntil(this.destroy$),
+        debounceTime(200),
+        distinctUntilChanged(),
+        map((value) => (value ? value : '')),
+        tap((value) => event.api.setQuickFilter(value)),
+        tap((value) => console.log(value))
+      )
+      .subscribe();
+
     event.api.sizeColumnsToFit();
   }
 
@@ -150,6 +126,10 @@ export class RunDetailsTasksComponent implements OnDestroy {
 
     this.gridOptions.api?.setFilterModel({ status: { filterType: 'text', type: 'equals', filter: taskFilter.filter } });
     taskFilter.checked = true;
+  }
+
+  onQuickFilterClear(): void {
+    this.quickFilter.reset();
   }
 }
 
