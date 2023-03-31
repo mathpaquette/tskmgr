@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "Running nx format:write..."
+nx format:write || exit 1
+
+# Check if there are any changes made by nx format:write
+if [ -n "$(git status --porcelain)" ]; then
+  echo "Staging changes made by nx format:write..."
+  git add .
+fi
+
+echo "Running nx lint affected..."
+nx affected --target=lint --quiet || exit 1
