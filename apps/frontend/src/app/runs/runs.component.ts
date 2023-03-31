@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ColDef, GridOptions, GridReadyEvent, RowDoubleClickedEvent } from 'ag-grid-community';
+import { CellClickedEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import {
   checkboxCellRenderer,
   defaultGridOptions,
@@ -63,13 +63,12 @@ export class RunsComponent implements OnInit, OnDestroy {
   readonly gridOptions: GridOptions = {
     ...defaultGridOptions,
     onGridReady: this.onGridReady.bind(this),
-    onRowDoubleClicked: this.onRowDoubleClicked.bind(this),
+    onCellClicked: this.onCellClicked.bind(this),
     getRowId: (params) => params.data.id,
   };
 
   readonly columnDefs: ColDef[] = [
     { field: 'id', width: 100, suppressSizeToFit: true, cellRenderer: RunIdCellRendererComponent },
-    { field: 'name', width: 400, cellRenderer: urlCellRenderer, suppressSizeToFit: true },
     { field: 'type', filter: true },
     { field: 'status', filter: true },
     { field: 'prioritization', filter: true },
@@ -78,6 +77,7 @@ export class RunsComponent implements OnInit, OnDestroy {
     { field: 'closed', cellRenderer: checkboxCellRenderer },
     { field: 'duration', valueFormatter: durationValueFormatter },
     { field: 'updatedAt', headerName: 'Last Update', cellRenderer: updatedAtValueFormatter },
+    { field: 'name', headerName: 'CI Job', width: 400, cellRenderer: urlCellRenderer, suppressSizeToFit: true },
   ];
 
   private search: string | undefined = undefined;
@@ -113,7 +113,8 @@ export class RunsComponent implements OnInit, OnDestroy {
     event.api.sizeColumnsToFit();
   }
 
-  onRowDoubleClicked(event: RowDoubleClickedEvent): void {
+  onCellClicked(event: CellClickedEvent): void {
+    if (event.colDef.field === 'name') return;
     this.router.navigate(['runs', event.data.id]);
   }
 }
