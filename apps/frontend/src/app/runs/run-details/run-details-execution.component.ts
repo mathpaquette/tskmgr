@@ -4,6 +4,10 @@ import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import TimelinesChart, { Line, TimelinesChartInstance } from 'timelines-chart';
 import { round, orderBy, groupBy } from 'lodash';
 import { DateUtil } from '@tskmgr/common';
+import { scaleSequential as d3ScaleSequential } from 'd3-scale';
+import { interpolateRdYlGn } from 'd3-scale-chromatic';
+
+const interpolate = (t: number): string => interpolateRdYlGn(1 - t);
 
 @Component({
   template: `
@@ -35,6 +39,7 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
     this.timelinesChart = TimelinesChart()(this.chart.nativeElement);
     this.timelinesChart.rightMargin(300);
     this.timelinesChart.width(this.el.nativeElement.offsetWidth);
+    this.timelinesChart.zColorScale(d3ScaleSequential(interpolate) as never);
 
     this.runDetailsService.tasks$.pipe(takeUntil(this.destroy$)).subscribe(async (tasks) => {
       const run = await firstValueFrom(this.runDetailsService.run$);
