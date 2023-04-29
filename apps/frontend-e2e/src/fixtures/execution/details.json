@@ -1,0 +1,18 @@
+{
+  "id": 587,
+  "name": "f2fc2980-30ad-4665-858f-cf0a67ebe988",
+  "type": "123",
+  "closed": true,
+  "url": null,
+  "failFast": true,
+  "leaderId": "RUNNER_1",
+  "prioritization": ["LONGEST"],
+  "info": null,
+  "parameters": null,
+  "affinity": false,
+  "duration": 54.507,
+  "status": "COMPLETED",
+  "createdAt": "2023-02-27T22:33:01.643Z",
+  "updatedAt": "2023-02-27T22:33:56.150Z",
+  "endedAt": "2023-02-27T22:33:56.150Z"
+}
