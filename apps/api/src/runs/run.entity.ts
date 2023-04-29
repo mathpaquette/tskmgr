@@ -101,6 +101,10 @@ export class RunEntity implements Run {
       throw new Error(`Run has been already closed!`);
     }
 
+    if (this.tasks.length === 0) {
+      this.complete();
+    }
+
     this.closed = true;
   }
 }

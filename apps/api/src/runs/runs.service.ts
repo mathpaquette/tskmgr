@@ -54,7 +54,10 @@ export class RunsService {
   }
 
   async close(id: number): Promise<RunEntity> {
-    const run = await this.runsRepository.findOneBy({ id: id });
+    const run = await this.runsRepository.findOne({
+      where: { id: id },
+      relations: { tasks: true },
+    });
     run.close();
     return this.runsRepository.save(run);
   }
