@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChil
 import { RunDetailsService } from './run-details.service';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import TimelinesChart, { Line, TimelinesChartInstance } from 'timelines-chart';
-import { round, orderBy } from 'lodash';
+import { round, orderBy, groupBy } from 'lodash';
 import { DateUtil } from '@tskmgr/common';
 
 @Component({
@@ -42,6 +42,7 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
 
       const startedTasks = tasks.filter((x) => !!x.startedAt);
       const orderedTasks = orderBy(startedTasks, (x) => x.startedAt);
+      const tasksByCommand = groupBy(orderedTasks, (x) => x.command);
 
       this.timelinesChart.data([
         {
@@ -49,7 +50,8 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
           data: orderedTasks.map<Line>((x) => {
             const taskDuration = DateUtil.getDurationInSeconds(x.startedAt as Date, x.endedAt || new Date());
             return {
-              label: x.command,
+              // if we found duplicated commands, just add id of the task
+              label: tasksByCommand[x.command].length > 1 ? `${x.command} #${x.id}` : x.command,
               data: [
                 {
                   timeRange: [new Date(x.startedAt as Date), new Date(x.endedAt || new Date())],
