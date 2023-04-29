@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CellClickedEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
+import { ColDef, GridOptions, GridReadyEvent, RowDoubleClickedEvent } from 'ag-grid-community';
 import {
   checkboxCellRenderer,
   defaultGridOptions,
@@ -63,7 +63,7 @@ export class RunsComponent implements OnInit, OnDestroy {
   readonly gridOptions: GridOptions = {
     ...defaultGridOptions,
     onGridReady: this.onGridReady.bind(this),
-    onCellClicked: this.onCellClicked.bind(this),
+    onRowDoubleClicked: this.onRowDoubleClicked.bind(this),
     getRowId: (params) => params.data.id,
   };
 
@@ -113,8 +113,7 @@ export class RunsComponent implements OnInit, OnDestroy {
     event.api.sizeColumnsToFit();
   }
 
-  onCellClicked(event: CellClickedEvent): void {
-    if (event.colDef.field === 'name') return;
+  onRowDoubleClicked(event: RowDoubleClickedEvent): void {
     this.router.navigate(['runs', event.data.id]);
   }
 }
