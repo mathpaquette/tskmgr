@@ -69,6 +69,15 @@ describe('Runs', () => {
     expect(run.status).toEqual(RunStatus.Created);
   });
 
+  it('should complete run when no tasks created', async () => {
+    // arrange
+    const runId = (await createRun(app, createRunDto)).body.id;
+    // act
+    const run = (await closeRun(app, runId).expect(200)).body;
+    // assert
+    expect(run.status).toEqual(RunStatus.Completed);
+  });
+
   it('should create tasks', async () => {
     // arrange
     const run: Run = (await createRun(app, createRunDto)).body;
