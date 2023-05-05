@@ -153,29 +153,60 @@ describe('Runs', () => {
     });
   });
 
-  describe('abort run', () => {
-    let run: Run;
-
-    beforeAll(async () => {
+  describe('fail task', () => {
+    it('should abort running tasks when failFast enabled', async () => {
       // arrange
       const createRunDto = TestDtoUtils.createRunDto();
-      run = (await createRun(app, createRunDto)).body;
-    });
-
-    it('should abort run when not ended', async () => {
+      const run: Run = (await createRun(app, createRunDto)).body;
+      await createTasks(app, run.id, TestDtoUtils.createTasksDto(5));
+      const startedTask1: StartTaskResponseDto = (await startTask(app, run.id, startTaskDto)).body;
+      const startedTask2: StartTaskResponseDto = (await startTask(app, run.id, startTaskDto)).body;
       // act
-      run = (await abortRun(app, run.id).expect(200)).body;
+      const failedTask: Task = (await failTask(app, startedTask1.task.id).expect(200)).body;
+      const tasks: Task[] = (await getTasks(app, run.id).expect(200)).body;
+      const abortedTask: Task = tasks.find((x) => x.id === startedTask2.task.id);
       // assert
-      expect(run.endedAt).toBeTruthy();
-      expect(run.status).toBe(RunStatus.Aborted);
+      expect(failedTask.status).toBe(TaskStatus.Failed);
+      expect(abortedTask.status).toBe(TaskStatus.Aborted);
+      expect(failedTask.run.status).toBe(RunStatus.Failed);
+    });
+  });
+
+  describe('abort run', () => {
+    it('should abort run when not ended', async () => {
+      // arrange
+      const createRunDto = TestDtoUtils.createRunDto();
+      const run: Run = (await createRun(app, createRunDto)).body;
+      // act
+      const abortedRun: Run = (await abortRun(app, run.id).expect(200)).body;
+      // assert
+      expect(abortedRun.endedAt).toBeTruthy();
+      expect(abortedRun.status).toBe(RunStatus.Aborted);
     });
 
     it('should not abort run when already ended', async () => {
+      // arrange
+      const createRunDto = TestDtoUtils.createRunDto();
+      const run: Run = (await createRun(app, createRunDto)).body;
+      const abortedRun: Run = (await abortRun(app, run.id).expect(200)).body;
       // act
       const exception = (await abortRun(app, run.id)).body;
       // assert
       expect(exception.statusCode).toBe(500);
       expect(exception.message).toBe("Can't abort already ended run.");
+    });
+
+    it('should abort running tasks', async () => {
+      // arrange
+      const createRunDto = TestDtoUtils.createRunDto();
+      const run: Run = (await createRun(app, createRunDto)).body;
+      await createTasks(app, run.id, createTasksDto);
+      const startTaskResponseDto: StartTaskResponseDto = (await startTask(app, run.id, startTaskDto)).body;
+      // act
+      const abortedRun: Run = (await abortRun(app, run.id).expect(200)).body;
+      // assert
+      const abortedTask = abortedRun.tasks.find((x) => x.id === startTaskResponseDto.task.id);
+      expect(abortedTask.status).toBe(TaskStatus.Aborted);
     });
   });
 
@@ -317,6 +348,10 @@ function createRun(app: INestApplication, data: CreateRunRequestDto): request.Te
 
 function getRun(app: INestApplication, runId: number): request.Test {
   return request(app.getHttpServer()).get(ApiUrl.createNoPrefix().getRunUrl(runId));
+}
+
+function getTasks(app: INestApplication, runId: number): request.Test {
+  return request(app.getHttpServer()).get(ApiUrl.createNoPrefix().getTasksUrl(runId));
 }
 
 function abortRun(app: INestApplication, runId: number): request.Test {
