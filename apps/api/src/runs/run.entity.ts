@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { RunStatus, TaskPriority, Run, DateUtil, RunParameters, RunInfo } from '@tskmgr/common';
+import { DateUtil, Run, RunInfo, RunParameters, RunStatus, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
 import { TaskEntity } from '../tasks/task.entity';
 
@@ -88,6 +88,11 @@ export class RunEntity implements Run {
   public abort(): void {
     if (this.hasEnded()) {
       throw new Error(`Can't abort already ended run.`);
+    }
+
+    const runningTasks = this.tasks.filter((x) => x.status === TaskStatus.Running);
+    for (const runningTask of runningTasks) {
+      runningTask.abort();
     }
 
     const endedAt = new Date();

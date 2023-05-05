@@ -63,7 +63,10 @@ export class RunsService {
   }
 
   async abort(id: number): Promise<RunEntity> {
-    const run = await this.runsRepository.findOneBy({ id: id });
+    const run = await this.runsRepository.findOne({
+      where: { id: id },
+      relations: { tasks: true },
+    });
     run.abort();
     return this.runsRepository.save(run);
   }

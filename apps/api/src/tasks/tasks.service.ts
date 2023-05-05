@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
 import {
   CompleteTaskDto,
@@ -19,7 +19,8 @@ export class TasksService {
   public constructor(
     @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
     @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
-    @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>
+    @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>,
+    private dataSource: DataSource
   ) {}
   /**
    * Create new tasks in bulk
@@ -89,19 +90,44 @@ export class TasksService {
     return task;
   }
 
+  /**
+   * If failFast enabled, set all running tasks to abort status.
+   * @param taskId
+   */
   async failTask(taskId: number): Promise<TaskEntity> {
-    const task = await this.tasksRepository.findOne({
-      where: { id: taskId },
-      relations: { run: true },
+    const task = await this.dataSource.transaction(async (manager) => {
+      const task = await manager.findOne(TaskEntity, {
+        where: { id: taskId },
+        relations: { run: true },
+        lock: {
+          mode: 'pessimistic_write',
+          tables: ['task'],
+        },
+      });
+
+      if (!task) {
+        throw new Error(`Task id: ${taskId} can't be found.`);
+      }
+
+      // if failFast enabled, abort all tasks from the run
+      if (task.run.failFast) {
+        const runningTasks = await manager.findBy(TaskEntity, {
+          run: { id: task.run.id },
+          status: TaskStatus.Running,
+        });
+
+        for (const runningTask of runningTasks) {
+          runningTask.abort();
+        }
+
+        await manager.save(runningTasks);
+      }
+
+      task.fail();
+      await manager.save(task);
+
+      return task;
     });
-
-    if (!task) {
-      throw new Error(`Task id: ${taskId} can't be found.`);
-    }
-
-    task.fail();
-    await this.tasksRepository.save(task);
-
     await this.updateRunStatus(task.run);
     return task;
   }
@@ -129,27 +155,26 @@ export class TasksService {
     return this.filesRepository.save(fileEntity);
   }
 
-  private async updateRunStatus(run: RunEntity): Promise<void> {
-    const allTasks = await this.tasksRepository.find({
-      where: { run: { id: run.id } },
-    });
-
+  private async updateRunStatus(run: RunEntity): Promise<RunEntity> {
+    const allTasks = await this.tasksRepository.find({ where: { run: { id: run.id } } });
+    const completedTasks = allTasks.filter((x) => x.status === TaskStatus.Completed);
     const endedTasks = allTasks.filter((x) => x.endedAt);
-    const failedTasks = allTasks.filter((x) => x.status === TaskStatus.Failed);
+    const uncompletedTasks = endedTasks.filter((x) => x.status !== TaskStatus.Completed);
 
-    // when fail fast enabled, we fail the run as soon we get one failed task
-    if (run.failFast && failedTasks.length > 0) {
+    // when fail fast enabled, we fail run as soon as we get one uncompleted task
+    if (run.failFast && uncompletedTasks.length > 0) {
       run.fail();
+      return this.runsRepository.save(run);
     }
 
     if (run.closed && allTasks.length === endedTasks.length) {
-      if (failedTasks.length > 0) {
-        run.fail();
-      } else {
+      if (completedTasks.length === allTasks.length) {
         run.complete();
+      } else {
+        run.fail();
       }
+      return this.runsRepository.save(run);
     }
-    await this.runsRepository.save(run);
   }
 
   private async getAverageTaskDuration(createTaskDto: CreateTaskDto): Promise<number> {
