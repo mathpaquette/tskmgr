@@ -1,4 +1,4 @@
-# tskmgr
+![tskmgr logo](./docs/assets/logo/web/svg/color-logo-with-background.svg)
 
 tskmgr (task manager) is a minimalist distributed build system that aims to offer an opensource on-prem installable alternative to Nx Cloud.
 
