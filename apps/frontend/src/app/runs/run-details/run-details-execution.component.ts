@@ -1,13 +1,14 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
-import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import TimelinesChart, { Line, TimelinesChartInstance } from 'timelines-chart';
-import { round, orderBy, groupBy } from 'lodash';
-import { DateUtil } from '@tskmgr/common';
-import { scaleSequential as d3ScaleSequential } from 'd3-scale';
-import { interpolateRdYlGn } from 'd3-scale-chromatic';
+import { groupBy, orderBy } from 'lodash';
+import { scaleOrdinal } from 'd3-scale';
+import { TaskStatus } from '@tskmgr/common';
 
-const interpolate = (t: number): string => interpolateRdYlGn(1 - t);
+const valColorScale: (domain: string) => unknown = scaleOrdinal()
+  .domain([TaskStatus.Running, TaskStatus.Completed, TaskStatus.Failed, TaskStatus.Aborted])
+  .range(['blue', 'green', 'red', 'black']);
 
 @Component({
   template: `
@@ -39,12 +40,9 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
     this.timelinesChart = TimelinesChart()(this.chart.nativeElement);
     this.timelinesChart.rightMargin(300);
     this.timelinesChart.width(this.el.nativeElement.offsetWidth);
-    this.timelinesChart.zColorScale(d3ScaleSequential(interpolate) as never);
+    this.timelinesChart.zColorScale(valColorScale as never);
 
     this.runDetailsService.tasks$.pipe(takeUntil(this.destroy$)).subscribe(async (tasks) => {
-      const run = await firstValueFrom(this.runDetailsService.run$);
-      const runDuration = DateUtil.getDurationInSeconds(run.createdAt, run.endedAt || new Date());
-
       const startedTasks = tasks.filter((x) => !!x.startedAt);
       const orderedTasks = orderBy(startedTasks, (x) => x.startedAt);
       const tasksByCommand = groupBy(orderedTasks, (x) => x.command);
@@ -53,14 +51,13 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
         {
           group: 'tasks',
           data: orderedTasks.map<Line>((x) => {
-            const taskDuration = DateUtil.getDurationInSeconds(x.startedAt as Date, x.endedAt || new Date());
             return {
               // if we found duplicated commands, just add id of the task
               label: tasksByCommand[x.command].length > 1 ? `${x.command} #${x.id}` : x.command,
               data: [
                 {
                   timeRange: [new Date(x.startedAt as Date), new Date(x.endedAt || new Date())],
-                  val: round(taskDuration / runDuration, 2),
+                  val: x.status,
                 },
               ],
             };
