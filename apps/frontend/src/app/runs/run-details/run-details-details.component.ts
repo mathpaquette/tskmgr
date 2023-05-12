@@ -141,6 +141,9 @@ export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
       }
 
       if (key === 'createdAt' || key === 'updatedAt' || key === 'endedAt') {
+        if (!value) {
+          return;
+        }
         value = format(value, 'yyyy-MM-dd HH:mm:ss');
       }
 
