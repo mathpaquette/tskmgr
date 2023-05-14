@@ -2,7 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, ILike, IsNull, Repository } from 'typeorm';
 import { RunEntity } from './run.entity';
-import { CreateFileRequestDto, CreateRunRequestDto, SetLeaderRequestDto, SetLeaderResponseDto } from '@tskmgr/common';
+import {
+  CreateFileRequestDto,
+  CreateRunRequestDto,
+  SetLeaderRequestDto,
+  SetLeaderResponseDto,
+  TaskStatus,
+} from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
 import { Express } from 'express';
 import { TaskEntity } from '../tasks/task.entity';
@@ -62,13 +68,34 @@ export class RunsService {
     return this.runsRepository.save(run);
   }
 
-  async abort(id: number): Promise<RunEntity> {
-    const run = await this.runsRepository.findOne({
-      where: { id: id },
-      relations: { tasks: true },
+  async abort(runId: number): Promise<RunEntity> {
+    return this.dataSource.transaction(async (manager) => {
+      // run
+      const run = await manager.findOne(RunEntity, {
+        where: { id: runId },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!run) {
+        throw new Error(`Unable run find run id: ${runId}`);
+      }
+
+      run.abort();
+
+      // tasks
+      const tasks = await manager.find(TaskEntity, {
+        where: { run: { id: runId } },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      const runningTasks = tasks.filter((x) => x.status === TaskStatus.Running);
+      runningTasks.forEach((x) => x.abort());
+
+      await manager.save(RunEntity, run);
+      await manager.save(TaskEntity, runningTasks);
+
+      return { ...run, tasks } as RunEntity;
     });
-    run.abort();
-    return this.runsRepository.save(run);
   }
 
   async fail(id: number): Promise<RunEntity> {
