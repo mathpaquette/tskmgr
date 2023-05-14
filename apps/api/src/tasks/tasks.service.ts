@@ -128,6 +128,7 @@ export class TasksService {
 
       return task;
     });
+
     await this.updateRunStatus(task.run);
     return task;
   }

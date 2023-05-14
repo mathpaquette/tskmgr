@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { StartTaskDto, StartTaskResponseDto, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaskEntity } from './task.entity';
-import { DataSource, IsNull, Repository } from 'typeorm';
+import { DataSource, EntityManager, IsNull, Repository } from 'typeorm';
 import { RunEntity } from '../runs/run.entity';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
@@ -19,25 +19,32 @@ export class PendingTasksService {
    * Get and start one pending task
    */
   async startPendingTask(runId: number, startTaskDto: StartTaskDto): Promise<StartTaskResponseDto> {
-    const run = await this.runsRepository.findOneBy({ id: runId });
-    if (!run) {
-      throw new Error(`Run id: ${runId} can't be found.`);
-    }
+    return await this.dataSource.transaction(async (manager) => {
+      const run = await manager.findOne(RunEntity, {
+        where: { id: runId },
+        lock: { mode: 'pessimistic_read' },
+      });
 
-    if (run.hasEnded()) {
-      return { continue: false, run };
-    }
+      if (!run) {
+        throw new Error(`Run id: ${runId} can't be found.`);
+      }
 
-    const startedTask = await this.getPendingTask(runId, startTaskDto, run.prioritization);
-    if (!startedTask) {
-      const waitingForTasks = !run.closed; // until run is closed, we need to wait for new incoming tasks.
-      return { continue: waitingForTasks, run };
-    }
+      if (run.hasEnded()) {
+        return { continue: false, run };
+      }
 
-    return { continue: true, run, task: startedTask };
+      const startedTask = await this.getPendingTask(manager, runId, startTaskDto, run.prioritization);
+      if (!startedTask) {
+        const waitingForTasks = !run.closed; // until run is closed, we need to wait for new incoming tasks.
+        return { continue: waitingForTasks, run };
+      }
+
+      return { continue: true, run, task: startedTask };
+    });
   }
 
   private async getPendingTask(
+    manager: EntityManager,
     runId: number,
     startTaskDto: StartTaskDto,
     prioritization: TaskPriority[]
@@ -47,16 +54,16 @@ export class PendingTasksService {
 
       switch (priority) {
         case TaskPriority.Longest:
-          task = await this.startOnePendingTask(startTaskDto, this.getLongestOptions(runId, startTaskDto));
+          task = await this.startOnePendingTask(manager, startTaskDto, this.getLongestOptions(runId, startTaskDto));
           break;
         case TaskPriority.Shortest:
-          task = await this.startOnePendingTask(startTaskDto, this.getShortestOptions(runId, startTaskDto));
+          task = await this.startOnePendingTask(manager, startTaskDto, this.getShortestOptions(runId, startTaskDto));
           break;
         case TaskPriority.Newest:
-          task = await this.startOnePendingTask(startTaskDto, this.getNewestOptions(runId, startTaskDto));
+          task = await this.startOnePendingTask(manager, startTaskDto, this.getNewestOptions(runId, startTaskDto));
           break;
         case TaskPriority.Oldest:
-          task = await this.startOnePendingTask(startTaskDto, this.getOldestOptions(runId, startTaskDto));
+          task = await this.startOnePendingTask(manager, startTaskDto, this.getOldestOptions(runId, startTaskDto));
           break;
         default:
           throw Error('Unknown priority type!');
@@ -157,19 +164,20 @@ export class PendingTasksService {
   }
 
   private async startOnePendingTask(
+    manager: EntityManager,
     startTaskDto: StartTaskDto,
     options: FindOneOptions<TaskEntity>
   ): Promise<TaskEntity> {
     const { runnerId, runnerInfo } = startTaskDto;
-    return await this.dataSource.transaction(async (manager) => {
-      const task = await manager.findOne(TaskEntity, options);
+    const task = await manager.findOne(TaskEntity, options);
 
-      if (!task) return;
+    if (!task) {
+      return;
+    }
 
-      task.start(runnerId, runnerInfo);
-      await manager.save(task);
+    task.start(runnerId, runnerInfo);
+    await manager.save(task);
 
-      return task;
-    });
+    return task;
   }
 }

@@ -90,11 +90,6 @@ export class RunEntity implements Run {
       throw new Error(`Can't abort already ended run.`);
     }
 
-    const runningTasks = this.tasks.filter((x) => x.status === TaskStatus.Running);
-    for (const runningTask of runningTasks) {
-      runningTask.abort();
-    }
-
     const endedAt = new Date();
     this.status = RunStatus.Aborted;
     this.duration = DateUtil.getDurationInSeconds(this.createdAt, endedAt);

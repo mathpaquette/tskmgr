@@ -26,6 +26,7 @@ export const environment: Environment = {
     database: `tskmgr_dev`,
     autoLoadEntities: true,
     synchronize: true,
+    logging: false,
   },
   multer: {
     dest: './files',
