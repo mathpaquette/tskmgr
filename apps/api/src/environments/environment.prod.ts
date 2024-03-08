@@ -6,7 +6,7 @@ import { RunEntity } from '../runs/run.entity';
 import { TaskEntity } from '../tasks/task.entity';
 import { version } from '../../../../package.json';
 
-const { type, host, port, username, password, database } = AppDataSource.options as PostgresConnectionOptions;
+const { type, host, port, username, password, database, extra, logging, schema } = AppDataSource.options as PostgresConnectionOptions;
 
 export const environment: Environment = {
   production: true,
@@ -18,6 +18,9 @@ export const environment: Environment = {
     username,
     password,
     database,
+    extra,
+    logging,
+    schema,
     autoLoadEntities: true,
     synchronize: false,
     entities: [FileEntity, RunEntity, TaskEntity],
