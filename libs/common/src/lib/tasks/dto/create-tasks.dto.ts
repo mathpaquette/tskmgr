@@ -11,4 +11,5 @@ export class CreateTaskDto {
   readonly arguments?: string[];
   readonly options?: object;
   readonly priority?: TaskPriority;
+  readonly dependsOn?: string[];
 }

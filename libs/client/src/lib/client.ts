@@ -31,7 +31,7 @@ export class Client {
     dataCallback: (task, data, cached) => {},
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     errorCallback: (task, data) => {},
-    pollingDelayMs: 1000,
+    pollingDelayMs: 5000,
     retryDelayMs: 5000,
     retryCount: 2,
   };

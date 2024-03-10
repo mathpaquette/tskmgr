@@ -74,6 +74,9 @@ export class TaskEntity implements Task {
   @Column({ name: 'ended_at', nullable: true, type: 'timestamptz' })
   endedAt: Date;
 
+  @Column({ type: 'simple-array', default: '' })
+  dependsOn: string[];
+
   public hasEnded(): boolean {
     return !!this.endedAt;
   }

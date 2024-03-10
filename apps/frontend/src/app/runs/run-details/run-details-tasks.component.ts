@@ -59,6 +59,7 @@ export class RunDetailsTasksComponent implements OnDestroy {
     { name: 'All', count: 0, checked: false },
     { name: 'Pending', filter: TaskStatus.Pending, count: 0, checked: false },
     { name: 'Running', filter: TaskStatus.Running, count: 0, checked: false },
+    { name: 'Aborted', filter: TaskStatus.Aborted, count: 0, checked: false },
     { name: 'Completed', filter: TaskStatus.Completed, count: 0, checked: false },
     this.taskFilterFailed,
   ];
