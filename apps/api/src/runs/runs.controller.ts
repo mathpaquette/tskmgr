@@ -15,7 +15,7 @@ import { TaskEntity } from '../tasks/task.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PendingTasksService } from '../tasks/pending-tasks.service';
 import { FileEntity } from '../files/file.entity';
-import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator';
+import { ApiQuery } from '@nestjs/swagger';
 
 @Controller('runs')
 export class RunsController {
@@ -59,7 +59,7 @@ export class RunsController {
   }
 
   @Get()
-  @ApiImplicitQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'search', required: false, type: String })
   async findAll(@Query('search') search: string): Promise<RunEntity[]> {
     return this.runsService.findAll(search);
   }

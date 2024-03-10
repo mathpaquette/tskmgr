@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ColDef, GridOptions, GridReadyEvent, RowDoubleClickedEvent } from 'ag-grid-community';
+import { ColDef, GridApi, GridOptions, GridReadyEvent, RowDoubleClickedEvent } from 'ag-grid-community';
 import {
   checkboxCellRenderer,
   defaultGridOptions,
@@ -80,6 +80,7 @@ export class RunsComponent implements OnInit, OnDestroy {
     { field: 'name', headerName: 'CI Job', width: 400, cellRenderer: urlCellRenderer, suppressSizeToFit: true },
   ];
 
+  private api!: GridApi;
   private search: string | undefined = undefined;
   private readonly destroy$ = new Subject<void>();
 
@@ -94,16 +95,17 @@ export class RunsComponent implements OnInit, OnDestroy {
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
-    this.gridOptions.api?.sizeColumnsToFit();
+    this.api?.sizeColumnsToFit();
   }
 
   refreshData(): void {
     this.runsService.findAll(this.search).subscribe((x) => {
-      this.gridOptions.api?.setRowData(x);
+      this.api?.setRowData(x);
     });
   }
 
   onGridReady(event: GridReadyEvent): void {
+    this.api = event.api;
     this.headerService.search$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
       this.search = x;
       this.refreshData();

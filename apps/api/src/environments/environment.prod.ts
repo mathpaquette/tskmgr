@@ -4,9 +4,11 @@ import { Environment } from './environment';
 import { FileEntity } from '../files/file.entity';
 import { RunEntity } from '../runs/run.entity';
 import { TaskEntity } from '../tasks/task.entity';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { version } from '../../../../package.json';
 
-const { type, host, port, username, password, database, extra, logging, schema } = AppDataSource.options as PostgresConnectionOptions;
+const { type, host, port, username, password, database, extra, logging, schema } =
+  AppDataSource.options as PostgresConnectionOptions;
 
 export const environment: Environment = {
   production: true,

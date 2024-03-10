@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM node:20-alpine
 WORKDIR /app
 
 COPY /dist/libs/db ./dist/libs/db
