@@ -1,5 +1,5 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
-import { AgGridEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
+import { AgGridEvent, ColDef, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { dateValueFormatter, defaultGridOptions } from '../../common/ag-grid.utils';
 import { RunDetailsService } from './run-details.service';
 import { Subject, takeUntil } from 'rxjs';
@@ -54,6 +54,8 @@ export class RunDetailsFilesComponent implements OnDestroy {
 
   readonly destroy$ = new Subject<void>();
 
+  private api!: GridApi;
+
   constructor(private readonly runDetailsService: RunDetailsService) {}
 
   ngOnDestroy(): void {
@@ -63,10 +65,11 @@ export class RunDetailsFilesComponent implements OnDestroy {
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
-    this.gridOptions.api?.sizeColumnsToFit();
+    this.api?.sizeColumnsToFit();
   }
 
   onGridReady(event: GridReadyEvent): void {
+    this.api = event.api;
     this.runDetailsService.files$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
       this.refreshData(x, event);
     });

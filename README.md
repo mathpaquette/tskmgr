@@ -37,7 +37,7 @@ docker-compose -f docker-compose.yml up
   `docker-compose -f docker-compose.yml --env-file .env-dev up -d postgres`
 - `npm install`
 - `npm run start:dev`
-- `npm run client:example`
+- `DEBUG=tskmgr:* ts-node --project libs/client/tsconfig.lib.json -r tsconfig-paths/register "libs/client/src/lib/client-example.ts"`
 - open browser to `http://localhost:4200`
 
 Check [client-example.ts](./libs/client/src/lib/client-example.ts) for more details.

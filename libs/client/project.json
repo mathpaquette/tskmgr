@@ -1,33 +1,29 @@
 {
+  "name": "client",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/client/src",
   "projectType": "library",
   "targets": {
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["libs/client/**/*.ts"]
-      }
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/client"],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/client"],
       "options": {
-        "jestConfig": "libs/client/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/client/jest.config.ts"
       }
     },
     "build": {
-      "executor": "@nrwl/js:tsc",
+      "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/client",
         "tsConfig": "libs/client/tsconfig.lib.json",
         "packageJson": "libs/client/package.json",
         "main": "libs/client/src/index.ts",
-        "assets": ["libs/client/*.md", "LICENSE"],
-        "updateBuildableProjectDepsInPackageJson": true,
-        "buildableProjectDepsInPackageJsonType": "dependencies"
+        "assets": ["libs/client/*.md", "LICENSE"]
       }
     }
   },

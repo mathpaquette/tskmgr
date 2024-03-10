@@ -1,6 +1,7 @@
 import { AppDataSource } from '@tskmgr/db';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { version } from '../../../../package.json';
 
 const { type } = AppDataSource.options as PostgresConnectionOptions;
