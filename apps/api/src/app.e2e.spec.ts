@@ -15,6 +15,7 @@ import {
   Task,
   File,
   CreateFileRequestDto,
+  CreateTaskDto,
 } from '@tskmgr/common';
 import { AppModule } from './app.module';
 import { TestDtoUtils } from './utils/test-dto-utils';
@@ -102,6 +103,94 @@ describe('Runs', () => {
     expect(data.task).toBeTruthy();
     expect(data.task.status).toEqual(TaskStatus.Running);
     expect(data.task.startedAt).toBeTruthy();
+  });
+
+  it('should start tasks in sequence task-3 -> task-1 -> task-2', async () => {
+    // arrange
+    const tasksDto: CreateTaskDto[] = [
+      {
+        name: 'task-1',
+        type: 'test',
+        command: 'command-1',
+        dependsOn: ['task-3'],
+        options: { shell: true },
+      },
+      {
+        name: 'task-2',
+        type: 'test',
+        command: 'command-1',
+        dependsOn: ['task-3', 'task-1'],
+        options: { shell: true },
+      },
+      {
+        name: 'task-3',
+        type: 'test',
+        command: 'command-1',
+        options: { shell: true },
+      },
+    ];
+    const run: Run = (await createRun(app, createRunDto)).body;
+    await createTasks(app, run.id, { tasks: tasksDto });
+
+    // act
+    let startedTask = (await startTask(app, run.id, startTaskDto)).body;
+    // expect
+    expect(startedTask.task.name).toEqual('task-3');
+
+    // act
+    await completeTask(app, startedTask.task.id).expect(200);
+    startedTask = (await startTask(app, run.id, startTaskDto)).body;
+    // expect
+    expect(startedTask.task.name).toEqual('task-1');
+
+    // act
+    await completeTask(app, startedTask.task.id).expect(200);
+    startedTask = (await startTask(app, run.id, startTaskDto)).body;
+    // expect
+    expect(startedTask.task.name).toEqual('task-2');
+  });
+
+  it('should wait for task-3 to complete before starting task-2', async () => {
+    // arrange
+    const tasksDto: CreateTaskDto[] = [
+      {
+        name: 'task-1',
+        type: 'test',
+        command: 'command-1',
+        dependsOn: ['task-3'],
+        options: { shell: true },
+      },
+      {
+        name: 'task-3',
+        type: 'test',
+        command: 'command-1',
+        options: { shell: true },
+      },
+    ];
+    const run: Run = (await createRun(app, createRunDto)).body;
+    await createTasks(app, run.id, { tasks: tasksDto });
+
+    // act
+    let startedTask = (await startTask(app, run.id, startTaskDto)).body;
+    // expect
+    expect(startedTask.task.name).toEqual('task-3');
+
+    // act
+    const startedEmptyTask = (await startTask(app, run.id, startTaskDto)).body;
+    // expect
+    expect(startedEmptyTask.continue).toEqual(true);
+    expect(startedEmptyTask.task).toBeFalsy();
+
+    // act
+    const completedTask = (await completeTask(app, startedTask.task.id).expect(200)).body;
+    // expect
+    expect(completedTask.status).toEqual(TaskStatus.Completed);
+    expect(completedTask.name).toEqual('task-3');
+
+    // act
+    startedTask = (await startTask(app, run.id, startTaskDto)).body;
+    // expect
+    expect(startedTask.task.name).toEqual('task-1');
   });
 
   it('should complete task', async () => {

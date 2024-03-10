@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Like, Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
 import {
   CompleteTaskDto,
@@ -12,7 +12,6 @@ import {
 } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
-import { Express } from 'express';
 
 @Injectable()
 export class TasksService {
@@ -53,6 +52,7 @@ export class TasksService {
         arguments: createTaskDto.arguments,
         options: createTaskDto.options,
         priority: createTaskDto.priority,
+        dependsOn: createTaskDto.dependsOn,
         avgDuration: avgDuration,
       });
 
@@ -63,7 +63,6 @@ export class TasksService {
       run.status = RunStatus.Started;
       await this.runsRepository.save(run);
     }
-
     return this.tasksRepository.save(tasks);
   }
 
@@ -120,6 +119,9 @@ export class TasksService {
 
       task.fail();
       await manager.save(task);
+
+      // Abort tasks that depends on current failed task
+      await this.abortDependentTasks(task.name, task.run.id);
 
       return task;
     });
@@ -189,5 +191,26 @@ export class TasksService {
 
     const sum = previousTasks.reduce((p, c) => p + c.duration, 0);
     return sum / previousTasks.length || undefined;
+  }
+
+  private async abortDependentTasks(taskName: string, runId: number): Promise<void> {
+    const dependentTasksToAbort = await this.tasksRepository.find({
+      relations: { run: true },
+      where: [
+        { dependsOn: Like(`%,${taskName},%`), run: { id: runId } }, // taskName is in the middle
+        { dependsOn: Like(`%,${taskName}`), run: { id: runId } }, // taskName is at the end
+        { dependsOn: Like(`${taskName},%`), run: { id: runId } }, // taskName is at the beginning
+        { dependsOn: Like(`${taskName}`), run: { id: runId } }, // taskName is only one in the list
+      ],
+    });
+    if (dependentTasksToAbort.length > 0) {
+      for (const taskToAbort of dependentTasksToAbort) {
+        if (taskToAbort.status === TaskStatus.Pending) {
+          taskToAbort.status = TaskStatus.Aborted;
+        }
+        await this.tasksRepository.save(taskToAbort);
+        await this.abortDependentTasks(taskToAbort.name, runId);
+      }
+    }
   }
 }
