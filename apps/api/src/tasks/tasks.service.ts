@@ -13,6 +13,7 @@ import {
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
 import { Express } from 'express';
+import { DependentProjectEntity } from './dependent-project.entity';
 
 @Injectable()
 export class TasksService {
@@ -20,6 +21,7 @@ export class TasksService {
     @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
     @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
     @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>,
+    @InjectRepository(DependentProjectEntity) private readonly dependentRepository: Repository<DependentProjectEntity>,
     private dataSource: DataSource
   ) {}
   /**
@@ -46,6 +48,14 @@ export class TasksService {
     for (const createTaskDto of createTasksDto.tasks) {
       const avgDuration = await this.getAverageTaskDuration(createTaskDto);
 
+      const dependencies =
+        createTaskDto.dependsOn?.map((dependencyDto) => {
+          return this.dependentRepository.create({
+            project: dependencyDto.project,
+            target: dependencyDto.target,
+          });
+        }) ?? [];
+
       const task = this.tasksRepository.create({
         run: run,
         name: createTaskDto.name,
@@ -54,13 +64,13 @@ export class TasksService {
         arguments: createTaskDto.arguments,
         options: createTaskDto.options,
         priority: createTaskDto.priority,
+        dependsOn: dependencies,
         avgDuration: avgDuration,
       });
 
       if (hasAffinity) {
         task.runnerId = await this.getRunnerIdFromAffinity(run, createTaskDto);
       }
-
       tasks.push(task);
     }
 
@@ -68,7 +78,6 @@ export class TasksService {
       run.status = RunStatus.Started;
       await this.runsRepository.save(run);
     }
-
     return this.tasksRepository.save(tasks);
   }
 

@@ -6,7 +6,7 @@
  *  Start API:
  *    nx serve api
  *  Command:
- *    DEBUG=tskmgr:* TS_NODE_PROJECT=libs/client/tsconfig.lib.json node --require ts-node/register --require tsconfig-paths/register libs/client/src/lib/client-example.ts
+ *    DEBUG=tskmgr:* ts-node --project libs/client/tsconfig.lib.json -r tsconfig-paths/register "libs/client/src/lib/client-example.ts"
  */
 
 import { execSync } from 'child_process';
@@ -15,6 +15,15 @@ import { ClientOptions } from './client-options';
 import { ClientFactory } from './client-factory';
 import { v4 as uuid } from 'uuid';
 import Debug from 'debug';
+import { readJsonFile } from '@nx/devkit';
+import { unlinkSync } from 'fs';
+import { createTaskGraph } from 'nx/src/tasks-runner/create-task-graph';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-expect-error
+import * as graph from './graph.json';
+import { readNxJson } from 'nx/src/config/configuration';
+// import {readNxJson} from "nx/src/config/configuration";
+
 const debug = Debug('tskmgr:client-example');
 
 delete process.env.TS_NODE_PROJECT;
@@ -32,6 +41,22 @@ let run: Run;
 
 (async () => {
   try {
+    // const projects = [
+    //   "api",
+    //   "client",
+    //   "common",
+    //   "frontend",
+    //   "frontend-e2e",
+    //   "db"
+    // ];
+    // const targets = ['build']
+    // const nxJson = readNxJson();
+    // const targetDependencies = {};
+    // Object.keys(nxJson.targetDefaults ?? {}).forEach((k) => {
+    //   targetDependencies[k] = nxJson.targetDefaults[k].dependsOn;
+    // });
+    // const taskGraph = createTaskGraph(graph, targetDependencies, projects, targets, undefined, {});
+    // console.log('taskGraph', taskGraph)
     // 1. Create the new run
     run = await client.createRun({
       name: uuid(),
@@ -44,10 +69,17 @@ let run: Run;
     const election = await client.setLeader(run.id);
     if (election.leader) {
       const tasks = getNxTasks().map<CreateTaskDto>((nxTask) => {
+        const command = `npx nx run ${nxTask.target.project}:${nxTask.target.target} --configuration=production`;
+        const dependsOn =
+          nxTask.target.project === 'frontend' && nxTask.target.target === 'build'
+            ? [{ project: 'common', target: 'build' }]
+            : undefined;
+        console.log('Depends On : ', dependsOn);
         return {
           name: nxTask.target.project,
           type: nxTask.target.target,
-          command: nxTask.command,
+          command: command.trim(),
+          dependsOn: dependsOn,
           options: { shell: true },
           priority: TaskPriority.Longest,
         };
@@ -79,14 +111,29 @@ let run: Run;
 })();
 
 function getNxTasks(): NxTask[] {
-  const tasks: NxTask[] = [
-    // --all should be removed in CI environment. Just for demo purpose.
-    ...JSON.parse(execSync('npx nx print-affected --all --target=lint').toString()).tasks,
-    ...JSON.parse(execSync('npx nx print-affected --all --target=test').toString()).tasks,
-    ...JSON.parse(execSync('npx nx print-affected --all --configuration=production --target=build').toString()).tasks,
-    ...JSON.parse(execSync('npx nx print-affected --all --configuration=production --target=e2e').toString()).tasks,
-  ];
-  return tasks;
+  const graphFileName = uuid() + '.json';
+  // In CI environment use npx nx affected --graph=${graphFileName} --target=lint command. run-many is just for demo purpose.
+  execSync(`npx nx run-many --graph=lint-${graphFileName} --target=lint`);
+  const lintJson = readJsonFile(`lint-${graphFileName}`);
+  unlinkSync(`lint-${graphFileName}`);
+  const lintTasks: NxTask[] = Object.values(lintJson.tasks.tasks);
+
+  execSync(`npx nx run-many --graph=test-${graphFileName} --target=test`);
+  const testJson = readJsonFile(`test-${graphFileName}`);
+  unlinkSync(`test-${graphFileName}`);
+  const testTasks: NxTask[] = Object.values(testJson.tasks.tasks);
+
+  execSync(`npx nx run-many --graph=build-${graphFileName} --target=build`);
+  const buildJson = readJsonFile(`build-${graphFileName}`);
+  // unlinkSync(`build-${graphFileName}`);
+  const buildTasks: NxTask[] = Object.values(buildJson.tasks.tasks);
+
+  execSync(`npx nx run-many --graph=e2e-${graphFileName} --target=e2e`);
+  const e2eJson = readJsonFile(`e2e-${graphFileName}`);
+  unlinkSync(`e2e-${graphFileName}`);
+  const e2eTasks: NxTask[] = Object.values(e2eJson.tasks.tasks);
+
+  return [...lintTasks, ...testTasks, ...buildTasks, ...e2eTasks];
 }
 
 function dataCallback(task: Task, data: string, cached: () => void): void {

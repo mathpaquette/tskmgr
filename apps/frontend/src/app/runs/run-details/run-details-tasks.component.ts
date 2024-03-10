@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
 import { RunStatus, Task, TaskStatus } from '@tskmgr/common';
-import { AgGridEvent, ColDef, GridOptions, GridReadyEvent } from 'ag-grid-community';
+import { AgGridEvent, ColDef, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import {
   checkboxCellRenderer,
   defaultGridOptions,
@@ -63,6 +63,8 @@ export class RunDetailsTasksComponent implements OnDestroy {
     this.taskFilterFailed,
   ];
 
+  private api!: GridApi;
+
   constructor(private readonly runDetailsService: RunDetailsService) {}
 
   ngOnDestroy(): void {
@@ -72,7 +74,7 @@ export class RunDetailsTasksComponent implements OnDestroy {
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
-    this.gridOptions.api?.sizeColumnsToFit();
+    this.api?.sizeColumnsToFit();
   }
 
   refreshData(tasks: Task[], event: AgGridEvent): void {
@@ -91,6 +93,7 @@ export class RunDetailsTasksComponent implements OnDestroy {
   }
 
   onGridReady(event: GridReadyEvent): void {
+    this.api = event.api;
     this.runDetailsService.run$.pipe(first()).subscribe((x) => {
       if (x.status === RunStatus.Failed) {
         this.onCheckboxChange(this.taskFilterFailed);
@@ -120,11 +123,11 @@ export class RunDetailsTasksComponent implements OnDestroy {
     this.taskFilters.forEach((x) => (x.checked = false));
 
     if (!taskFilter.filter) {
-      this.gridOptions.api?.setFilterModel({});
+      this.api?.setFilterModel({});
       return;
     }
 
-    this.gridOptions.api?.setFilterModel({ status: { filterType: 'text', type: 'equals', filter: taskFilter.filter } });
+    this.api?.setFilterModel({ status: { filterType: 'text', type: 'equals', filter: taskFilter.filter } });
     taskFilter.checked = true;
   }
 

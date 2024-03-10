@@ -7,3 +7,6 @@
 /files
 
 /libs/db/src/migrations
+
+/.nx/cache
+.angular

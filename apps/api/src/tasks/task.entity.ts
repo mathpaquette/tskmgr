@@ -9,9 +9,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { DateUtil, RunnerInfo, Task, TaskPriority, TaskStatus } from '@tskmgr/common';
+import { DateUtil, DependentProject, RunnerInfo, Task, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
+import { DependentProjectEntity } from './dependent-project.entity';
 
 @Entity({ name: 'task' })
 export class TaskEntity implements Task {
@@ -73,6 +74,9 @@ export class TaskEntity implements Task {
 
   @Column({ name: 'ended_at', nullable: true, type: 'timestamptz' })
   endedAt: Date;
+
+  @OneToMany(() => DependentProjectEntity, (dependentProject) => dependentProject.task, { cascade: true })
+  dependsOn: DependentProjectEntity[];
 
   public hasEnded(): boolean {
     return !!this.endedAt;

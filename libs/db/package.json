@@ -1,4 +1,9 @@
 {
   "name": "@tskmgr/db",
-  "version": "0.0.0"
+  "version": "0.0.0",
+  "dependencies": {
+    "reflect-metadata": "^0.1.13",
+    "tslib": "^2.3.0",
+    "typeorm": "^0.3.20"
+  }
 }

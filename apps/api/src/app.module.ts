@@ -14,8 +14,9 @@ import { FilesService } from './files/files.service';
 import { environment } from './environments/environment';
 import { AllExceptionsFilter } from './config/all-exceptions.filter';
 import { APP_FILTER } from '@nestjs/core';
+import { DependentProjectEntity } from './tasks/dependent-project.entity';
 
-const ENTITIES = [FileEntity, RunEntity, TaskEntity];
+const ENTITIES = [FileEntity, RunEntity, TaskEntity, DependentProjectEntity];
 
 @Module({
   imports: [
