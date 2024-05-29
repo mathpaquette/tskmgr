@@ -40,7 +40,6 @@ export class TasksService {
       throw new Error(`Run with ${run.status} status can't accept new tasks`);
     }
 
-    const hasAffinity = run.affinity;
     const tasks: TaskEntity[] = [];
 
     for (const createTaskDto of createTasksDto.tasks) {
@@ -56,10 +55,6 @@ export class TasksService {
         priority: createTaskDto.priority,
         avgDuration: avgDuration,
       });
-
-      if (hasAffinity) {
-        task.runnerId = await this.getRunnerIdFromAffinity(run, createTaskDto);
-      }
 
       tasks.push(task);
     }
@@ -194,26 +189,5 @@ export class TasksService {
 
     const sum = previousTasks.reduce((p, c) => p + c.duration, 0);
     return sum / previousTasks.length || undefined;
-  }
-
-  private async getRunnerIdFromAffinity(run: RunEntity, createTaskDto: CreateTaskDto): Promise<string> {
-    const task = await this.tasksRepository.findOne({
-      where: {
-        run: {
-          affinity: true,
-          parameters: run.parameters || {}, // must match all parameters from current run
-        },
-        status: TaskStatus.Completed,
-        type: createTaskDto.type,
-        command: createTaskDto.command,
-        arguments: createTaskDto.arguments?.toString(),
-        options: createTaskDto.options,
-        // TODO: maximum one month old to limit scan
-      },
-      relations: { run: true },
-      order: { endedAt: 'DESC' },
-    });
-
-    return task?.runnerId;
   }
 }

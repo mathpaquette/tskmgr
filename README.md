@@ -9,7 +9,6 @@ tskmgr (task manager) is a minimalist distributed build system that aims to offe
 - monitoring dashboard
 - task prioritization strategies (longest first, shortest first, FIFO, LIFO)
 - leader election
-- cache affinity
 - logging
 - dockerized
 
