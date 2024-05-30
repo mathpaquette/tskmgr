@@ -30,7 +30,6 @@ export class RunsService {
       info: createRunDto.info,
       parameters: createRunDto.parameters,
       prioritization: createRunDto.prioritization,
-      affinity: createRunDto.affinity,
       failFast: createRunDto.failFast,
     });
 

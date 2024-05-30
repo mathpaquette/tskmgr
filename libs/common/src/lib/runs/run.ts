@@ -13,7 +13,6 @@ export interface Run {
   closed: boolean;
   prioritization: TaskPriority[];
   leaderId: string;
-  affinity: boolean;
   failFast: boolean;
   info: RunInfo;
   parameters: RunParameters;
