@@ -54,16 +54,16 @@ export class PendingTasksService {
 
       switch (priority) {
         case TaskPriority.Longest:
-          task = await this.startOnePendingTask(manager, startTaskDto, this.getLongestOptions(runId, startTaskDto));
+          task = await this.startOnePendingTask(manager, startTaskDto, this.getLongestOptions(runId));
           break;
         case TaskPriority.Shortest:
-          task = await this.startOnePendingTask(manager, startTaskDto, this.getShortestOptions(runId, startTaskDto));
+          task = await this.startOnePendingTask(manager, startTaskDto, this.getShortestOptions(runId));
           break;
         case TaskPriority.Newest:
-          task = await this.startOnePendingTask(manager, startTaskDto, this.getNewestOptions(runId, startTaskDto));
+          task = await this.startOnePendingTask(manager, startTaskDto, this.getNewestOptions(runId));
           break;
         case TaskPriority.Oldest:
-          task = await this.startOnePendingTask(manager, startTaskDto, this.getOldestOptions(runId, startTaskDto));
+          task = await this.startOnePendingTask(manager, startTaskDto, this.getOldestOptions(runId));
           break;
         default:
           throw Error('Unknown priority type!');
@@ -77,19 +77,13 @@ export class PendingTasksService {
     return null;
   }
 
-  private getLongestOptions(runId: number, startTaskDto: StartTaskDto): FindOneOptions<TaskEntity> {
-    const { runnerId } = startTaskDto;
-    const query: FindOptionsWhere<TaskEntity> = {
-      run: { id: runId },
-      status: TaskStatus.Pending,
-      priority: TaskPriority.Longest,
-    };
-
+  private getLongestOptions(runId: number): FindOneOptions<TaskEntity> {
     return {
-      where: [
-        { ...query, runnerId },
-        { ...query, runnerId: IsNull() },
-      ],
+      where: {
+        run: { id: runId },
+        status: TaskStatus.Pending,
+        priority: TaskPriority.Longest,
+      },
       order: { avgDuration: 'DESC' },
       lock: {
         mode: 'pessimistic_write',
@@ -98,19 +92,13 @@ export class PendingTasksService {
     };
   }
 
-  private getShortestOptions(runId: number, startTaskDto: StartTaskDto): FindOneOptions<TaskEntity> {
-    const { runnerId } = startTaskDto;
-    const query: FindOptionsWhere<TaskEntity> = {
-      run: { id: runId },
-      status: TaskStatus.Pending,
-      priority: TaskPriority.Shortest,
-    };
-
+  private getShortestOptions(runId: number): FindOneOptions<TaskEntity> {
     return {
-      where: [
-        { ...query, runnerId },
-        { ...query, runnerId: IsNull() },
-      ],
+      where: {
+        run: { id: runId },
+        status: TaskStatus.Pending,
+        priority: TaskPriority.Shortest,
+      },
       order: { avgDuration: 'ASC' },
       lock: {
         mode: 'pessimistic_write',
@@ -120,19 +108,13 @@ export class PendingTasksService {
   }
 
   // FIFO
-  private getNewestOptions(runId: number, startTaskDto: StartTaskDto): FindOneOptions<TaskEntity> {
-    const { runnerId } = startTaskDto;
-    const query: FindOptionsWhere<TaskEntity> = {
-      run: { id: runId },
-      status: TaskStatus.Pending,
-      priority: TaskPriority.Newest,
-    };
-
+  private getNewestOptions(runId: number): FindOneOptions<TaskEntity> {
     return {
-      where: [
-        { ...query, runnerId },
-        { ...query, runnerId: IsNull() },
-      ],
+      where: {
+        run: { id: runId },
+        status: TaskStatus.Pending,
+        priority: TaskPriority.Newest,
+      },
       order: { createdAt: 'DESC' },
       lock: {
         mode: 'pessimistic_write',
@@ -142,19 +124,13 @@ export class PendingTasksService {
   }
 
   // LIFO
-  private getOldestOptions(runId: number, startTaskDto: StartTaskDto): FindOneOptions<TaskEntity> {
-    const { runnerId } = startTaskDto;
-    const query: FindOptionsWhere<TaskEntity> = {
-      run: { id: runId },
-      status: TaskStatus.Pending,
-      priority: TaskPriority.Oldest,
-    };
-
+  private getOldestOptions(runId: number): FindOneOptions<TaskEntity> {
     return {
-      where: [
-        { ...query, runnerId },
-        { ...query, runnerId: IsNull() },
-      ],
+      where: {
+        run: { id: runId },
+        status: TaskStatus.Pending,
+        priority: TaskPriority.Oldest,
+      },
       order: { createdAt: 'ASC' },
       lock: {
         mode: 'pessimistic_write',
