@@ -43,6 +43,7 @@ export class RunDetailsTasksComponent implements OnDestroy {
 
   readonly gridOptions: GridOptions = {
     ...defaultGridOptions,
+    columnDefs: this.columnDefs,
     onGridReady: this.onGridReady.bind(this),
   };
 
@@ -78,7 +79,7 @@ export class RunDetailsTasksComponent implements OnDestroy {
   }
 
   refreshData(tasks: Task[], event: AgGridEvent): void {
-    event.api.setRowData(tasks);
+    event.api.updateGridOptions({ rowData: tasks });
   }
 
   updateCounts(tasks: Task[]): void {
@@ -111,7 +112,7 @@ export class RunDetailsTasksComponent implements OnDestroy {
         debounceTime(200),
         distinctUntilChanged(),
         map((value) => (value ? value : '')),
-        tap((value) => event.api.setQuickFilter(value)),
+        tap((value) => event.api.updateGridOptions({ quickFilterText: value })),
         tap((value) => console.log(value))
       )
       .subscribe();

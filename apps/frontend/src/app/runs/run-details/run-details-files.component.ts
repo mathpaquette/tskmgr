@@ -78,6 +78,6 @@ export class RunDetailsFilesComponent implements OnDestroy {
   }
 
   refreshData(files: File[], event: AgGridEvent): void {
-    event.api.setRowData(files);
+    event.api.updateGridOptions({ rowData: files });
   }
 }
