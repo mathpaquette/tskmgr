@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
 import { RunStatus, Task, TaskStatus } from '@tskmgr/common';
-import { AgGridEvent, ColDef, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
+import { AgGridEvent, ColDef, GetRowIdParams, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import {
   checkboxCellRenderer,
   defaultGridOptions,
@@ -45,6 +45,7 @@ export class RunDetailsTasksComponent implements OnDestroy {
     ...defaultGridOptions,
     columnDefs: this.columnDefs,
     onGridReady: this.onGridReady.bind(this),
+    getRowId: (params: GetRowIdParams<Task>) => params.data.id.toString(),
   };
 
   readonly destroy$ = new Subject<void>();
