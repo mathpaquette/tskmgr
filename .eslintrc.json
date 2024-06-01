@@ -31,7 +31,8 @@
     {
       "files": ["*.ts", "*.tsx"],
       "extends": ["plugin:@nx/typescript"],
-      "rules": {}
+      "plugins": ["deprecation"],
+      "rules": { "deprecation/deprecation": "error" }
     },
     {
       "files": ["*.js", "*.jsx"],

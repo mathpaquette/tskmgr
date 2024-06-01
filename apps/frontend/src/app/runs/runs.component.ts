@@ -99,7 +99,7 @@ export class RunsComponent implements OnInit, OnDestroy {
 
   refreshData(): void {
     this.runsService.findAll(this.search).subscribe((x) => {
-      this.api?.setRowData(x);
+      this.api?.updateGridOptions({ rowData: x });
     });
   }
 
