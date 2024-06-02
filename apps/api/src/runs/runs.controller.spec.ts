@@ -3,8 +3,7 @@ import { AppModule } from '../app.module';
 import { INestApplication } from '@nestjs/common';
 import { RunsController } from './runs.controller';
 import { TestDtoUtils } from '../utils/test-dto-utils';
-import { CreateTasksDto, SetLeaderResponseDto, StartTaskResponseDto } from '@tskmgr/common';
-import { uniq } from 'lodash';
+import { SetLeaderResponseDto, StartTaskResponseDto } from '@tskmgr/common';
 import { TasksController } from '../tasks/tasks.controller';
 
 describe('RunsController', () => {
@@ -47,7 +46,7 @@ describe('RunsController', () => {
 
       // assert
       const ids = res.map((x) => x.task.id);
-      const uniqIds = uniq(ids);
+      const uniqIds = [...new Set(ids)];
       expect(uniqIds).toHaveLength(parallel);
     });
 
