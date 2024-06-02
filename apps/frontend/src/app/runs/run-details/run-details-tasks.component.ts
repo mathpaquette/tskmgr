@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
 import { RunStatus, Task, TaskStatus } from '@tskmgr/common';
 import { AgGridEvent, ColDef, GetRowIdParams, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
@@ -8,16 +8,19 @@ import {
   durationValueFormatter,
   timeValueFormatter,
 } from '../../common/ag-grid.utils';
-import { debounceTime, distinctUntilChanged, first, map, Subject, takeUntil, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, first, map, Subject, takeUntil, tap } from 'rxjs';
 import { FilesCellRendererComponent } from '../cell-renderers/files-cell-renderer.component';
 import { FormControl } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { RunDetailsTaskLogComponent } from './run-details-task-log.component';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'tskmgr-run-details-tasks',
   templateUrl: 'run-details-tasks.component.html',
   styleUrls: ['run-details-tasks.component.scss'],
 })
-export class RunDetailsTasksComponent implements OnDestroy {
+export class RunDetailsTasksComponent implements OnDestroy, OnInit {
   readonly columnDefs: ColDef[] = [
     { field: 'id' },
     { field: 'name', filter: true },
@@ -67,11 +70,30 @@ export class RunDetailsTasksComponent implements OnDestroy {
 
   private api!: GridApi;
 
-  constructor(private readonly runDetailsService: RunDetailsService) {}
+  constructor(
+    private readonly runDetailsService: RunDetailsService,
+    private modalService: NgbModal,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  ngOnInit() {
+    this.route.queryParams
+      .pipe(
+        takeUntil(this.destroy$),
+        tap((params) => {
+          const fileId = params['fileId'];
+          if (fileId) {
+            this.openLogFileModal(fileId);
+          }
+        })
+      )
+      .subscribe();
   }
 
   @HostListener('window:resize', ['$event'])
@@ -135,6 +157,38 @@ export class RunDetailsTasksComponent implements OnDestroy {
 
   onQuickFilterClear(): void {
     this.quickFilter.reset();
+  }
+
+  private openLogFileModal(fileId: string): void {
+    const unsubscribe$ = new Subject<void>();
+    const modalRef = this.modalService.open(RunDetailsTaskLogComponent, {
+      scrollable: true,
+      size: 'xl',
+    });
+    modalRef.componentInstance.logFileId = fileId;
+    modalRef.closed
+      .pipe(
+        takeUntil(this.destroy$),
+        takeUntil(unsubscribe$),
+        tap(() => this.router.navigate([], { queryParams: {} })),
+        tap(() => {unsubscribe$.next(); unsubscribe$.complete();})
+      )
+      .subscribe();
+    modalRef.dismissed
+      .pipe(
+        takeUntil(this.destroy$),
+        takeUntil(unsubscribe$),
+        tap(() => this.router.navigate([], { queryParams: {} })),
+        tap(() => {unsubscribe$.next(); unsubscribe$.complete();})
+      )
+      .subscribe();
+
+    this.router.events.pipe(
+      takeUntil(this.destroy$),
+      takeUntil(unsubscribe$),
+      filter(event => event instanceof NavigationStart && event.navigationTrigger === 'popstate'),
+      tap(() => modalRef.dismiss())
+    ).subscribe();
   }
 }
 
