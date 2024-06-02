@@ -6,7 +6,7 @@ import { File } from '@tskmgr/common';
 @Component({
   selector: 'tskmgr-files-cell-renderer',
   template: `
-    <a *ngFor="let file of files; let i = index" href="/api/files/{{ file.id }}" target="_blank">
+    <a *ngFor="let file of files; let i = index" routerLink="." [queryParams]="{ fileId: file.id }">
       <i class="bi bi-file-text" placement="top" ngbTooltip="{{ file.originName }}" container="body"></i>
     </a>
   `,
