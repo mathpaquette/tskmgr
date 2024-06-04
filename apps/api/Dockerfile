@@ -10,14 +10,13 @@ COPY ./tools ./tools
 COPY package.json .
 COPY package-lock.json .
 COPY nx.json .
-COPY workspace.json .
 COPY tsconfig.base.json .
 
 RUN npm install
-RUN npx nx affected:build --all --configuration=production --verbose
+RUN npx nx run api:build:production --verbose
 RUN npm install --omit dev
 
-FROM node:16-alpine
+FROM node:18-alpine
 WORKDIR /app
 
 COPY --from=build --chown=node:node /build/dist/apps/api ./api

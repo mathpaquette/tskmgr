@@ -10,11 +10,10 @@ COPY ./tools ./tools
 COPY package.json .
 COPY package-lock.json .
 COPY nx.json .
-COPY workspace.json .
 COPY tsconfig.base.json .
 
 RUN npm install
-RUN npx nx affected:build --all --configuration=production --verbose
+RUN npx nx run frontend:build:production --verbose
 RUN npm install --omit dev
 
 FROM nginxinc/nginx-unprivileged:1-alpine
