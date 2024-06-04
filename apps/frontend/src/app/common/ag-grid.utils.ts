@@ -17,7 +17,8 @@ export const durationValueFormatter = (params: ValueFormatterParams) => {
 export const updatedAtValueFormatter = (params: ValueFormatterParams) => {
   if (!params.value) return '';
   const duration = intervalToDuration({ start: params.value, end: new Date() });
-  if (duration.days) return `>1d ago`;
+  if (duration?.days && duration.days > 30) return `>30d ago`;
+  if (duration.days) return `${duration.days}d ago`;
   if (duration.hours) return `${duration.hours}h ago`;
   if (duration.minutes) return `${duration.minutes}m ago`;
   if (duration.seconds) return `${duration.seconds}s ago`;
