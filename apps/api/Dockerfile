@@ -19,6 +19,8 @@ RUN npm install --omit dev
 FROM node:18-alpine
 WORKDIR /app
 
+RUN apk add --no-cache krb5 krb5-libs
+
 COPY --from=build --chown=node:node /build/dist/apps/api ./api
 COPY --from=build --chown=node:node /build/node_modules node_modules/
 
