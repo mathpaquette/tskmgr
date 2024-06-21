@@ -1,0 +1,26 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "127.0.0.1",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "tskmgr",
+            "database": "tskmgr_dev",
+            "username": "tskmgr",
+            "password": ""
+        },
+        {
+            "previewLimit": 50,
+            "server": "127.0.0.1",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "tskmgr",
+            "database": "tskmgr",
+            "username": "tskmgr",
+            "password": ""
+        }
+    ],
+    "IDX.aI.enableInlineCompletion": true,
+    "IDX.aI.enableCodebaseIndexing": true
+}
