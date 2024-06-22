@@ -4,21 +4,31 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TaskLogFileService } from './task-log-file.service';
 import { catchError, map, Observable, of } from 'rxjs';
 import { AsyncPipe, NgIf } from '@angular/common';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'tskmgr-run-details-task-log',
   standalone: true,
   template: `
-    <div class="overflow-auto p-3" *ngIf="taskLogHtml$ | async as taskLogHtml; else spinner" style="min-height: 100vh">
-      <div [innerHTML]="taskLogHtml"></div>
-    </div>
-    <ng-template #spinner>
-      <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh">
-        <div class="spinner-border" role="status" style="width: 4rem; height: 4rem;">
-          <span class="visually-hidden">Loading...</span>
-        </div>
+		<div class="modal-header">
+			<h5 class="modal-title">Task execution log</h5>
+			<button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss()"></button>
+		</div>
+
+    <div class="modal-body">
+			<div class="overflow-auto p-3 bg-dark text-light" *ngIf="taskLogHtml$ | async as taskLogHtml; else spinner" style="min-height: 100vh">
+        <div [innerHTML]="taskLogHtml"></div>
       </div>
-    </ng-template>
+      <ng-template #spinner>
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh">
+          <div class="spinner-border" role="status" style="width: 4rem; height: 4rem;">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </ng-template>
+		</div>
+
+		<div class="modal-footer"></div>
   `,
   imports: [AsyncPipe, NgIf],
   styles: [],
@@ -37,7 +47,7 @@ export class RunDetailsTaskLogComponent {
 
   taskLogHtml$: Observable<SafeHtml>;
 
-  constructor(private sanitizer: DomSanitizer, private taskLogFileService: TaskLogFileService) {}
+  constructor(private sanitizer: DomSanitizer, private taskLogFileService: TaskLogFileService, public activeModal: NgbActiveModal) {}
 
   private convertAnsiToHtml(ansiText: string): SafeHtml {
     const ansiConverter = new AnsiUp();
