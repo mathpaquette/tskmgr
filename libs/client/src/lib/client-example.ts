@@ -96,7 +96,7 @@ function getNxTasks(): NxTask[] {
 
   execSync(`npx nx run-many --graph=build-${graphFileName} --target=build`);
   const buildJson = readJsonFile(`build-${graphFileName}`);
-  // unlinkSync(`build-${graphFileName}`);
+  unlinkSync(`build-${graphFileName}`);
   const buildTasks: NxTask[] = Object.values(buildJson.tasks.tasks);
 
   execSync(`npx nx run-many --graph=e2e-${graphFileName} --target=e2e`);
