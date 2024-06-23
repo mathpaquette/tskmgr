@@ -25,7 +25,7 @@ const options: ClientOptions = {
   parallel: 1,
   dataCallback,
   errorCallback,
-  spawnOptions: { env: { ...process.env, NO_COLOR: '1' } },
+  spawnOptions: { env: { ...process.env } },
 };
 const client = ClientFactory.createNew('http://localhost:3333', 'RUNNER_1', options);
 

@@ -170,7 +170,7 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
       .pipe(
         takeUntil(this.destroy$),
         takeUntil(unsubscribe$),
-        tap(() => this.router.navigate([], { queryParams: {} })),
+        tap(() => this.router.navigate([], { queryParams: {}, replaceUrl: true})),
         tap(() => {unsubscribe$.next(); unsubscribe$.complete();})
       )
       .subscribe();
@@ -178,7 +178,7 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
       .pipe(
         takeUntil(this.destroy$),
         takeUntil(unsubscribe$),
-        tap(() => this.router.navigate([], { queryParams: {} })),
+        tap(() => this.router.navigate([], { queryParams: {}, replaceUrl: true})),
         tap(() => {unsubscribe$.next(); unsubscribe$.complete();})
       )
       .subscribe();
