@@ -193,6 +193,7 @@ export class TasksService {
     return sum / previousTasks.length || undefined;
   }
 
+  // TODO: refactor to fetch all dependent tasks in one query
   private async abortDependentTasks(taskName: string, runId: number): Promise<void> {
     const dependentTasksToAbort = await this.tasksRepository.find({
       relations: { run: true },

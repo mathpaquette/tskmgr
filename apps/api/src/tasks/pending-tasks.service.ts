@@ -119,6 +119,7 @@ export class PendingTasksService {
     };
   }
 
+  // TODO: refactor to fetch all tasks at once
   /**
    * This function is used to find a task based on the provided options.
    * It checks for circular dependencies, whether all dependencies of a task are completed,
