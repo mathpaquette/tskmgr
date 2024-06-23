@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # Usage:
 # DOCKER_PUSH=true sh scripts/docker.sh
 
