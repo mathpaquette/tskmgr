@@ -5,7 +5,7 @@
   "dependencies": {
     "debug": "^4.3.4",
     "node-fetch": "^2.6.7",
-    "@tskmgr/common": "0.0.0",
+    "@tskmgr/common": "^2.0.0",
     "uuid": "^9.0.1",
     "@nx/devkit": "18.0.7",
     "form-data": "2.3.3"
