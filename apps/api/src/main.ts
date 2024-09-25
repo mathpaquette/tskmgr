@@ -6,9 +6,9 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-
 import { AppModule } from './app.module';
 import { environment } from './environments/environment';
+import { urlencoded, json } from 'express';
 
 async function bootstrap() {
   const globalPrefix = 'api';
@@ -23,6 +23,9 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(globalPrefix, app, document);
+
+  app.use(json({ limit: '5mb' }));
+  app.use(urlencoded({ extended: true, limit: '5mb' }));
 
   const port = process.env.PORT || 3333;
   await app.listen(port);
