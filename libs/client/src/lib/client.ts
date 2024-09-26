@@ -13,14 +13,14 @@ import {
   SetLeaderResponseDto,
   CreateFileRequestDto,
 } from '@tskmgr/common';
-import fetch from 'node-fetch';
-import * as FormData from 'form-data';
 import { checkStatus, delay, getTaskLogFilename, spawnAsync } from './utils';
 import { RunTasksResult } from './run-tasks-result';
 import { TaskResult } from './task-result';
 import { ClientOptions } from './client-options';
-import { createReadStream, createWriteStream, unlinkSync } from 'fs';
+import { createWriteStream, unlinkSync } from 'fs';
 import Debug from 'debug';
+import { readFile } from "node:fs/promises";
+
 
 const debug = Debug('tskmgr:client');
 
@@ -149,11 +149,10 @@ export class Client {
   }
 
   private async uploadFile(url: string, path: string, params: CreateFileRequestDto): Promise<File_> {
-    // https://github.com/node-fetch/node-fetch/tree/2.x#post-with-form-data-detect-multipart
-    // https://github.com/form-data/form-data#readme
-
     const formData = new FormData();
-    formData.append('file', createReadStream(path));
+
+    const blob = new Blob([await readFile(path)]);
+    formData.append('file', blob, path);
 
     if (params.type) {
       formData.append('type', params.type);
