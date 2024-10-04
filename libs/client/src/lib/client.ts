@@ -223,15 +223,22 @@ export class Client {
         }
       };
 
+      const options = {
+        ...task.options,
+        ...this.options.spawnOptions,
+      }
+      options.env = {
+        ...process.env,
+        ...options.env,
+        TSKMGR_PARALLEL_ID: parallelId.toString()
+      }
+      
       debug(`${logInfo} starting task: ${task.id}`);
       try {
         childProcess = await spawnAsync(
           task.command,
           task.arguments,
-          {
-            ...task.options,
-            ...this.options.spawnOptions,
-          },
+          options,
           {
             dataCallback: dataHandler,
             errorCallback: errorHandler,
