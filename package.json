@@ -1,6 +1,6 @@
 {
   "name": "tskmgr",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "license": "MIT",
   "scripts": {
     "clean": "sh scripts/clean.sh",
