@@ -15,6 +15,7 @@ export class PendingTasksService {
   async startPendingTask(runId: number, startTaskDto: StartTaskDto): Promise<StartTaskResponseDto> {
     let run: RunEntity;
     try {
+      // TODO: add lock we need to acquire lock here
       return await this.dataSource.transaction(async (manager) => {
         const { runnerId, runnerInfo } = startTaskDto;
         run = await manager.findOne(RunEntity, { where: { id: runId } });
@@ -23,6 +24,7 @@ export class PendingTasksService {
           throw new Error(`Run id: ${runId} can't be found.`);
         }
 
+        // TODO: move to controller
         for (const priority of run.prioritization) {
           if (!Object.values(TaskPriority).includes(priority)) {
             throw new Error('Unknown priority type!');
@@ -32,6 +34,22 @@ export class PendingTasksService {
         if (run.hasEnded()) {
           return { continue: false, run };
         }
+
+        // get all tasks from the run
+
+        // generate the task model
+
+
+
+        // sort tasks by priority
+
+
+
+
+
+        // check if task can be executed
+
+
 
         const allTasks = await manager.find(TaskEntity, this.getOptions({ runId }));
         const allPendingTasks = allTasks.filter((task) => task.status === TaskStatus.Pending);
@@ -66,57 +84,6 @@ export class PendingTasksService {
         throw error;
       }
     }
-  }
-
-  /**
-   * Constructs the options for finding a task entity.
-   *
-   *   @param params - An object containing the parameters for the find operation.
-   *   @param params.runId - The ID of the run.
-   *   @param params.priority - The priority of the task.
-   *   @param params.taskStatus - The status of the task.
-   *   @param params.taskName - Optional. The name of the task.
-   *   @param params.exclude - Optional. An array of task IDs to exclude from the search.
-   *
-   *   @returns An object containing the options for the find operation.
-   */
-  private getOptions(params: {
-    runId: number;
-    priority?: TaskPriority;
-    taskStatus?: TaskStatus;
-    taskName?: string;
-    exclude?: number[];
-  }): FindOneOptions<TaskEntity> {
-    const { runId, priority, taskStatus, taskName, exclude = [] } = params;
-    // Set the order based on the priority
-    let order;
-    switch (priority) {
-      case TaskPriority.Longest:
-        order = { avgDuration: 'DESC' };
-        break;
-      case TaskPriority.Shortest:
-        order = { avgDuration: 'ASC' };
-        break;
-      case TaskPriority.Newest:
-        order = { createdAt: 'DESC' }; // FIFO
-        break;
-      case TaskPriority.Oldest:
-        order = { createdAt: 'ASC' }; // LIFO
-    }
-
-    return {
-      where: {
-        run: { id: runId },
-        name: taskName,
-        status: taskStatus,
-        id: Not(In(exclude)),
-      },
-      order: order,
-      lock: {
-        mode: 'pessimistic_write',
-        tables: ['task'],
-      },
-    };
   }
 
   /**
