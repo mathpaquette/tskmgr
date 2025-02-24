@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { DateUtil, Run, RunInfo, RunParameters, RunStatus, TaskPriority, TaskStatus } from '@tskmgr/common';
+import { DateUtil, Run, RunInfo, RunParameters, RunStatus, TaskPriority } from '@tskmgr/common';
 import { FileEntity } from '../files/file.entity';
 import { TaskEntity } from '../tasks/task.entity';
 

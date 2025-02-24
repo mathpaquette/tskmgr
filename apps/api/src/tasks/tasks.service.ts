@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Like, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
 import {
   CompleteTaskDto,
@@ -12,6 +12,7 @@ import {
 } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
+import { DagService } from './dag.service';
 
 @Injectable()
 export class TasksService {
@@ -19,7 +20,8 @@ export class TasksService {
     @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
     @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
     @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>,
-    private dataSource: DataSource
+    private readonly dataSource: DataSource,
+    private readonly dagService: DagService
   ) {}
   /**
    * Create new tasks in bulk
@@ -103,6 +105,9 @@ export class TasksService {
         throw new Error(`Task id: ${taskId} can't be found.`);
       }
 
+      // get all tasks from the run
+      const tasks = await manager.find(TaskEntity, { where: { run: { id: task.run.id } } });
+
       // if failFast enabled, abort all tasks from the run
       if (task.run.failFast) {
         const runningTasks = await manager.findBy(TaskEntity, {
@@ -117,11 +122,12 @@ export class TasksService {
         await manager.save(runningTasks);
       }
 
-      task.fail();
-      await manager.save(task);
-
-      // Abort tasks that depends on current failed task
-      await this.abortDependentTasks(task.name, task.run.id);
+      const failedTask = task.fail();
+      const cancelledDependantTasks = this.dagService.getDependantTasks(task.name, tasks).map((x) =>
+        // TODO: replace ABORT by a new CANCELLED task status
+        x.abort()
+      );
+      await manager.save([failedTask, ...cancelledDependantTasks]);
 
       return task;
     });
@@ -191,27 +197,5 @@ export class TasksService {
 
     const sum = previousTasks.reduce((p, c) => p + c.duration, 0);
     return sum / previousTasks.length || undefined;
-  }
-
-  // TODO: refactor to fetch all dependent tasks in one query
-  private async abortDependentTasks(taskName: string, runId: number): Promise<void> {
-    const dependentTasksToAbort = await this.tasksRepository.find({
-      relations: { run: true },
-      where: [
-        { dependsOn: Like(`%,${taskName},%`), run: { id: runId } }, // taskName is in the middle
-        { dependsOn: Like(`%,${taskName}`), run: { id: runId } }, // taskName is at the end
-        { dependsOn: Like(`${taskName},%`), run: { id: runId } }, // taskName is at the beginning
-        { dependsOn: Like(`${taskName}`), run: { id: runId } }, // taskName is only one in the list
-      ],
-    });
-    if (dependentTasksToAbort.length > 0) {
-      for (const taskToAbort of dependentTasksToAbort) {
-        if (taskToAbort.status === TaskStatus.Pending) {
-          taskToAbort.status = TaskStatus.Aborted;
-        }
-        await this.tasksRepository.save(taskToAbort);
-        await this.abortDependentTasks(taskToAbort.name, runId);
-      }
-    }
   }
 }
