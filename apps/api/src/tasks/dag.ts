@@ -50,7 +50,7 @@ export class DAG {
       }
     }
 
-    dependents.delete(startNode); // Remove the start node itself
+    //dependents.delete(startNode); // Remove the start node itself
     return dependents;
   }
 
