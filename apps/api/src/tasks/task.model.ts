@@ -3,13 +3,13 @@ import { TaskStatus } from '@tskmgr/common';
 
 export class TaskModel {
   readonly status: TaskStatus;
-  readonly dependsOn: TaskModel[] = []
+  readonly dependsOn: TaskModel[] = [];
 
   public constructor(entity: TaskEntity) {
     this.status = entity.status;
   }
 
-  public hasDependencies() : boolean {
+  public hasDependencies(): boolean {
     return this.dependsOn.length > 0;
   }
 
@@ -18,7 +18,7 @@ export class TaskModel {
       return this;
     }
 
-    const visited = new Set<TaskModel>
+    const visited = new Set<TaskModel>();
     const stack: TaskModel[] = [];
     stack.push(this);
 
@@ -37,18 +37,16 @@ export class TaskModel {
     return null;
   }
 
-
-
   public static mapFromEntities(entities: TaskEntity[]): TaskModel[] {
     const modelByName = new Map<string, TaskModel>();
     const withDependencies: TaskEntity[] = [];
 
     // create
     for (const entity of entities) {
-      modelByName.set(entity.name, new TaskModel(entity))
+      modelByName.set(entity.name, new TaskModel(entity));
 
       if (entity.dependsOn.length > 0) {
-        withDependencies.push(entity)
+        withDependencies.push(entity);
       }
     }
 
@@ -57,10 +55,10 @@ export class TaskModel {
       const model = modelByName.get(entity.name);
 
       for (const taskName of entity.dependsOn) {
-        model.dependsOn.push(modelByName.get(taskName))
+        model.dependsOn.push(modelByName.get(taskName));
       }
     }
 
-    return Array.from(modelByName.values())
+    return Array.from(modelByName.values());
   }
 }

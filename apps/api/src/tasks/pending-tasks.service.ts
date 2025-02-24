@@ -35,21 +35,13 @@ export class PendingTasksService {
           return { continue: false, run };
         }
 
-        // get all tasks from the run
+        // get all tasks from the run by priority
 
         // generate the task model
 
-
-
         // sort tasks by priority
 
-
-
-
-
         // check if task can be executed
-
-
 
         const allTasks = await manager.find(TaskEntity, this.getOptions({ runId }));
         const allPendingTasks = allTasks.filter((task) => task.status === TaskStatus.Pending);
