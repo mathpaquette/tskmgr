@@ -9,6 +9,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { environment } from './environments/environment';
 import { urlencoded, json } from 'express';
+import { PerformanceInterceptor } from './config/performance.interceptor';
 
 async function bootstrap() {
   const globalPrefix = 'api';
@@ -26,6 +27,7 @@ async function bootstrap() {
 
   app.use(json({ limit: '5mb' }));
   app.use(urlencoded({ extended: true, limit: '5mb' }));
+  app.useGlobalInterceptors(new PerformanceInterceptor());
 
   const port = process.env.PORT || 3333;
   await app.listen(port);
