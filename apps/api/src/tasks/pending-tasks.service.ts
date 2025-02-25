@@ -60,7 +60,8 @@ export class PendingTasksService {
         return { continue: true, run, task: startedTask };
       });
     } catch (error) {
-      if (error instanceof QueryFailedError && error.message.includes('Deadlock detected')) {
+      console.error('startPendingTask:', error);
+      if (error instanceof QueryFailedError) {
         return { continue: true, run };
       } else {
         throw error;
