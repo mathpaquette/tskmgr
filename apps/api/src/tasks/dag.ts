@@ -37,7 +37,7 @@ export class DAG {
    */
   public getAllDependents(startNode: string): Set<string> {
     if (!this.graph.has(startNode)) {
-      throw new Error(`Node "${startNode}" not found in the DAG.`);
+      return new Set();
     }
 
     const dependents = new Set<string>();
@@ -53,7 +53,7 @@ export class DAG {
       }
     }
 
-    dependents.delete(startNode); // Remove the start node itself
+    dependents.delete(startNode); // remove the start node itself
     return dependents;
   }
 
@@ -74,6 +74,7 @@ export class DAG {
       }
     }
 
+    requiredNodes.delete(startNode); // remove the start node itself
     return requiredNodes;
   }
 
@@ -82,7 +83,7 @@ export class DAG {
    */
   topologicalSortFrom(startNode: string): string[] {
     if (!this.graph.has(startNode)) {
-      throw new Error(`Node "${startNode}" not found in the DAG.`);
+      return [];
     }
 
     // Get all dependencies that must be executed before startNode

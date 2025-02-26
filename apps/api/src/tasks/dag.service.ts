@@ -11,8 +11,8 @@ export class DagService {
     for (const task of tasks) {
       tasksByName.set(task.name, task);
 
-      for (const dependencyName of task.dependsOn) {
-        dag.addDependency(task.name, dependencyName);
+      for (const dependency of task.dependsOn) {
+        dag.addDependency(dependency, task.name);
       }
     }
 

@@ -116,15 +116,19 @@ export class TaskEntity implements Task {
     return this;
   }
 
+  // TODO: create a cancelled state
   public abort(): TaskEntity {
     // if (this.status !== TaskStatus.Running) {
     //   throw new Error(`Task with ${this.status} status can't change to ${TaskStatus.Aborted}`);
     // }
 
-    const endedAt = new Date();
-    this.endedAt = endedAt;
+    // const endedAt = new Date();
+    // this.endedAt = endedAt;
+    // this.status = TaskStatus.Aborted;
+    // this.duration = DateUtil.getDurationInSeconds(this.startedAt, endedAt);
+    // return this;
+
     this.status = TaskStatus.Aborted;
-    this.duration = DateUtil.getDurationInSeconds(this.startedAt, endedAt);
     return this;
   }
 }

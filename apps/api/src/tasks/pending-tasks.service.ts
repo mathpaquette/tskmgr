@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { RunnerInfo, StartTaskDto, StartTaskResponseDto, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { TaskEntity } from './task.entity';
 import { DataSource, EntityManager, In, Not, QueryFailedError } from 'typeorm';
@@ -60,12 +60,8 @@ export class PendingTasksService {
         return { continue: true, run, task: startedTask };
       });
     } catch (error) {
-      console.error('startPendingTask:', error);
-      if (error instanceof QueryFailedError) {
-        return { continue: true, run };
-      } else {
-        throw error;
-      }
+      Logger.error('startPendingTask:', error);
+      return { continue: true, run };
     }
   }
 
