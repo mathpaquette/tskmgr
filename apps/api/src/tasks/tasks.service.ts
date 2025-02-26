@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
@@ -44,7 +44,8 @@ export class TasksService {
     const tasks: TaskEntity[] = [];
 
     for (const createTaskDto of createTasksDto.tasks) {
-      const avgDuration = await this.getAverageTaskDuration(createTaskDto);
+      // TODO: need to be address for performance issues.
+      //const avgDuration = await this.getAverageTaskDuration(createTaskDto);
 
       const task = this.tasksRepository.create({
         run: run,
@@ -55,7 +56,7 @@ export class TasksService {
         options: createTaskDto.options,
         priority: createTaskDto.priority,
         dependsOn: createTaskDto.dependsOn,
-        avgDuration: avgDuration,
+        avgDuration: 0,
       });
 
       tasks.push(task);
@@ -127,6 +128,15 @@ export class TasksService {
         // TODO: replace ABORT by a new CANCELLED task status
         x.abort()
       );
+
+      if (cancelledDependantTasks.length > 0) {
+        Logger.debug(
+          `Failed task: ${task.name} from run: ${task.run.id} has dependent tasks: ${cancelledDependantTasks
+            .map((x) => x.name)
+            .join(',')}`
+        );
+      }
+
       await manager.save([failedTask, ...cancelledDependantTasks]);
 
       return task;

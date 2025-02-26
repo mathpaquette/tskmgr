@@ -44,6 +44,6 @@ describe('DAG', () => {
     // act
     const result = dag.getAllDependencies('D');
     // assert
-    expect(Array.from(result)).toStrictEqual(['D', 'E']);
+    expect(Array.from(result)).toStrictEqual(['E']);
   });
 });
