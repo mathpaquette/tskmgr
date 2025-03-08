@@ -1,4 +1,4 @@
-FROM node:20-alpine as build
+FROM node:lts-alpine as build
 WORKDIR /build
 
 RUN apk add --no-cache python3 make g++
@@ -16,7 +16,7 @@ RUN npm install
 RUN npx nx run api:build:production --verbose
 RUN npm install --omit dev
 
-FROM node:18-alpine
+FROM node:lts-alpine
 WORKDIR /app
 
 RUN apk add --no-cache krb5 krb5-libs

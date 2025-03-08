@@ -26,7 +26,7 @@ docker-compose -f docker-compose.yml up
 
 #### Prerequisites
 
-- node 20 LTS
+- node 22 LTS
 - postgres
 
 #### Install
