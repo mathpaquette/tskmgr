@@ -1,4 +1,4 @@
-FROM node:20-alpine as build
+FROM node:lts-alpine as build
 WORKDIR /build
 
 RUN apk add --no-cache python3 make g++
