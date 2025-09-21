@@ -1,30 +1,30 @@
-import { ChildProcess, spawn, SpawnOptionsWithoutStdio } from 'child_process';
-import { createInterface } from 'readline';
-import { tmpdir } from 'os';
-import { join } from 'path';
+import { ChildProcess, spawn, SpawnOptionsWithoutStdio } from 'node:child_process';
+import { createInterface } from 'node:readline';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
-export interface SpawnAsyncOptions {
-  dataCallback?: (data: string) => void;
-  errorCallback?: (data: string) => void;
+export interface SpawnAsyncLineHandlers {
+  dataHandler?: (line: string) => void;
+  errorHandler?: (line: string) => void;
 }
 
 export async function spawnAsync(
   command: string,
   args?: ReadonlyArray<string>,
   options?: SpawnOptionsWithoutStdio,
-  logging?: SpawnAsyncOptions
+  lineHandlers?: SpawnAsyncLineHandlers
 ): Promise<ChildProcess> {
   return new Promise((resolve, reject) => {
     const childProcess = spawn(command, args, options);
 
-    if (logging.dataCallback) {
+    if (lineHandlers?.dataHandler) {
       const readlineStdout = createInterface({ input: childProcess.stdout });
-      readlineStdout.on('line', logging.dataCallback);
+      readlineStdout.on('line', lineHandlers.dataHandler);
     }
 
-    if (logging.errorCallback) {
+    if (lineHandlers?.errorHandler) {
       const readlineStderr = createInterface({ input: childProcess.stderr });
-      readlineStderr.on('line', logging.errorCallback);
+      readlineStderr.on('line', lineHandlers.errorHandler);
     }
 
     childProcess.on('close', (code) => {

@@ -1,3 +1,3 @@
 export interface RunnerInfo {
-  [key: string]: never;
+  [name: string]: string;
 }

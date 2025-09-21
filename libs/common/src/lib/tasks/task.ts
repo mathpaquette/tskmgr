@@ -10,7 +10,7 @@ export interface Task {
   type: string;
   command: string;
   arguments: string[];
-  options: object;
+  options: TaskOptions;
   runnerId: string;
   runnerInfo: RunnerInfo;
   status: string;
@@ -23,4 +23,18 @@ export interface Task {
   startedAt: Date | null;
   endedAt: Date | null;
   files: File[];
+}
+
+export interface TaskOptions {
+  cwd?: string;
+  env?: { [key: string]: string };
+  argv0?: string;
+  detached?: boolean;
+  uid?: number;
+  gid?: number;
+  serialization?: string;
+  shell?: boolean;
+  signal?: object;
+  timeout?: number;
+  killSignal?: string | number;
 }
