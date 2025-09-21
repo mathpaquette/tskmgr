@@ -41,7 +41,7 @@
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "7.8.1",
-    "systeminformation": "^5.16.6",
+    "systeminformation": "^5.27.10",
     "timelines-chart": "^2.12.1",
     "tslib": "^2.3.0",
     "typeorm": "^0.3.20",
