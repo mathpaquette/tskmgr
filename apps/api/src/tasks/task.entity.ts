@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { DateUtil, RunnerInfo, Task, TaskPriority, TaskStatus } from '@tskmgr/common';
+import { DateUtil, RunnerInfo, Task, TaskOptions, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
 
@@ -39,7 +39,7 @@ export class TaskEntity implements Task {
   arguments: string[];
 
   @Column({ type: 'jsonb', nullable: true })
-  options: object;
+  options: TaskOptions;
 
   @Column({ name: 'runner_id', nullable: true })
   runnerId: string;

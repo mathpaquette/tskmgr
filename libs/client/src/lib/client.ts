@@ -1,4 +1,4 @@
-import { ChildProcess } from 'child_process';
+import { ChildProcess } from 'node:child_process';
 import {
   ApiUrl,
   Run,
@@ -17,20 +17,22 @@ import { checkStatus, delay, getTaskLogFilename, spawnAsync } from './utils';
 import { RunTasksResult } from './run-tasks-result';
 import { TaskResult } from './task-result';
 import { ClientOptions } from './client-options';
-import { createWriteStream, unlinkSync } from 'fs';
+import { createWriteStream, unlinkSync } from 'node:fs';
 import Debug from 'debug';
-import { readFile } from "node:fs/promises";
-
+import { readFile } from 'node:fs/promises';
+import { SpawnOptionsWithoutStdio } from 'node:child_process';
 
 const debug = Debug('tskmgr:client');
 
 export class Client {
   public static readonly DefaultOptions: ClientOptions = {
     parallel: 1,
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    dataCallback: (task, data, cached) => {},
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    errorCallback: (task, data) => {},
+    dataCallback: (task, data, cached) => {
+      // noop
+    },
+    errorCallback: (task, data) => {
+      // noop
+    },
     pollingDelayMs: 5000,
     retryDelayMs: 5000,
     retryCount: 2,
@@ -39,7 +41,7 @@ export class Client {
   constructor(
     private readonly apiUrl: ApiUrl,
     private readonly runnerId: string,
-    private readonly options: ClientOptions
+    private readonly clientOptions: ClientOptions
   ) {}
 
   public async createRun(params: CreateRunRequestDto): Promise<Run> {
@@ -113,7 +115,7 @@ export class Client {
   public async runTasks(runId: number): Promise<RunTasksResult> {
     const taskRunners: Promise<TaskResult[]>[] = [];
 
-    for (let i = 0; i < this.options.parallel; i++) {
+    for (let i = 0; i < this.clientOptions.parallel; i++) {
       taskRunners.push(this.defaultParallelTaskRunner(runId, i));
     }
 
@@ -191,8 +193,8 @@ export class Client {
       }
 
       if (!res.task) {
-        debug(`${logInfo} polling for new tasks in ${this.options.pollingDelayMs} ms`);
-        await delay(this.options.pollingDelayMs);
+        debug(`${logInfo} polling for new tasks in ${this.clientOptions.pollingDelayMs} ms`);
+        await delay(this.clientOptions.pollingDelayMs);
         continue;
       }
 
@@ -210,40 +212,36 @@ export class Client {
       writeStream.on('open', () => (writable = true));
 
       const dataHandler = (data: string): void => {
-        this.options.dataCallback(task, data, () => (cached = true));
+        this.clientOptions.dataCallback(task, data, () => (cached = true));
         if (writable) {
           writeStream.write(`[${new Date().toISOString()}] ${data}\n`);
         }
       };
 
       const errorHandler = (data: string): void => {
-        this.options.errorCallback(task, data);
+        this.clientOptions.errorCallback(task, data);
         if (writable) {
           writeStream.write(`[${new Date().toISOString()}] ${data}\n`);
         }
       };
 
-      const options = {
-        ...task.options,
-        ...this.options.spawnOptions,
-      }
-      options.env = {
-        ...process.env,
-        ...options.env,
-        TSKMGR_PARALLEL_ID: parallelId.toString()
-      }
-      
+      const spawnOptions: SpawnOptionsWithoutStdio = {
+        ...(task.options as SpawnOptionsWithoutStdio),
+        ...this.clientOptions.spawnOptions,
+        env: {
+          ...process.env,
+          ...task.options.env,
+          ...this.clientOptions.spawnOptions.env,
+          TSKMGR_PARALLEL_ID: parallelId.toString(),
+        },
+      };
+
       debug(`${logInfo} starting task: ${task.id}`);
       try {
-        childProcess = await spawnAsync(
-          task.command,
-          task.arguments,
-          options,
-          {
-            dataCallback: dataHandler,
-            errorCallback: errorHandler,
-          }
-        );
+        childProcess = await spawnAsync(task.command, task.arguments, spawnOptions, {
+          dataHandler,
+          errorHandler,
+        });
         completed = true;
         debug(`${logInfo} completed task: ${task.id}`);
       } catch (err) {
