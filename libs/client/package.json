@@ -4,7 +4,6 @@
   "license": "MIT",
   "dependencies": {
     "debug": "^4.3.4",
-    "@tskmgr/common": "0.0.0",
-    "uuid": "^9.0.1"
+    "@tskmgr/common": "0.0.0"
   }
 }
