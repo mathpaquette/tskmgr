@@ -1,25 +1,17 @@
 /**
- * IntelliJ debug:
- *  Node parameters: --require ts-node/register --require tsconfig-paths/register
- *  Environment variables: TS_NODE_PROJECT=libs/client/tsconfig.lib.json
- *
- *  Start API:
- *    nx serve api
- *  Command:
- *    DEBUG=tskmgr:* ts-node --project libs/client/tsconfig.lib.json -r tsconfig-paths/register "libs/client/src/lib/client-example.ts"
+ * Usage:
+ *   DEBUG=tskmgr:* npx ts-node --project tsconfig.base.json -r tsconfig-paths/register "examples/client-example.ts"
  */
 
 import { execSync } from 'child_process';
 import { CreateTaskDto, Run, Task, TaskPriority } from '@tskmgr/common';
-import { ClientOptions } from './client-options';
-import { ClientFactory } from './client-factory';
+import { ClientOptions, ClientFactory } from '@tskmgr/client';
 import { v4 as uuid } from 'uuid';
 import Debug from 'debug';
 import { readJsonFile } from '@nx/devkit';
 import { unlinkSync } from 'fs';
-const debug = Debug('tskmgr:client-example');
 
-delete process.env.TS_NODE_PROJECT;
+const debug = Debug('tskmgr:client-example');
 
 const options: ClientOptions = {
   parallel: 1,
