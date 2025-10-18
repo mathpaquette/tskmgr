@@ -230,8 +230,8 @@ export class Client {
         ...this.clientOptions.spawnOptions,
         env: {
           ...process.env,
-          ...task.options.env,
-          ...this.clientOptions.spawnOptions.env,
+          ...task.options?.env,
+          ...this.clientOptions.spawnOptions?.env,
           TSKMGR_PARALLEL_ID: parallelId.toString(),
         },
       };
