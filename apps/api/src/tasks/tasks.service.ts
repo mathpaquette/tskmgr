@@ -2,17 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
-import {
-  CompleteTaskDto,
-  CreateFileRequestDto,
-  CreateTaskDto,
-  CreateTasksDto,
-  RunStatus,
-  TaskStatus,
-} from '@tskmgr/common';
+import { CompleteTaskDto, CreateFileRequestDto, CreateTasksDto, RunStatus, TaskStatus } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
 import { DagService } from './dag.service';
+import { HashService } from '../utils/hash.service';
 
 @Injectable()
 export class TasksService {
@@ -21,7 +15,8 @@ export class TasksService {
     @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
     @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>,
     private readonly dataSource: DataSource,
-    private readonly dagService: DagService
+    private readonly dagService: DagService,
+    private readonly hashService: HashService
   ) {}
   /**
    * Create new tasks in bulk
@@ -44,9 +39,6 @@ export class TasksService {
     const tasks: TaskEntity[] = [];
 
     for (const createTaskDto of createTasksDto.tasks) {
-      // TODO: need to be address for performance issues.
-      //const avgDuration = await this.getAverageTaskDuration(createTaskDto);
-
       const task = this.tasksRepository.create({
         run: run,
         name: createTaskDto.name,
@@ -56,9 +48,10 @@ export class TasksService {
         options: createTaskDto.options,
         priority: createTaskDto.priority,
         dependsOn: createTaskDto.dependsOn,
-        avgDuration: 0,
       });
 
+      task.hash = this.getHashForTask(task);
+      task.avgDuration = await this.getAvgDurationFromLastCompleted(task.hash);
       tasks.push(task);
     }
 
@@ -81,6 +74,7 @@ export class TasksService {
 
     const { cached } = completeTaskDto;
     task.complete(cached);
+    task.avgDuration = await this.getAverageTaskDuration(task);
     await this.tasksRepository.save(task);
 
     await this.updateRunStatus(task.run);
@@ -191,21 +185,44 @@ export class TasksService {
     }
   }
 
-  private async getAverageTaskDuration(createTaskDto: CreateTaskDto): Promise<number> {
-    const previousTasks = await this.tasksRepository.find({
+  private async getAverageTaskDuration(task: TaskEntity): Promise<number> {
+    const hash = this.getHashForTask(task);
+    const result = await this.tasksRepository
+      .createQueryBuilder()
+      .select('AVG(t.duration)', 'avgDuration')
+      .from((subQuery) => {
+        return subQuery
+          .select('task.duration', 'duration')
+          .from(TaskEntity, 'task')
+          .where('task.hash = :hash', { hash })
+          .andWhere('task.status = :status', { status: TaskStatus.Completed })
+          .andWhere('task.cached = :cached', { cached: false })
+          .orderBy('task.endedAt', 'DESC')
+          .limit(10);
+      }, 't')
+      .getRawOne();
+
+    return result.avgDuration;
+  }
+
+  private async getAvgDurationFromLastCompleted(hash: string): Promise<number> {
+    const task = await this.tasksRepository.findOne({
       where: {
-        type: createTaskDto.type,
-        command: createTaskDto.command,
-        arguments: createTaskDto.arguments?.toString(),
-        options: createTaskDto.options,
+        hash: hash,
         status: TaskStatus.Completed,
-        cached: false,
       },
       order: { endedAt: 'DESC' },
-      take: 25, // TODO: make it configurable
+      select: { avgDuration: true },
     });
 
-    const sum = previousTasks.reduce((p, c) => p + c.duration, 0);
-    return sum / previousTasks.length || undefined;
+    return task?.avgDuration ?? null;
+  }
+
+  private getHashForTask(task: TaskEntity): string {
+    return this.hashService.generateHash({
+      command: task.command ?? null,
+      arguments: task.arguments ?? null,
+      options: task.options ?? null,
+    });
   }
 }
