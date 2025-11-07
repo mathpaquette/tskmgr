@@ -9,7 +9,10 @@
       "port": 9229,
       "request": "attach",
       "skipFiles": ["<node_internals>/**"],
-      "type": "node"
+      "type": "node",
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+      "cwd": "${workspaceFolder}/apps/api",
+      "sourceMaps": true
     }
   ]
 }
