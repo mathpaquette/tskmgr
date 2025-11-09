@@ -1,6 +1,6 @@
 /**
  * Usage:
- *   DEBUG=tskmgr:* npx ts-node --project tsconfig.base.json -r tsconfig-paths/register "examples/client-example.ts"
+ *   npm run client:example
  */
 
 import { execSync, spawnSync, spawn } from 'node:child_process';
@@ -97,7 +97,6 @@ function dataCallback(task: Task, data: string, cached: () => void): void {
   if (match && match[1] === match[2]) {
     cached();
   }
-
   console.log(`[stdout] ${data}`);
 }
 

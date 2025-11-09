@@ -80,11 +80,13 @@ export class TasksService {
 
     const { cached } = completeTaskDto;
     task.complete(cached);
-    await this.tasksRepository.save(task);
 
-    task.avgDuration = await this.tasksRepository.getAverageTaskDuration(task.hash);
-    await this.tasksRepository.save(task);
+    if (!cached) {
+      await this.tasksRepository.save(task);
+      task.avgDuration = await this.tasksRepository.calculateAvgTaskDuration(task.hash);
+    }
 
+    await this.tasksRepository.save(task);
     await this.updateRunStatus(task.run);
     return task;
   }

@@ -9,7 +9,7 @@ export class TasksRepository extends Repository<TaskEntity> {
     super(TaskEntity, dataSource.createEntityManager());
   }
 
-  public async getAverageTaskDuration(hash: string): Promise<number> {
+  public async calculateAvgTaskDuration(hash: string): Promise<number> {
     const result = await this.createQueryBuilder()
       .select('AVG(t.duration)', 'avgDuration')
       .from((subQuery) => {
@@ -20,7 +20,7 @@ export class TasksRepository extends Repository<TaskEntity> {
           .andWhere('task.status = :status', { status: TaskStatus.Completed })
           .andWhere('task.cached = :cached', { cached: false })
           .orderBy('task.endedAt', 'DESC')
-          .limit(10);
+          .limit(10); // TODO: make it configurable
       }, 't')
       .getRawOne();
 
@@ -29,9 +29,9 @@ export class TasksRepository extends Repository<TaskEntity> {
 
   public async getAvgDurationsByHash(hashes: string[]): Promise<Map<string, number>> {
     const results = await this.createQueryBuilder('task')
-      .select(['task.hash AS hash', 'task.avgDuration AS "avgDuration"', 'task.id'])
+      .select(['task.hash AS hash', 'task.avgDuration AS "avgDuration"'])
       .where('task.hash IN (:...hashes)', { hashes })
-      .andWhere('task.status = :status', { status: TaskStatus.Completed })
+      // .andWhere('task.status = :status', { status: TaskStatus.Completed })
       .orderBy('task.hash')
       .addOrderBy('task.endedAt', 'DESC')
       .distinctOn(['task.hash'])
