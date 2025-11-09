@@ -20,16 +20,12 @@ export class PendingTasksService {
    * Get and start one pending task
    */
   async startPendingTask(runId: number, startTaskDto: StartTaskDto): Promise<StartTaskResponseDto> {
-    console.log('runId:', runId);
-
     let run: RunEntity;
+
     try {
       return await this.runsRepository.manager.transaction(async (manager) => {
-        const { runnerId, runnerInfo } = startTaskDto;
-
-        const run = await manager.findOne(RunEntity, {
+        run = await manager.findOne(RunEntity, {
           where: { id: runId },
-          lock: { mode: 'pessimistic_read' },
         });
 
         if (!run) {
@@ -63,6 +59,10 @@ export class PendingTasksService {
             continue;
           }
 
+          if (task.dependencies.length === 0) {
+            return { continue: true, run, task: await this.startTask(manager, task, startTaskDto) };
+          }
+
           const executionOrder = dag.topologicalSortFrom(task.name);
           for (const taskName of executionOrder) {
             const currentTask = tasksByName.get(taskName);
@@ -74,12 +74,21 @@ export class PendingTasksService {
               .map((x) => tasksByName.get(x))
               .every((x) => x.status === TaskStatus.Completed);
 
+            console.log(
+              'taskName:',
+              taskName,
+              'deps:',
+              dag.getAllDependencies(taskName),
+              'completed:',
+              allDependenciesCompleted
+            );
+
             if (allDependenciesCompleted) {
               return { continue: true, run, task: await this.startTask(manager, currentTask, startTaskDto) };
             }
           }
 
-          return { continue: true, run, task: await this.startTask(manager, task, startTaskDto) };
+          //return { continue: true, run, task: await this.startTask(manager, task, startTaskDto) };
 
           /*
               const hasFailedDependency = executionOrder
