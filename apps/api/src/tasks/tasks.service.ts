@@ -47,7 +47,7 @@ export class TasksService {
         arguments: createTaskDto.arguments,
         options: createTaskDto.options,
         priority: createTaskDto.priority,
-        dependsOn: createTaskDto.dependsOn,
+        dependencies: createTaskDto.dependencies,
       });
 
       task.hash = this.getHashForTask(task);

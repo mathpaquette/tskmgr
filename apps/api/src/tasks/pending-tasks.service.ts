@@ -52,7 +52,7 @@ export class PendingTasksService {
         for (const task of tasks) {
           tasksByName.set(task.name, task);
 
-          for (const dependency of task.dependsOn) {
+          for (const dependency of task.dependencies) {
             dag.addDependency(dependency, task.name);
           }
         }
@@ -64,7 +64,6 @@ export class PendingTasksService {
           }
 
           const executionOrder = dag.topologicalSortFrom(task.name);
-
           for (const taskName of executionOrder) {
             const currentTask = tasksByName.get(taskName);
             if (currentTask.status !== TaskStatus.Pending) {
@@ -80,6 +79,8 @@ export class PendingTasksService {
             }
           }
 
+          return { continue: true, run, task: await this.startTask(manager, task, startTaskDto) };
+
           /*
               const hasFailedDependency = executionOrder
                 .map((x) => tasksByName.get(x))
@@ -89,11 +90,11 @@ export class PendingTasksService {
               }*/
         }
 
-        for (const priority of run.prioritization) {
-          if (priority === TaskPriority.Longest) {
-            //
-          }
-        }
+        // for (const priority of run.prioritization) {
+        //   if (priority === TaskPriority.Longest) {
+        //     //
+        //   }
+        // }
 
         return { continue: true, run };
       });

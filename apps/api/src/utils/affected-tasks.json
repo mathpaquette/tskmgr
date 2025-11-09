@@ -2,19 +2,19 @@
   "tasks": [
     {
       "name": "A",
-      "dependsOn": ["B", "C"]
+      "dependencies": ["B", "C"]
     },
     {
       "name": "B",
-      "dependsOn": ["D"]
+      "dependencies": ["D"]
     },
     {
       "name": "C",
-      "dependsOn": ["D"]
+      "dependencies": ["D"]
     },
     {
       "name": "D",
-      "dependsOn": ["E"]
+      "dependencies": ["E"]
     }
   ]
 }

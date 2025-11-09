@@ -14,6 +14,7 @@ import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
 
 @Entity({ name: 'task' })
+@Index(['run.id', 'name'], { unique: true })
 export class TaskEntity implements Task {
   @PrimaryGeneratedColumn()
   id: number;
@@ -74,8 +75,8 @@ export class TaskEntity implements Task {
   @Column({ name: 'ended_at', nullable: true, type: 'timestamptz' })
   endedAt: Date;
 
-  @Column({ name: 'depends_on', type: 'simple-array', default: '' })
-  dependsOn: string[];
+  @Column({ name: 'dependencies', type: 'simple-array', default: '' })
+  dependencies: string[];
 
   @Column({ name: 'hash', type: 'varchar', length: 44, nullable: true })
   hash: string;
