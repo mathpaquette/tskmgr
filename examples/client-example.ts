@@ -37,7 +37,7 @@ async function main() {
     const election = await client.setLeader(run.id);
     if (election.leader) {
       const tasks = getNxTasks(['lint', 'test', 'build']).map<CreateTaskDto>((x) => {
-        const command = `npx nx run ${x.id} --skip-nx-cache`;
+        const command = `npx nx run ${x.id}`;
         return {
           name: x.id,
           type: x.target.target,
@@ -91,13 +91,10 @@ function getNxTasks(targets: string[]): NxGraphTask[] {
 }
 
 function dataCallback(task: Task, data: string, cached: () => void): void {
-  // > nx run frontend:lint  [existing outputs match the cache, left as is]
-  // > nx run client:lint  [local cache]
-  if (
-    (data.startsWith(`> nx run ${task.name}:${task.type}`) &&
-      data.endsWith('[existing outputs match the cache, left as is]')) ||
-    data.endsWith('[local cache]')
-  ) {
+  // Nx read the output from the cache instead of running the command for 1 out of 1 tasks.
+  const regex = /Nx read the output from the cache instead of running the command for (\d+) out of (\d+) tasks\./;
+  const match = data.match(regex);
+  if (match && match[1] === match[2]) {
     cached();
   }
 
