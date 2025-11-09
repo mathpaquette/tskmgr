@@ -7,11 +7,12 @@ import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
 import { DagService } from './dag.service';
 import { HashService } from '../utils/hash.service';
+import { TasksRepository } from './tasks.repository';
 
 @Injectable()
 export class TasksService {
   public constructor(
-    @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
+    private readonly tasksRepository: TasksRepository,
     @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
     @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>,
     private readonly dataSource: DataSource,
@@ -37,22 +38,27 @@ export class TasksService {
     }
 
     const tasks: TaskEntity[] = [];
+    const hashes: string[] = [];
 
-    for (const createTaskDto of createTasksDto.tasks) {
+    for (const dto of createTasksDto.tasks) {
       const task = this.tasksRepository.create({
         run: run,
-        name: createTaskDto.name,
-        type: createTaskDto.type,
-        command: createTaskDto.command,
-        arguments: createTaskDto.arguments,
-        options: createTaskDto.options,
-        priority: createTaskDto.priority,
-        dependencies: createTaskDto.dependencies,
+        name: dto.name,
+        type: dto.type,
+        command: dto.command,
+        arguments: dto.arguments,
+        options: dto.options,
+        priority: dto.priority,
+        dependencies: dto.dependencies,
       });
-
       task.hash = this.getHashForTask(task);
-      task.avgDuration = await this.getAvgDurationFromLastCompleted(task.hash);
       tasks.push(task);
+      hashes.push(task.hash);
+    }
+
+    const avgDurationsByHash = await this.tasksRepository.getAvgDurationsByHash(hashes);
+    for (const task of tasks) {
+      task.avgDuration = avgDurationsByHash.get(task.hash);
     }
 
     if (run.status === RunStatus.Created) {
@@ -74,7 +80,7 @@ export class TasksService {
 
     const { cached } = completeTaskDto;
     task.complete(cached);
-    task.avgDuration = await this.getAverageTaskDuration(task);
+    task.avgDuration = await this.tasksRepository.getAverageTaskDuration(task.hash);
     await this.tasksRepository.save(task);
 
     await this.updateRunStatus(task.run);
@@ -183,39 +189,6 @@ export class TasksService {
       }
       return this.runsRepository.save(run);
     }
-  }
-
-  private async getAverageTaskDuration(task: TaskEntity): Promise<number> {
-    const hash = this.getHashForTask(task);
-    const result = await this.tasksRepository
-      .createQueryBuilder()
-      .select('AVG(t.duration)', 'avgDuration')
-      .from((subQuery) => {
-        return subQuery
-          .select('task.duration', 'duration')
-          .from(TaskEntity, 'task')
-          .where('task.hash = :hash', { hash })
-          .andWhere('task.status = :status', { status: TaskStatus.Completed })
-          .andWhere('task.cached = :cached', { cached: false })
-          .orderBy('task.endedAt', 'DESC')
-          .limit(10);
-      }, 't')
-      .getRawOne();
-
-    return result.avgDuration;
-  }
-
-  private async getAvgDurationFromLastCompleted(hash: string): Promise<number> {
-    const task = await this.tasksRepository.findOne({
-      where: {
-        hash: hash,
-        status: TaskStatus.Completed,
-      },
-      order: { endedAt: 'DESC' },
-      select: { avgDuration: true },
-    });
-
-    return task?.avgDuration ?? null;
   }
 
   private getHashForTask(task: TaskEntity): string {

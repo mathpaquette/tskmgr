@@ -74,29 +74,10 @@ export class PendingTasksService {
               .map((x) => tasksByName.get(x))
               .every((x) => x.status === TaskStatus.Completed);
 
-            console.log(
-              'taskName:',
-              taskName,
-              'deps:',
-              dag.getAllDependencies(taskName),
-              'completed:',
-              allDependenciesCompleted
-            );
-
             if (allDependenciesCompleted) {
               return { continue: true, run, task: await this.startTask(manager, currentTask, startTaskDto) };
             }
           }
-
-          //return { continue: true, run, task: await this.startTask(manager, task, startTaskDto) };
-
-          /*
-              const hasFailedDependency = executionOrder
-                .map((x) => tasksByName.get(x))
-                .some((x) => x.status === TaskStatus.Failed);
-              if (hasFailedDependency) {
-                continue;
-              }*/
         }
 
         // for (const priority of run.prioritization) {

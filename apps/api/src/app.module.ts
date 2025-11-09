@@ -16,6 +16,7 @@ import { AllExceptionsFilter } from './config/all-exceptions.filter';
 import { APP_FILTER } from '@nestjs/core';
 import { DagService } from './tasks/dag.service';
 import { HashService } from './utils/hash.service';
+import { TasksRepository } from './tasks/tasks.repository';
 
 const ENTITIES = [FileEntity, RunEntity, TaskEntity];
 
@@ -37,6 +38,7 @@ const ENTITIES = [FileEntity, RunEntity, TaskEntity];
     PendingTasksService,
     DagService,
     HashService,
+    TasksRepository,
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,

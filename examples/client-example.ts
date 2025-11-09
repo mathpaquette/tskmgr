@@ -37,7 +37,7 @@ async function main() {
     const election = await client.setLeader(run.id);
     if (election.leader) {
       const tasks = getNxTasks(['lint', 'test', 'build']).map<CreateTaskDto>((x) => {
-        const command = `npx nx run ${x.id} --configuration=production`;
+        const command = `npx nx run ${x.id} --skip-nx-cache`;
         return {
           name: x.id,
           type: x.target.target,
