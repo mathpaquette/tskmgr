@@ -11,13 +11,14 @@ export class TasksRepository extends Repository<TaskEntity> {
   }
 
   public async getAvgDurationsByHash(hashes: string[]): Promise<Map<string, number>> {
+    const schema = environment.datasource.schema;
     const results = await this.manager.query(
       `
     SELECT hash, AVG(duration) AS "avgDuration"
     FROM (
       SELECT hash, duration,
              ROW_NUMBER() OVER (PARTITION BY hash ORDER BY ended_at DESC) AS rn
-      FROM ${environment.datasource.schema}.task
+      FROM ${schema}.task
       WHERE hash = ANY($1)
         AND status = $2
         AND cached = false
