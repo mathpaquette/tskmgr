@@ -53,38 +53,34 @@ export class PendingTasksService {
           }
         }
 
-        const sortedTasks = tasks.sort((a, b) => (b.avgDuration ?? 0) - (a.avgDuration ?? 0)); // Sort tasks by avgDuration descending
-        for (const task of sortedTasks) {
-          if (task.status !== TaskStatus.Pending) {
-            continue;
-          }
-
-          if (task.dependencies.length === 0) {
-            return { continue: true, run, task: await this.startTask(manager, task, startTaskDto) };
-          }
-
-          const executionOrder = dag.topologicalSortFrom(task.name);
-          for (const taskName of executionOrder) {
-            const currentTask = tasksByName.get(taskName);
-            if (currentTask.status !== TaskStatus.Pending) {
+        for (const priority of run.prioritization) {
+          const sortedTasks = this.sortByPriority(tasks, priority);
+          for (const task of sortedTasks) {
+            if (task.status !== TaskStatus.Pending) {
               continue;
             }
 
-            const allDependenciesCompleted = Array.from(dag.getAllDependencies(taskName))
-              .map((x) => tasksByName.get(x))
-              .every((x) => x.status === TaskStatus.Completed);
+            if (task.dependencies.length === 0) {
+              return { continue: true, run, task: await this.startTask(manager, task, startTaskDto) };
+            }
 
-            if (allDependenciesCompleted) {
-              return { continue: true, run, task: await this.startTask(manager, currentTask, startTaskDto) };
+            const executionOrder = dag.topologicalSortFrom(task.name);
+            for (const taskName of executionOrder) {
+              const currentTask = tasksByName.get(taskName);
+              if (currentTask.status !== TaskStatus.Pending) {
+                continue;
+              }
+
+              const allDependenciesCompleted = Array.from(dag.getAllDependencies(taskName))
+                .map((x) => tasksByName.get(x))
+                .every((x) => x.status === TaskStatus.Completed);
+
+              if (allDependenciesCompleted) {
+                return { continue: true, run, task: await this.startTask(manager, currentTask, startTaskDto) };
+              }
             }
           }
         }
-
-        // for (const priority of run.prioritization) {
-        //   if (priority === TaskPriority.Longest) {
-        //     //
-        //   }
-        // }
 
         return { continue: true, run };
       });
@@ -92,6 +88,25 @@ export class PendingTasksService {
       Logger.error('startPendingTask:', error);
       return { continue: true, run };
     }
+  }
+
+  private sortByPriority(tasks: TaskEntity[], priority: TaskPriority): TaskEntity[] {
+    if (priority === TaskPriority.Longest) {
+      // Sort tasks by avgDuration descending
+      return tasks.filter((x) => x.priority === priority).sort((a, b) => (b.avgDuration ?? 0) - (a.avgDuration ?? 0));
+    }
+
+    if (priority === TaskPriority.Shortest) {
+      // Sort tasks by avgDuration ascending
+      return tasks.filter((x) => x.priority === priority).sort((a, b) => (a.avgDuration ?? 0) - (b.avgDuration ?? 0));
+    }
+
+    if (priority === TaskPriority.Newest) {
+      // Sort tasks by id ascending
+      return tasks.filter((x) => x.priority === priority).sort((a, b) => a.id - b.id);
+    }
+
+    return [];
   }
 
   private async startTask(manager: EntityManager, task: TaskEntity, startTaskDto: StartTaskDto): Promise<TaskEntity> {
