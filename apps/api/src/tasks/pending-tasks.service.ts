@@ -1,19 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RunnerInfo, StartTaskDto, StartTaskResponseDto, TaskPriority, TaskStatus } from '@tskmgr/common';
+import { StartTaskDto, StartTaskResponseDto, TaskPriority, TaskStatus } from '@tskmgr/common';
 import { TaskEntity } from './task.entity';
-import { DataSource, EntityManager, IsNull, Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { RunEntity } from '../runs/run.entity';
-import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
-import { DagService } from './dag.service';
 import { DAG } from './dag';
 
 @Injectable()
 export class PendingTasksService {
   constructor(
     @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
-    @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
-    private readonly dagService: DagService
+    @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>
   ) {}
 
   /**
@@ -102,11 +99,16 @@ export class PendingTasksService {
     }
 
     if (priority === TaskPriority.Newest) {
-      // Sort tasks by id ascending
+      // Sort tasks by id descending (FIFO)
+      return tasks.filter((x) => x.priority === priority).sort((a, b) => b.id - a.id);
+    }
+
+    if (priority === TaskPriority.Oldest) {
+      // Sort tasks by id ascending (LIFO)
       return tasks.filter((x) => x.priority === priority).sort((a, b) => a.id - b.id);
     }
 
-    return [];
+    throw new Error(`Unknown TaskPriority: ${priority}`);
   }
 
   private async startTask(manager: EntityManager, task: TaskEntity, startTaskDto: StartTaskDto): Promise<TaskEntity> {
