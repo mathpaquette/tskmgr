@@ -56,7 +56,7 @@ export class TasksService {
       hashes.push(task.hash);
     }
 
-    const avgDurationsByHash = await this.tasksRepository.getAvgDurationsByHash(hashes);
+    const avgDurationsByHash = await this.tasksRepository.getAvgDurationsByHashNew(hashes);
     for (const task of tasks) {
       task.avgDuration = avgDurationsByHash.get(task.hash);
     }
@@ -80,13 +80,8 @@ export class TasksService {
 
     const { cached } = completeTaskDto;
     task.complete(cached);
-
-    if (!cached) {
-      await this.tasksRepository.save(task);
-      task.avgDuration = await this.tasksRepository.calculateAvgTaskDuration(task.hash);
-    }
-
     await this.tasksRepository.save(task);
+
     await this.updateRunStatus(task.run);
     return task;
   }
