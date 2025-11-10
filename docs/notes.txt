@@ -5,6 +5,8 @@ curl -X POST http://localhost:3333/api/runs
 sudo -u postgres psql # linux
 psql postgres         # macos
 
+CREATE USER tskmgr WITH PASSWORD 'tskmgr';
+
 DROP DATABASE tskmgr;
 CREATE DATABASE tskmgr;
 GRANT ALL PRIVILEGES ON DATABASE tskmgr TO tskmgr;
