@@ -56,7 +56,7 @@ export class TasksService {
       hashes.push(task.hash);
     }
 
-    const avgDurationsByHash = await this.tasksRepository.getAvgDurationsByHashNew(hashes);
+    const avgDurationsByHash = await this.tasksRepository.getAvgDurationsByHash(hashes);
     for (const task of tasks) {
       task.avgDuration = avgDurationsByHash.get(task.hash);
     }
