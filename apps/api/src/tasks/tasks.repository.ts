@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
 import { TaskStatus } from '@tskmgr/common';
+import { environment } from '../environments/environment';
 
 @Injectable()
 export class TasksRepository extends Repository<TaskEntity> {
@@ -16,7 +17,7 @@ export class TasksRepository extends Repository<TaskEntity> {
     FROM (
       SELECT hash, duration,
              ROW_NUMBER() OVER (PARTITION BY hash ORDER BY ended_at DESC) AS rn
-      FROM task
+      FROM ${environment.datasource.schema}.task
       WHERE hash = ANY($1)
         AND status = $2
         AND cached = false
