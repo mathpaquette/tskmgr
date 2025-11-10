@@ -3,10 +3,6 @@
 /dist
 /coverage
 /.angular
+/.nx
 /data
 /files
-
-/libs/db/src/migrations
-
-/.nx/cache
-.angular
