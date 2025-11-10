@@ -3,7 +3,7 @@
  *   npm run client:example
  */
 
-import { execSync, spawnSync, spawn } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { unlinkSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';

@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Attach",
+      "name": "Attach to NestJS",
       "port": 9229,
       "request": "attach",
       "skipFiles": ["<node_internals>/**"],

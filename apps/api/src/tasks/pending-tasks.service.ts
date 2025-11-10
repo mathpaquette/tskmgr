@@ -8,10 +8,7 @@ import { DAG } from './dag';
 
 @Injectable()
 export class PendingTasksService {
-  constructor(
-    @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
-    @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>
-  ) {}
+  constructor(@InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>) {}
 
   /**
    * Get and start one pending task
@@ -33,7 +30,7 @@ export class PendingTasksService {
           return { continue: false, run };
         }
 
-        const tasks = await manager.find(TaskEntity, {
+        const allTasks = await manager.find(TaskEntity, {
           where: { run: { id: run.id } },
           lock: { mode: 'pessimistic_write' },
         });
@@ -42,7 +39,7 @@ export class PendingTasksService {
         const tasksByName = new Map<string, TaskEntity>();
         const dag = new DAG();
 
-        for (const task of tasks) {
+        for (const task of allTasks) {
           tasksByName.set(task.name, task);
 
           for (const dependency of task.dependencies) {
@@ -50,13 +47,11 @@ export class PendingTasksService {
           }
         }
 
+        // TODO: could be optimized to avoid multiple visits
+        const pendingTasks = allTasks.filter((x) => x.status === TaskStatus.Pending);
         for (const priority of run.prioritization) {
-          const sortedTasks = this.sortByPriority(tasks, priority);
+          const sortedTasks = this.sortByPriority(pendingTasks, priority);
           for (const task of sortedTasks) {
-            if (task.status !== TaskStatus.Pending) {
-              continue;
-            }
-
             if (task.dependencies.length === 0) {
               return { continue: true, run, task: await this.startTask(manager, task, startTaskDto) };
             }
