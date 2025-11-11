@@ -47,7 +47,7 @@ export class PendingTasksService {
           }
         }
 
-        // TODO: could be optimized to avoid multiple visits
+        const visited = new Set<string>();
         const pendingTasks = allTasks.filter((x) => x.status === TaskStatus.Pending);
         for (const priority of run.prioritization) {
           const sortedTasks = this.sortByPriority(pendingTasks, priority);
@@ -58,6 +58,12 @@ export class PendingTasksService {
 
             const executionOrder = dag.topologicalSortFrom(task.name);
             for (const taskName of executionOrder) {
+              if (visited.has(taskName)) {
+                console.log('Already visited:', taskName, 'for run id:', run.id);
+                continue;
+              }
+              visited.add(taskName);
+
               const currentTask = tasksByName.get(taskName);
               if (currentTask.status !== TaskStatus.Pending) {
                 continue;
