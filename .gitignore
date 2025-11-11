@@ -38,8 +38,6 @@ testem.log
 Thumbs.db
 
 /.angular
+/.nx
 /data
 /files
-
-.nx/cache
-.angular

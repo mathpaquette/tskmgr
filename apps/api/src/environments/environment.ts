@@ -9,7 +9,7 @@ const { type } = AppDataSource.options as PostgresConnectionOptions;
 export interface Environment {
   production: boolean;
   version: string;
-  datasource: TypeOrmModuleOptions;
+  datasource: TypeOrmModuleOptions & PostgresConnectionOptions;
   multer: {
     dest: string;
   };
@@ -25,6 +25,7 @@ export const environment: Environment = {
     username: 'tskmgr',
     password: 'tskmgr',
     database: `tskmgr_dev`,
+    schema: 'public',
     autoLoadEntities: true,
     synchronize: true,
     logging: false,

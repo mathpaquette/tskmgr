@@ -14,6 +14,7 @@ import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
 
 @Entity({ name: 'task' })
+@Index(['run.id', 'name'], { unique: true })
 export class TaskEntity implements Task {
   @PrimaryGeneratedColumn()
   id: number;
@@ -44,7 +45,7 @@ export class TaskEntity implements Task {
   @Column({ name: 'runner_id', nullable: true })
   runnerId: string;
 
-  @Column({ type: 'jsonb', name: 'runner_info', nullable: true })
+  @Column({ name: 'runner_info', type: 'jsonb', nullable: true })
   runnerInfo: RunnerInfo;
 
   @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.Pending })
@@ -56,7 +57,7 @@ export class TaskEntity implements Task {
   @Column({ type: 'real', nullable: true })
   duration: number;
 
-  @Column({ type: 'real', name: 'avg_duration', nullable: true })
+  @Column({ name: 'avg_duration', type: 'real', nullable: true })
   avgDuration: number;
 
   @Column({ type: 'enum', enum: TaskPriority, default: TaskPriority.Longest })
@@ -74,8 +75,11 @@ export class TaskEntity implements Task {
   @Column({ name: 'ended_at', nullable: true, type: 'timestamptz' })
   endedAt: Date;
 
-  @Column({ type: 'simple-array', default: '' })
-  dependsOn: string[];
+  @Column({ name: 'dependencies', type: 'simple-array', default: '' })
+  dependencies: string[];
+
+  @Column({ name: 'hash', type: 'varchar', length: 44, nullable: true })
+  hash: string;
 
   public hasEnded(): boolean {
     return !!this.endedAt;
