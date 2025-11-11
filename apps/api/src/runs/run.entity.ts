@@ -62,7 +62,7 @@ export class RunEntity implements Run {
 
   public complete(): void {
     if (this.hasEnded()) {
-      throw new Error(`Can't complete already ended run.`);
+      throw new Error(`Can't complete already ended run (id: ${this.id}).`);
     }
 
     const endedAt = new Date();
@@ -73,7 +73,7 @@ export class RunEntity implements Run {
 
   public fail(): void {
     if (this.hasEnded()) {
-      throw new Error(`Can't fail already ended run.`);
+      throw new Error(`Can't fail already ended run (id: ${this.id}).`);
     }
 
     const endedAt = new Date();
@@ -84,7 +84,7 @@ export class RunEntity implements Run {
 
   public abort(): void {
     if (this.hasEnded()) {
-      throw new Error(`Can't abort already ended run.`);
+      throw new Error(`Can't abort already ended run (id: ${this.id}).`);
     }
 
     const endedAt = new Date();
@@ -95,7 +95,7 @@ export class RunEntity implements Run {
 
   public close(): void {
     if (this.closed) {
-      throw new Error(`Run has been already closed!`);
+      throw new Error(`Can't close already closed run (id: ${this.id}).`);
     }
 
     if (this.tasks.length === 0) {
