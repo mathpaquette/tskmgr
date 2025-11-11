@@ -59,7 +59,6 @@ export class PendingTasksService {
             const executionOrder = dag.topologicalSortFrom(task.name);
             for (const taskName of executionOrder) {
               if (visited.has(taskName)) {
-                console.log('Already visited:', taskName, 'for run id:', run.id);
                 continue;
               }
               visited.add(taskName);
