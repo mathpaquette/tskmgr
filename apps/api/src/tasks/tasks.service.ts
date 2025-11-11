@@ -49,7 +49,8 @@ export class TasksService {
         arguments: dto.arguments,
         options: dto.options,
         priority: dto.priority,
-        dependencies: dto.dependencies,
+        // eslint-disable-next-line deprecation/deprecation
+        dependencies: dto.dependencies ?? dto.dependsOn,
       });
       task.hash = this.getHashForTask(task);
       tasks.push(task);
