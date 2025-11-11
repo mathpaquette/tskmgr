@@ -2,26 +2,22 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
-import {
-  CompleteTaskDto,
-  CreateFileRequestDto,
-  CreateTaskDto,
-  CreateTasksDto,
-  RunStatus,
-  TaskStatus,
-} from '@tskmgr/common';
+import { CompleteTaskDto, CreateFileRequestDto, CreateTasksDto, RunStatus, TaskStatus } from '@tskmgr/common';
 import { RunEntity } from '../runs/run.entity';
 import { FileEntity } from '../files/file.entity';
 import { DagService } from './dag.service';
+import { HashService } from '../utils/hash.service';
+import { TasksRepository } from './tasks.repository';
 
 @Injectable()
 export class TasksService {
   public constructor(
-    @InjectRepository(TaskEntity) private readonly tasksRepository: Repository<TaskEntity>,
+    private readonly tasksRepository: TasksRepository,
     @InjectRepository(RunEntity) private readonly runsRepository: Repository<RunEntity>,
     @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>,
     private readonly dataSource: DataSource,
-    private readonly dagService: DagService
+    private readonly dagService: DagService,
+    private readonly hashService: HashService
   ) {}
   /**
    * Create new tasks in bulk
@@ -42,24 +38,28 @@ export class TasksService {
     }
 
     const tasks: TaskEntity[] = [];
+    const hashes: string[] = [];
 
-    for (const createTaskDto of createTasksDto.tasks) {
-      // TODO: need to be address for performance issues.
-      //const avgDuration = await this.getAverageTaskDuration(createTaskDto);
-
+    for (const dto of createTasksDto.tasks) {
       const task = this.tasksRepository.create({
         run: run,
-        name: createTaskDto.name,
-        type: createTaskDto.type,
-        command: createTaskDto.command,
-        arguments: createTaskDto.arguments,
-        options: createTaskDto.options,
-        priority: createTaskDto.priority,
-        dependsOn: createTaskDto.dependsOn,
-        avgDuration: 0,
+        name: dto.name,
+        type: dto.type,
+        command: dto.command,
+        arguments: dto.arguments,
+        options: dto.options,
+        priority: dto.priority,
+        // eslint-disable-next-line deprecation/deprecation
+        dependencies: dto.dependencies ?? dto.dependsOn,
       });
-
+      task.hash = this.getHashForTask(task);
       tasks.push(task);
+      hashes.push(task.hash);
+    }
+
+    const avgDurationsByHash = await this.tasksRepository.getAvgDurationsByHash(hashes);
+    for (const task of tasks) {
+      task.avgDuration = avgDurationsByHash.get(task.hash);
     }
 
     if (run.status === RunStatus.Created) {
@@ -191,21 +191,11 @@ export class TasksService {
     }
   }
 
-  private async getAverageTaskDuration(createTaskDto: CreateTaskDto): Promise<number> {
-    const previousTasks = await this.tasksRepository.find({
-      where: {
-        type: createTaskDto.type,
-        command: createTaskDto.command,
-        arguments: createTaskDto.arguments?.toString(),
-        options: createTaskDto.options,
-        status: TaskStatus.Completed,
-        cached: false,
-      },
-      order: { endedAt: 'DESC' },
-      take: 25, // TODO: make it configurable
+  private getHashForTask(task: TaskEntity): string {
+    return this.hashService.generateHash({
+      command: task.command ?? null,
+      arguments: task.arguments ?? null,
+      options: task.options ?? null,
     });
-
-    const sum = previousTasks.reduce((p, c) => p + c.duration, 0);
-    return sum / previousTasks.length || undefined;
   }
 }

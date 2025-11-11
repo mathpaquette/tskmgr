@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME || 'tskmgr',
   password: process.env.DB_PASSWORD || 'tskmgr',
   database: process.env.DB_DATABASE || 'tskmgr',
-  schema: process.env.DB_SCHEMA,
+  schema: process.env.DB_SCHEMA || 'public',
   synchronize: false,
   logging: (process.env.DB_LOGGING as LoggerOptions) || false,
   extra: {

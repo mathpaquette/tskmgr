@@ -112,14 +112,14 @@ describe('Runs', () => {
         name: 'task-1',
         type: 'test',
         command: 'command-1',
-        dependsOn: ['task-3'],
+        dependencies: ['task-3'],
         options: { shell: true },
       },
       {
         name: 'task-2',
         type: 'test',
         command: 'command-1',
-        dependsOn: ['task-3', 'task-1'],
+        dependencies: ['task-3', 'task-1'],
         options: { shell: true },
       },
       {
@@ -157,7 +157,7 @@ describe('Runs', () => {
         name: 'task-1',
         type: 'test',
         command: 'command-1',
-        dependsOn: ['task-3'],
+        dependencies: ['task-3'],
         options: { shell: true },
       },
       {

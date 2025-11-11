@@ -1,29 +1,29 @@
 /**
  * Usage:
- *   DEBUG=tskmgr:* npx ts-node --project tsconfig.base.json -r tsconfig-paths/register "examples/client-example.ts"
+ *   npm run client:example
  */
 
-import { execSync } from 'child_process';
+import { execSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import { unlinkSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { CreateTaskDto, Run, Task, TaskPriority } from '@tskmgr/common';
 import { ClientOptions, ClientFactory } from '@tskmgr/client';
 import { v4 as uuid } from 'uuid';
 import Debug from 'debug';
-import { readJsonFile } from '@nx/devkit';
-import { unlinkSync } from 'fs';
-
 const debug = Debug('tskmgr:client-example');
 
-const options: ClientOptions = {
-  parallel: 1,
-  dataCallback,
-  errorCallback,
-};
-const client = ClientFactory.createNew('http://localhost:3333', 'RUNNER_1', options);
+async function main() {
+  const options: ClientOptions = {
+    parallel: 1,
+    dataCallback,
+    errorCallback,
+  };
 
-let completed = false;
-let run: Run;
+  let run: Run;
+  let completed = false;
+  const client = ClientFactory.createNew('http://localhost:3333', 'RUNNER_1', options);
 
-(async () => {
   try {
     // 1. Create the new run
     run = await client.createRun({
@@ -36,14 +36,15 @@ let run: Run;
     // 2. Leader should create some tasks to run
     const election = await client.setLeader(run.id);
     if (election.leader) {
-      const tasks = getNxTasks().map<CreateTaskDto>((nxTask) => {
-        const command = `npx nx run ${nxTask.target.project}:${nxTask.target.target} --configuration=production`;
+      const tasks = getNxTasks(['lint', 'test', 'build']).map<CreateTaskDto>((x) => {
+        const command = `npx nx run ${x.id}`;
         return {
-          name: nxTask.target.project,
-          type: nxTask.target.target,
+          name: x.id,
+          type: x.target.target,
           command: command.trim(),
           options: { shell: true },
           priority: TaskPriority.Longest,
+          dependencies: x.dependencies,
         };
       });
 
@@ -70,45 +71,32 @@ let run: Run;
     console.log(`${completed ? 'COMPLETED!' : 'FAILED!'}`);
     process.exit(completed ? 0 : 1);
   }
-})();
+}
 
-function getNxTasks(): NxTask[] {
-  const graphFileName = uuid() + '.json';
-  // In CI environment use npx nx affected --graph=${graphFileName} --target=lint command. run-many is just for demo purpose.
-  execSync(`npx nx run-many --graph=lint-${graphFileName} --target=lint`);
-  const lintJson = readJsonFile(`lint-${graphFileName}`);
-  unlinkSync(`lint-${graphFileName}`);
-  const lintTasks: NxTask[] = Object.values(lintJson.tasks.tasks);
+main();
 
-  execSync(`npx nx run-many --graph=test-${graphFileName} --target=test`);
-  const testJson = readJsonFile(`test-${graphFileName}`);
-  unlinkSync(`test-${graphFileName}`);
-  const testTasks: NxTask[] = Object.values(testJson.tasks.tasks);
-
-  execSync(`npx nx run-many --graph=build-${graphFileName} --target=build`);
-  const buildJson = readJsonFile(`build-${graphFileName}`);
-  unlinkSync(`build-${graphFileName}`);
-  const buildTasks: NxTask[] = Object.values(buildJson.tasks.tasks);
-
-  execSync(`npx nx run-many --graph=e2e-${graphFileName} --target=e2e`);
-  const e2eJson = readJsonFile(`e2e-${graphFileName}`);
-  unlinkSync(`e2e-${graphFileName}`);
-  const e2eTasks: NxTask[] = Object.values(e2eJson.tasks.tasks);
-
-  return [...lintTasks, ...testTasks, ...buildTasks, ...e2eTasks];
+function getNxTasks(targets: string[]): NxGraphTask[] {
+  const tmpFile = join(tmpdir(), uuid()) + '.json';
+  const command = `npx nx run-many --all --graph=${tmpFile} --target=${targets.join(',')}`;
+  execSync(command);
+  const parsed = JSON.parse(readFileSync(tmpFile).toString());
+  unlinkSync(tmpFile);
+  return Object.entries<any>(parsed.tasks.tasks).map(([key, value]) => {
+    return {
+      id: key,
+      target: value.target,
+      dependencies: parsed.tasks.dependencies[key],
+    };
+  });
 }
 
 function dataCallback(task: Task, data: string, cached: () => void): void {
-  // > nx run frontend:lint  [existing outputs match the cache, left as is]
-  // > nx run client:lint  [local cache]
-  if (
-    (data.startsWith(`> nx run ${task.name}:${task.type}`) &&
-      data.endsWith('[existing outputs match the cache, left as is]')) ||
-    data.endsWith('[local cache]')
-  ) {
+  // Nx read the output from the cache instead of running the command for 1 out of 1 tasks.
+  const regex = /Nx read the output from the cache instead of running the command for (\d+) out of (\d+) tasks\./;
+  const match = data.match(regex);
+  if (match && match[1] === match[2]) {
     cached();
   }
-
   console.log(`[stdout] ${data}`);
 }
 
@@ -116,10 +104,8 @@ function errorCallback(task: Task, data: string): void {
   console.log(`[stderr] ${data}`);
 }
 
-interface NxTask {
+interface NxGraphTask {
   id: string;
-  overrides: any;
   target: { project: string; target: string };
-  command: string;
-  outputs: string[];
+  dependencies: string[];
 }
