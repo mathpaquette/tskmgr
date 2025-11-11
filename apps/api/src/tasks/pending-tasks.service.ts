@@ -74,7 +74,8 @@ export class PendingTasksService {
           }
         }
 
-        return { continue: true, run };
+        const hasPendingTasks = pendingTasks.length > 0 || run.closed === false;
+        return { continue: hasPendingTasks, run };
       });
     } catch (error) {
       Logger.error('startPendingTask:', error);
