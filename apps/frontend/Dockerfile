@@ -20,4 +20,4 @@ FROM nginxinc/nginx-unprivileged:1-alpine
 WORKDIR /usr/share/nginx/html
 
 COPY --from=build /build/apps/frontend/nginx/default.conf.template /etc/nginx/templates/default.conf.template
-COPY --from=build /build/dist/apps/frontend .
+COPY --from=build /build/dist/apps/frontend/browser .
