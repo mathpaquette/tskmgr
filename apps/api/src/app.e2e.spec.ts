@@ -282,7 +282,7 @@ describe('Runs', () => {
       const exception = (await abortRun(app, run.id)).body;
       // assert
       expect(exception.statusCode).toBe(500);
-      expect(exception.message).toBe("Can't abort already ended run.");
+      expect(exception.message).toMatch(/^Can't abort already ended run \(id: \d+\)\.$/);
     });
 
     it('should abort running tasks', async () => {
@@ -321,7 +321,7 @@ describe('Runs', () => {
       const exception = (await failRun(app, run.id)).body;
       // assert
       expect(exception.statusCode).toBe(500);
-      expect(exception.message).toBe("Can't fail already ended run.");
+      expect(exception.message).toMatch(/^Can't fail already ended run \(id: \d+\)\.$/);
     });
   });
 
