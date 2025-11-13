@@ -2,9 +2,9 @@ import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChil
 import { RunDetailsService } from './run-details.service';
 import { Subject, takeUntil } from 'rxjs';
 import TimelinesChart, { Line, TimelinesChartInstance } from 'timelines-chart';
+import { groupBy, orderBy } from 'lodash-es';
 import { scaleOrdinal } from 'd3-scale';
 import { TaskStatus } from '@tskmgr/common';
-import { differenceInMilliseconds } from 'date-fns/fp';
 
 const valColorScale: (domain: string) => unknown = scaleOrdinal()
   .domain([TaskStatus.Running, TaskStatus.Completed, TaskStatus.Failed, TaskStatus.Aborted])
@@ -44,20 +44,8 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
 
     this.runDetailsService.tasks$.pipe(takeUntil(this.destroy$)).subscribe(async (tasks) => {
       const startedTasks = tasks.filter((x) => !!x.startedAt);
-      const orderedTasks = tasks.sort((a, b) => {
-        if (a.startedAt && b.startedAt) {
-          return differenceInMilliseconds(new Date(b.startedAt), new Date(a.startedAt));
-        } else {
-          return 0;
-        }
-      });
-      const tasksByCommand: { [key: string]: typeof orderedTasks[0][] } = {};
-      for (const task of orderedTasks) {
-        if (!tasksByCommand[task.command]) {
-          tasksByCommand[task.command] = [];
-        }
-        tasksByCommand[task.command].push(task);
-      }
+      const orderedTasks = orderBy(startedTasks, (x) => x.startedAt);
+      const tasksByCommand = groupBy(orderedTasks, (x) => x.command);
 
       this.timelinesChart.data([
         {
