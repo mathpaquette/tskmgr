@@ -12,17 +12,14 @@ import {
 import { HeaderService } from '../common/header/header.service';
 import { RunIdCellRendererComponent } from './cell-renderers/run-id-cell-renderer.component';
 import { Subject, takeUntil } from 'rxjs';
+import { themeAlpine } from 'ag-grid-community';
 
 @Component({
   selector: 'tskmgr-runs',
   template: `
     <div class="container-fs">
       <div class="second-row">
-        <ag-grid-angular
-          class="ag-theme-alpine"
-          [columnDefs]="columnDefs"
-          [gridOptions]="gridOptions"
-        ></ag-grid-angular>
+        <ag-grid-angular [columnDefs]="columnDefs" [gridOptions]="gridOptions" [theme]="theme"></ag-grid-angular>
       </div>
     </div>
   `,
@@ -59,6 +56,8 @@ export class RunsComponent implements OnInit, OnDestroy {
     private router: Router,
     private headerService: HeaderService
   ) {}
+
+  readonly theme = themeAlpine;
 
   readonly gridOptions: GridOptions = {
     ...defaultGridOptions,
