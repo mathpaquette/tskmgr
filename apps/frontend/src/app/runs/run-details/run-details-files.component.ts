@@ -5,6 +5,7 @@ import { RunDetailsService } from './run-details.service';
 import { Subject, takeUntil } from 'rxjs';
 import { File } from '@tskmgr/common';
 import { FileIdCellRendererComponent } from '../cell-renderers/file-id-cell-renderer.component';
+import { themeAlpine } from 'ag-grid-community';
 
 @Component({
   template: `
@@ -14,11 +15,7 @@ import { FileIdCellRendererComponent } from '../cell-renderers/file-id-cell-rend
       </div>
 
       <div class="d-flex h-100">
-        <ag-grid-angular
-          class="ag-theme-alpine"
-          [columnDefs]="columnDefs"
-          [gridOptions]="gridOptions"
-        ></ag-grid-angular>
+        <ag-grid-angular [columnDefs]="columnDefs" [gridOptions]="gridOptions" [theme]="theme"></ag-grid-angular>
       </div>
     </div>
   `,
@@ -37,6 +34,8 @@ import { FileIdCellRendererComponent } from '../cell-renderers/file-id-cell-rend
   ],
 })
 export class RunDetailsFilesComponent implements OnDestroy {
+  readonly theme = themeAlpine;
+
   readonly columnDefs: ColDef[] = [
     { field: 'id', cellRenderer: FileIdCellRendererComponent },
     { field: 'description' },

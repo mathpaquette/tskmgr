@@ -14,6 +14,7 @@ import { FormControl } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RunDetailsTaskLogComponent } from './run-details-task-log.component';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { themeAlpine } from 'ag-grid-community';
 
 @Component({
   selector: 'tskmgr-run-details-tasks',
@@ -21,6 +22,8 @@ import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
   styleUrls: ['run-details-tasks.component.scss'],
 })
 export class RunDetailsTasksComponent implements OnDestroy, OnInit {
+  readonly theme = themeAlpine;
+
   readonly columnDefs: ColDef[] = [
     { field: 'id' },
     { field: 'name', filter: true },
@@ -171,25 +174,33 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
       .pipe(
         takeUntil(this.destroy$),
         takeUntil(unsubscribe$),
-        tap(() => this.router.navigate([], { queryParams: {}, replaceUrl: true})),
-        tap(() => {unsubscribe$.next(); unsubscribe$.complete();})
+        tap(() => this.router.navigate([], { queryParams: {}, replaceUrl: true })),
+        tap(() => {
+          unsubscribe$.next();
+          unsubscribe$.complete();
+        })
       )
       .subscribe();
     modalRef.dismissed
       .pipe(
         takeUntil(this.destroy$),
         takeUntil(unsubscribe$),
-        tap(() => this.router.navigate([], { queryParams: {}, replaceUrl: true})),
-        tap(() => {unsubscribe$.next(); unsubscribe$.complete();})
+        tap(() => this.router.navigate([], { queryParams: {}, replaceUrl: true })),
+        tap(() => {
+          unsubscribe$.next();
+          unsubscribe$.complete();
+        })
       )
       .subscribe();
 
-    this.router.events.pipe(
-      takeUntil(this.destroy$),
-      takeUntil(unsubscribe$),
-      filter(event => event instanceof NavigationStart && event.navigationTrigger === 'popstate'),
-      tap(() => modalRef.dismiss())
-    ).subscribe();
+    this.router.events
+      .pipe(
+        takeUntil(this.destroy$),
+        takeUntil(unsubscribe$),
+        filter((event) => event instanceof NavigationStart && event.navigationTrigger === 'popstate'),
+        tap(() => modalRef.dismiss())
+      )
+      .subscribe();
   }
 }
 
