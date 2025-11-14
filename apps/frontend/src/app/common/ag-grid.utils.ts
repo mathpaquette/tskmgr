@@ -1,5 +1,5 @@
 import { GridOptions, ICellRendererParams, ValueFormatterParams } from 'ag-grid-community';
-import { format, intervalToDuration } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { formatDuration } from './time.utils';
 
 export const dateValueFormatter = (params: ValueFormatterParams): string => {
@@ -16,13 +16,7 @@ export const durationValueFormatter = (params: ValueFormatterParams) => {
 
 export const updatedAtValueFormatter = (params: ValueFormatterParams) => {
   if (!params.value) return '';
-  const duration = intervalToDuration({ start: params.value, end: new Date() });
-  if (duration?.days && duration.days > 30) return `>30d ago`;
-  if (duration.days) return `${duration.days}d ago`;
-  if (duration.hours) return `${duration.hours}h ago`;
-  if (duration.minutes) return `${duration.minutes}m ago`;
-  if (duration.seconds) return `${duration.seconds}s ago`;
-  return `${Math.trunc(params.value * 1000)}ms ago`;
+  return formatDistanceToNow(params.value, { addSuffix: true });
 };
 
 export const defaultGridOptions: GridOptions = {
