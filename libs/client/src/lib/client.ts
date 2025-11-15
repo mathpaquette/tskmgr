@@ -13,7 +13,7 @@ import {
   SetLeaderResponseDto,
   CreateFileRequestDto,
 } from '@tskmgr/common';
-import { checkStatus, delay, getTaskLogFilename, spawnAsync } from './utils';
+import { delay, getTaskLogFilename, spawnAsync } from './utils';
 import { RunTasksResult } from './run-tasks-result';
 import { TaskResult } from './task-result';
 import { ClientOptions } from './client-options';
@@ -21,8 +21,10 @@ import { createWriteStream, unlinkSync } from 'node:fs';
 import Debug from 'debug';
 import { readFile } from 'node:fs/promises';
 import { SpawnOptionsWithoutStdio } from 'node:child_process';
+import pRetry from 'p-retry';
 
 const debug = Debug('tskmgr:client');
+const headers = { 'Content-Type': 'application/json' };
 
 export class Client {
   public static readonly DefaultOptions: ClientOptions = {
@@ -45,71 +47,83 @@ export class Client {
   ) {}
 
   public async createRun(params: CreateRunRequestDto): Promise<Run> {
-    const res = await fetch(this.apiUrl.createRunUrl(), {
-      headers: { 'Content-Type': 'application/json' },
-      method: 'POST',
-      body: JSON.stringify(params),
-    });
-
-    return await checkStatus(res).json();
+    const res = await pRetry(
+      async () =>
+        await fetch(this.apiUrl.createRunUrl(), {
+          headers,
+          method: 'POST',
+          body: JSON.stringify(params),
+        })
+    );
+    return res.json();
   }
 
   public async closeRun(runId: number): Promise<Run> {
-    const res = await fetch(this.apiUrl.closeRunUrl(runId), {
-      headers: { 'Content-Type': 'application/json' },
-      method: 'PUT',
-    });
-
-    return await checkStatus(res).json();
+    const res = await pRetry(
+      async () =>
+        await fetch(this.apiUrl.closeRunUrl(runId), {
+          headers,
+          method: 'PUT',
+        })
+    );
+    return res.json();
   }
 
   public async abortRun(runId: number): Promise<Run> {
-    const res = await fetch(this.apiUrl.abortRunUrl(runId), {
-      headers: { 'Content-Type': 'application/json' },
-      method: 'PUT',
-    });
-
-    return await checkStatus(res).json();
+    const res = await pRetry(
+      async () =>
+        await fetch(this.apiUrl.abortRunUrl(runId), {
+          headers,
+          method: 'PUT',
+        })
+    );
+    return res.json();
   }
 
   public async failRun(runId: number): Promise<Run> {
-    const res = await fetch(this.apiUrl.failRunUrl(runId), {
-      headers: { 'Content-Type': 'application/json' },
-      method: 'PUT',
-    });
-
-    return await checkStatus(res).json();
+    const res = await pRetry(
+      async () =>
+        await fetch(this.apiUrl.failRunUrl(runId), {
+          headers,
+          method: 'PUT',
+        })
+    );
+    return res.json();
   }
 
   public async setLeader(runId: number): Promise<SetLeaderResponseDto> {
     const params: SetLeaderRequestDto = { runnerId: this.runnerId };
-    const res = await fetch(this.apiUrl.setLeaderUrl(runId), {
-      headers: { 'Content-Type': 'application/json' },
-      method: 'PUT',
-      body: JSON.stringify(params),
-    });
-
-    return await checkStatus(res).json();
+    const res = await pRetry(async () =>
+      fetch(this.apiUrl.setLeaderUrl(runId), {
+        headers,
+        method: 'PUT',
+        body: JSON.stringify(params),
+      })
+    );
+    return res.json();
   }
 
   public async createTasks(runId: number, params: CreateTasksDto): Promise<Task[]> {
-    const res = await fetch(this.apiUrl.createTasksUrl(runId), {
-      headers: { 'Content-Type': 'application/json' },
-      method: 'POST',
-      body: JSON.stringify(params),
-    });
-
-    return await checkStatus(res).json();
+    const res = await pRetry(async () =>
+      fetch(this.apiUrl.createTasksUrl(runId), {
+        headers,
+        method: 'POST',
+        body: JSON.stringify(params),
+      })
+    );
+    return res.json();
   }
 
   public async startTask(runId: number, params: StartTaskDto): Promise<StartTaskResponseDto> {
-    const res = await fetch(this.apiUrl.startTaskUrl(runId), {
-      headers: { 'Content-Type': 'application/json' },
-      method: 'PUT',
-      body: JSON.stringify(params),
-    });
-
-    return await checkStatus(res).json();
+    const res = await pRetry(
+      async () =>
+        await fetch(this.apiUrl.startTaskUrl(runId), {
+          headers,
+          method: 'PUT',
+          body: JSON.stringify(params),
+        })
+    );
+    return res.json();
   }
 
   public async runTasks(runId: number): Promise<RunTasksResult> {
@@ -124,22 +138,27 @@ export class Client {
   }
 
   public async completeTask(taskId: number, params: CompleteTaskDto): Promise<Task> {
-    const res = await fetch(this.apiUrl.completeTaskUrl(taskId), {
-      headers: { 'Content-Type': 'application/json' },
-      method: 'PUT',
-      body: JSON.stringify(params),
-    });
+    const res = await pRetry(
+      async () =>
+        await fetch(this.apiUrl.completeTaskUrl(taskId), {
+          headers,
+          method: 'PUT',
+          body: JSON.stringify(params),
+        })
+    );
 
-    return await checkStatus(res).json();
+    return res.json();
   }
 
   public async failTask(taskId: number): Promise<Task> {
-    const res = await fetch(this.apiUrl.failTaskUrl(taskId), {
-      headers: { 'Content-Type': 'application/json' },
-      method: 'PUT',
-    });
-
-    return await checkStatus(res).json();
+    const res = await pRetry(
+      async () =>
+        await fetch(this.apiUrl.failTaskUrl(taskId), {
+          headers,
+          method: 'PUT',
+        })
+    );
+    return res.json();
   }
 
   public async uploadRunFile(runId: number, path: string, params: CreateFileRequestDto): Promise<File_> {
@@ -164,10 +183,12 @@ export class Client {
       formData.append('description', params.description);
     }
 
-    const res = await fetch(url, {
-      method: 'POST',
-      body: formData,
-    });
+    const res = await pRetry(() =>
+      fetch(url, {
+        method: 'POST',
+        body: formData,
+      })
+    );
 
     return await checkStatus(res).json();
   }
