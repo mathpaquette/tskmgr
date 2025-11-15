@@ -10,7 +10,6 @@
     "angular.ng-template"
     "nrwl.angular-console"
     "esbenp.prettier-vscode"
-    "firsttris.vscode-jest-runner"
     "dbaeumer.vscode-eslint"
     "mtxr.sqltools"
     "mtxr.sqltools-driver-pg"

@@ -8,7 +8,7 @@
     "moduleResolution": "bundler"
   },
   "files": ["src/main.ts"],
-  "include": ["src/**/*.d.ts"],
+  "include": ["src/**/*.d.ts", "src/environments/environment.prod.ts"],
   "exclude": [
     "**/*.test.ts",
     "**/*.spec.ts",
