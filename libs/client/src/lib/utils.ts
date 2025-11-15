@@ -50,19 +50,3 @@ export function delay(ms: number): Promise<void> {
 export function getTaskLogFilename(taskId: number): string {
   return join(tmpdir(), `task-${taskId}.log`);
 }
-
-export class HTTPResponseError extends Error {
-  constructor(public readonly response) {
-    super(`HTTP Error Response: ${response.status} ${response.statusText}`);
-    this.response = response;
-  }
-}
-
-export const checkStatus = (response) => {
-  if (response.ok) {
-    // response.status >= 200 && response.status < 300
-    return response;
-  } else {
-    throw new HTTPResponseError(response);
-  }
-};
