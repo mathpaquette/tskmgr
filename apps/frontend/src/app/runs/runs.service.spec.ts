@@ -10,8 +10,8 @@ describe('RunsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        { provide: HttpClient, useValue: { get: jest.fn() } },
-        { provide: API_URL_TOKEN, useValue: { createTasksUrl: jest.fn() } },
+        { provide: HttpClient, useValue: { get: vi.fn() } },
+        { provide: API_URL_TOKEN, useValue: { createTasksUrl: vi.fn() } },
       ],
     });
     service = TestBed.inject(RunsService);
