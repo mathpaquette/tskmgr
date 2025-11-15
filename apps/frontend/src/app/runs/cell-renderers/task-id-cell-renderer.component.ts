@@ -4,12 +4,15 @@ import { ICellRendererParams } from 'ag-grid-community';
 import { Task } from '@tskmgr/common';
 
 @Component({
+  standalone: false,
   selector: 'tskmgr-task-id-cell-renderer',
   template: `
-    <ng-template [ngIf]="id">
+    @if (id) {
       <a href="/api/files/1">{{ id }}</a>
-    </ng-template>
-    <ng-template [ngIf]="!id">{{ value }}</ng-template>
+    }
+    @if (!id) {
+      {{ value }}
+    }
   `,
 })
 export class TaskIdCellRendererComponent implements ICellRendererAngularComp {

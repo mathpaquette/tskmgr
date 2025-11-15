@@ -3,6 +3,8 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/frontend-e2e/src",
   "projectType": "application",
+  "tags": [],
+  "implicitDependencies": ["frontend"],
   "targets": {
     "e2e": {
       "executor": "@nx/cypress:cypress",
@@ -21,7 +23,5 @@
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"]
     }
-  },
-  "tags": [],
-  "implicitDependencies": ["frontend"]
+  }
 }

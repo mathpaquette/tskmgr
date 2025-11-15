@@ -4,6 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/frontend/src",
   "prefix": "tskmgr",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:application",
@@ -62,7 +63,8 @@
           "buildTarget": "frontend:build:development"
         }
       },
-      "defaultConfiguration": "development"
+      "defaultConfiguration": "development",
+      "continuous": true
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
@@ -77,9 +79,9 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/frontend"],
       "options": {
-        "jestConfig": "apps/frontend/jest.config.ts"
+        "jestConfig": "apps/frontend/jest.config.ts",
+        "tsConfig": "apps/frontend/tsconfig.spec.json"
       }
     }
-  },
-  "tags": []
+  }
 }

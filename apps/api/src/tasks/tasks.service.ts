@@ -17,7 +17,7 @@ export class TasksService {
     @InjectRepository(FileEntity) private readonly filesRepository: Repository<FileEntity>,
     private readonly dataSource: DataSource,
     private readonly dagService: DagService,
-    private readonly hashService: HashService
+    private readonly hashService: HashService,
   ) {}
   /**
    * Create new tasks in bulk
@@ -49,7 +49,6 @@ export class TasksService {
         arguments: dto.arguments,
         options: dto.options,
         priority: dto.priority,
-        // eslint-disable-next-line deprecation/deprecation
         dependencies: dto.dependencies ?? dto.dependsOn,
       });
       task.hash = this.getHashForTask(task);
@@ -69,7 +68,7 @@ export class TasksService {
     return this.tasksRepository.save(tasks);
   }
 
-  async completeTask(taskId: number, completeTaskDto: CompleteTaskDto): Promise<TaskEntity> {
+  async completeTask(taskId: number, completeTaskDto: CompleteTaskDto = { cached: false }): Promise<TaskEntity> {
     const task = await this.tasksRepository.findOne({
       where: { id: taskId },
       relations: { run: true },
@@ -126,14 +125,14 @@ export class TasksService {
       const failedTask = task.fail();
       const cancelledDependantTasks = this.dagService.getDependantTasks(task.name, tasks).map((x) =>
         // TODO: replace ABORT by a new CANCELLED task status
-        x.abort()
+        x.abort(),
       );
 
       if (cancelledDependantTasks.length > 0) {
         Logger.debug(
           `Failed task: ${task.name} from run: ${task.run.id} has dependent tasks: ${cancelledDependantTasks
             .map((x) => x.name)
-            .join(',')}`
+            .join(',')}`,
         );
       }
 
@@ -149,7 +148,7 @@ export class TasksService {
   async createFile(
     taskId: number,
     file: Express.Multer.File,
-    createFileRequestDto: CreateFileRequestDto
+    createFileRequestDto: CreateFileRequestDto,
   ): Promise<FileEntity> {
     const task = await this.tasksRepository.findOne({ where: { id: taskId }, relations: { run: true } });
     if (!task) {

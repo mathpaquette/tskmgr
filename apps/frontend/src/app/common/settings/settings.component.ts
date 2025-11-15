@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'tskmgr-settings',
   template: `
     <div class="container-fluid mt-2">

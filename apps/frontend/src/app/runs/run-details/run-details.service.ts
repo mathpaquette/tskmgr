@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, inject } from '@angular/core';
 import { Observable, shareReplay, Subject, switchMap, takeUntil, takeWhile, tap, timer } from 'rxjs';
 import { Run, Task, File } from '@tskmgr/common';
 import { RunsService } from '../runs.service';
@@ -6,6 +6,9 @@ import { ActivatedRoute } from '@angular/router';
 
 @Injectable()
 export class RunDetailsService implements OnDestroy {
+  private readonly runsService = inject(RunsService);
+  private readonly activatedRoute = inject(ActivatedRoute);
+
   readonly runId: number;
 
   readonly run$: Observable<Run>;
@@ -17,7 +20,7 @@ export class RunDetailsService implements OnDestroy {
 
   private readonly pollingInterval$ = timer(0, 1000 * 10).pipe(takeUntil(this.destroy$));
 
-  constructor(private readonly runsService: RunsService, private readonly activatedRoute: ActivatedRoute) {
+  constructor() {
     this.runId = Number(this.activatedRoute.snapshot.paramMap.get('id'));
 
     this.run$ = this.pollingInterval$.pipe(
@@ -28,17 +31,17 @@ export class RunDetailsService implements OnDestroy {
         }
       }),
       takeWhile(() => this.running, true),
-      shareReplay(1)
+      shareReplay(1),
     );
 
     this.tasks$ = this.pollingInterval$.pipe(
       switchMap(() => this.runsService.findTasksById(this.runId)),
-      takeWhile(() => this.running, true)
+      takeWhile(() => this.running, true),
     );
 
     this.files$ = this.pollingInterval$.pipe(
       switchMap(() => this.runsService.findFilesById(this.runId)),
-      takeWhile(() => this.running, true)
+      takeWhile(() => this.running, true),
     );
   }
 

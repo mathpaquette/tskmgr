@@ -4,11 +4,14 @@ import { ICellRendererParams } from 'ag-grid-community';
 import { File } from '@tskmgr/common';
 
 @Component({
+  standalone: false,
   selector: 'tskmgr-files-cell-renderer',
   template: `
-    <a *ngFor="let file of files; let i = index" routerLink="." [queryParams]="{ fileId: file.id }">
-      <i class="bi bi-file-text" placement="top" ngbTooltip="{{ file.originName }}" container="body"></i>
-    </a>
+    @for (file of files; track file; let i = $index) {
+      <a routerLink="." [queryParams]="{ fileId: file.id }">
+        <i class="bi bi-file-text" placement="top" ngbTooltip="{{ file.originName }}" container="body"></i>
+      </a>
+    }
   `,
 })
 export class FilesCellRendererComponent implements ICellRendererAngularComp {

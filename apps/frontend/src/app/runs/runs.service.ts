@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { API_URL_TOKEN } from '../common/api-url.token';
 import { ApiUrl, Run, Task, File } from '@tskmgr/common';
@@ -8,10 +8,8 @@ import { map, Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class RunsService {
-  constructor(
-    private readonly http: HttpClient, //
-    @Inject(API_URL_TOKEN) private readonly apiUrl: ApiUrl
-  ) {}
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = inject<ApiUrl>(API_URL_TOKEN);
 
   public findAll(search?: string): Observable<Run[]> {
     const url = this.apiUrl.createRunUrl();
@@ -25,8 +23,8 @@ export class RunsService {
             updatedAt: new Date(x.updatedAt),
             endedAt: x.endedAt ? new Date(x.endedAt) : null,
           };
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -40,7 +38,7 @@ export class RunsService {
           updatedAt: new Date(x.updatedAt),
           endedAt: x.endedAt ? new Date(x.endedAt) : null,
         };
-      })
+      }),
     );
   }
 
@@ -56,8 +54,8 @@ export class RunsService {
             startedAt: x.startedAt ? new Date(x.startedAt) : null,
             endedAt: x.endedAt ? new Date(x.endedAt) : null,
           };
-        })
-      )
+        }),
+      ),
     );
   }
 
@@ -70,8 +68,8 @@ export class RunsService {
             ...x,
             createdAt: new Date(x.createdAt),
           };
-        })
-      )
+        }),
+      ),
     );
   }
 }

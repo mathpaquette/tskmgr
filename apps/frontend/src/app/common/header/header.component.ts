@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { HeaderService } from './header.service';
 import { Observable } from 'rxjs';
 import { IsActiveMatchOptions } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
 @Component({
+  standalone: false,
   selector: 'tskmgr-header',
   template: `
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
@@ -42,17 +43,19 @@ import { environment } from '../../../environments/environment';
               <a class="nav-link" aria-current="page" routerLink="/settings" routerLinkActive="active">Settings</a>
             </li>
           </ul>
-          <form class="d-flex" role="search" *ngIf="headerService.searchEnable$ | async">
-            <input
-              class="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-              [ngModel]="headerService.search$ | async"
-              [ngModelOptions]="{ standalone: true }"
-              (ngModelChange)="headerService.setSearch($event)"
-            />
-          </form>
+          @if (headerService.searchEnable$ | async) {
+            <form class="d-flex" role="search">
+              <input
+                class="form-control me-2"
+                type="search"
+                placeholder="Search"
+                aria-label="Search"
+                [ngModel]="headerService.search$ | async"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="headerService.setSearch($event)"
+              />
+            </form>
+          }
         </div>
       </div>
     </nav>
@@ -66,6 +69,8 @@ import { environment } from '../../../environments/environment';
   ],
 })
 export class HeaderComponent {
+  headerService = inject(HeaderService);
+
   readonly search$: Observable<string>;
   readonly options: IsActiveMatchOptions = {
     queryParams: 'ignored',
@@ -75,7 +80,9 @@ export class HeaderComponent {
   };
   readonly version = environment.version;
 
-  constructor(public headerService: HeaderService) {
+  constructor() {
+    const headerService = this.headerService;
+
     this.search$ = headerService.search$;
   }
 }

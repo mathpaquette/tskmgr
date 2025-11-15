@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, inject } from '@angular/core';
 import { AgGridEvent, ColDef, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { dateValueFormatter, defaultGridOptions } from '../../common/ag-grid.utils';
 import { RunDetailsService } from './run-details.service';
@@ -8,6 +8,7 @@ import { FileIdCellRendererComponent } from '../cell-renderers/file-id-cell-rend
 import { themeAlpine } from 'ag-grid-community';
 
 @Component({
+  standalone: false,
   template: `
     <div class="d-flex flex-column w-100">
       <div class="d-flex flex-row justify-content-end m-2">
@@ -34,6 +35,8 @@ import { themeAlpine } from 'ag-grid-community';
   ],
 })
 export class RunDetailsFilesComponent implements OnDestroy {
+  private readonly runDetailsService = inject(RunDetailsService);
+
   readonly theme = themeAlpine;
 
   readonly columnDefs: ColDef[] = [
@@ -54,8 +57,6 @@ export class RunDetailsFilesComponent implements OnDestroy {
   readonly destroy$ = new Subject<void>();
 
   private api!: GridApi;
-
-  constructor(private readonly runDetailsService: RunDetailsService) {}
 
   ngOnDestroy(): void {
     this.destroy$.next();

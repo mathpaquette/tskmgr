@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'tskmgr-root',
   template: `
     <tskmgr-header></tskmgr-header>

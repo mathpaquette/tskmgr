@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { RunDetailsService } from './run-details.service';
 import { Run } from '@tskmgr/common';
@@ -6,6 +6,7 @@ import { formatDuration } from '../../common/time.utils';
 import { format } from 'date-fns';
 
 @Component({
+  standalone: false,
   template: `
     <div class="d-flex flex-column w-100 m-3">
       <div class="accordion" id="accordionRunDetails">
@@ -27,69 +28,79 @@ import { format } from 'date-fns';
             <div class="accordion-body">
               <table class="table">
                 <tbody>
-                  <tr *ngFor="let detail of detailsEntries; let i = index">
-                    <th scope="row">{{ detail.key | camelCaseToWords }}</th>
-                    <td><span [outerHTML]="detail.value | urlify"></span></td>
-                  </tr>
+                  @for (detail of detailsEntries; track detail; let i = $index) {
+                    <tr>
+                      <th scope="row">{{ detail.key | camelCaseToWords }}</th>
+                      <td><span [outerHTML]="detail.value | urlify"></span></td>
+                    </tr>
+                  }
                 </tbody>
               </table>
             </div>
           </div>
         </div>
         <!-- INFO -->
-        <div class="accordion-item" *ngIf="infoEntries.length > 0">
-          <h2 class="accordion-header">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseTwo"
-              aria-expanded="false"
-              aria-controls="collapseTwo"
-            >
-              Run info
-            </button>
-          </h2>
-          <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo">
-            <div class="accordion-body">
-              <table class="table">
-                <tbody>
-                  <tr *ngFor="let info of infoEntries; let i = index">
-                    <th scope="row">{{ info.key }}</th>
-                    <td><span [outerHTML]="info.value | urlify"></span></td>
-                  </tr>
-                </tbody>
-              </table>
+        @if (infoEntries.length > 0) {
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseTwo"
+                aria-expanded="false"
+                aria-controls="collapseTwo"
+              >
+                Run info
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo">
+              <div class="accordion-body">
+                <table class="table">
+                  <tbody>
+                    @for (info of infoEntries; track info; let i = $index) {
+                      <tr>
+                        <th scope="row">{{ info.key }}</th>
+                        <td><span [outerHTML]="info.value | urlify"></span></td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
+        }
         <!-- PARAMETERS -->
-        <div class="accordion-item" *ngIf="paramsEntries.length > 0">
-          <h2 class="accordion-header" id="headingThree">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseThree"
-              aria-expanded="false"
-              aria-controls="collapseThree"
-            >
-              Run parameters
-            </button>
-          </h2>
-          <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree">
-            <div class="accordion-body">
-              <table class="table">
-                <tbody>
-                  <tr *ngFor="let param of paramsEntries; let i = index">
-                    <th scope="row">{{ param.key }}</th>
-                    <td>{{ param.value }}</td>
-                  </tr>
-                </tbody>
-              </table>
+        @if (paramsEntries.length > 0) {
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseThree"
+                aria-expanded="false"
+                aria-controls="collapseThree"
+              >
+                Run parameters
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree">
+              <div class="accordion-body">
+                <table class="table">
+                  <tbody>
+                    @for (param of paramsEntries; track param; let i = $index) {
+                      <tr>
+                        <th scope="row">{{ param.key }}</th>
+                        <td>{{ param.value }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
+        }
       </div>
     </div>
   `,
@@ -103,14 +114,14 @@ import { format } from 'date-fns';
   ],
 })
 export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
+  private readonly runDetailsService = inject(RunDetailsService);
+
   detailsEntries: { key: string; value: string }[] = [];
   infoEntries: { key: string; value: string }[] = [];
   paramsEntries: { key: string; value: never }[] = [];
   run: Run;
 
   readonly destroy$ = new Subject<void>();
-
-  constructor(private readonly runDetailsService: RunDetailsService) {}
 
   ngOnInit(): void {
     this.runDetailsService.run$.pipe(takeUntil(this.destroy$)).subscribe((x) => {

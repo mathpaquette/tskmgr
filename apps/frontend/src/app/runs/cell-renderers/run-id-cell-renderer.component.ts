@@ -3,6 +3,7 @@ import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
 
 @Component({
+  standalone: false,
   selector: 'tskmgr-run-id-cell-renderer',
   template: ` <a routerLink="/runs/{{ id }}/tasks">{{ id }}</a> `,
 })

@@ -2,15 +2,26 @@ import { Component, Input } from '@angular/core';
 import { Run, RunStatus } from '@tskmgr/common';
 
 @Component({
+  standalone: false,
   selector: 'tskmgr-run-status',
   template: `
-    <span *ngIf="run?.status === statusEnum.Created" class="badge bg-secondary">CREATED</span>
-    <span *ngIf="run?.status === statusEnum.Started" class="badge bg-secondary">STARTED</span>
+    @if (run?.status === statusEnum.Created) {
+      <span class="badge bg-secondary">CREATED</span>
+    }
+    @if (run?.status === statusEnum.Started) {
+      <span class="badge bg-secondary">STARTED</span>
+    }
 
-    <span *ngIf="run?.status === statusEnum.Completed" class="badge bg-success">COMPLETED</span>
+    @if (run?.status === statusEnum.Completed) {
+      <span class="badge bg-success">COMPLETED</span>
+    }
 
-    <span *ngIf="run?.status === statusEnum.Failed" class="badge bg-danger">FAILED</span>
-    <span *ngIf="run?.status === statusEnum.Aborted" class="badge bg-danger">ABORTED</span>
+    @if (run?.status === statusEnum.Failed) {
+      <span class="badge bg-danger">FAILED</span>
+    }
+    @if (run?.status === statusEnum.Aborted) {
+      <span class="badge bg-danger">ABORTED</span>
+    }
   `,
   styles: [],
 })

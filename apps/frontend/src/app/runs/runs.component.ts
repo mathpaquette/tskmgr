@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ColDef, GridApi, GridOptions, GridReadyEvent, RowDoubleClickedEvent } from 'ag-grid-community';
@@ -15,6 +15,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { themeAlpine } from 'ag-grid-community';
 
 @Component({
+  standalone: false,
   selector: 'tskmgr-runs',
   template: `
     <div class="container-fs">
@@ -50,12 +51,10 @@ import { themeAlpine } from 'ag-grid-community';
   ],
 })
 export class RunsComponent implements OnInit, OnDestroy {
-  constructor(
-    private readonly runsService: RunsService, //
-    private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private headerService: HeaderService
-  ) {}
+  private readonly runsService = inject(RunsService);
+  private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
+  private headerService = inject(HeaderService);
 
   readonly theme = themeAlpine;
 

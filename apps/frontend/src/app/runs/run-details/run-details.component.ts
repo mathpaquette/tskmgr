@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Run } from '@tskmgr/common';
 import { RunDetailsService } from './run-details.service';
 import { Observable, Subject } from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'tskmgr-run-details',
   template: `
     <div class="container-fluid mt-2 d-flex flex-column">
@@ -50,11 +51,11 @@ import { Observable, Subject } from 'rxjs';
   providers: [RunDetailsService],
 })
 export class RunDetailsComponent implements OnInit {
+  private runDetailsService = inject(RunDetailsService);
+
   run$: Observable<Run>;
 
   readonly destroy$ = new Subject<void>();
-
-  constructor(private runDetailsService: RunDetailsService) {}
 
   ngOnInit(): void {
     this.run$ = this.runDetailsService.run$;

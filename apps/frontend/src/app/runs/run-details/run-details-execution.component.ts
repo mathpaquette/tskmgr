@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild, inject } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
 import { Subject, takeUntil } from 'rxjs';
-import TimelinesChart, { Line, TimelinesChartInstance } from 'timelines-chart';
+import TimelinesChart, { Line } from 'timelines-chart';
+import TimelinesChartInstance from 'timelines-chart';
 import { groupBy, orderBy } from 'lodash-es';
 import { scaleOrdinal } from 'd3-scale';
 import { TaskStatus } from '@tskmgr/common';
@@ -11,6 +12,7 @@ const valColorScale: (domain: string) => unknown = scaleOrdinal()
   .range(['blue', 'green', 'red', 'black']);
 
 @Component({
+  standalone: false,
   template: `
     <div class="m-2">
       <div #chart id="timelines-chart"></div>
@@ -19,12 +21,13 @@ const valColorScale: (domain: string) => unknown = scaleOrdinal()
   styles: [``],
 })
 export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
+  private readonly runDetailsService = inject(RunDetailsService);
+  private readonly el = inject(ElementRef);
+
   readonly destroy$ = new Subject<void>();
 
   @ViewChild('chart') private chart: ElementRef;
   private timelinesChart: TimelinesChartInstance;
-
-  constructor(private readonly runDetailsService: RunDetailsService, private readonly el: ElementRef) {}
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -37,7 +40,7 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.timelinesChart = TimelinesChart()(this.chart.nativeElement);
+    this.timelinesChart = new TimelinesChart(this.chart.nativeElement);
     this.timelinesChart.rightMargin(300);
     this.timelinesChart.width(this.el.nativeElement.offsetWidth);
     this.timelinesChart.zColorScale(valColorScale as never);

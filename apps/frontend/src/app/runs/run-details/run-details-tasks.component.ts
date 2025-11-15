@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
 import { RunStatus, Task, TaskStatus } from '@tskmgr/common';
 import { AgGridEvent, ColDef, GetRowIdParams, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
@@ -17,11 +17,17 @@ import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { themeAlpine } from 'ag-grid-community';
 
 @Component({
+  standalone: false,
   selector: 'tskmgr-run-details-tasks',
   templateUrl: 'run-details-tasks.component.html',
   styleUrls: ['run-details-tasks.component.scss'],
 })
 export class RunDetailsTasksComponent implements OnDestroy, OnInit {
+  private readonly runDetailsService = inject(RunDetailsService);
+  private modalService = inject(NgbModal);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
   readonly theme = themeAlpine;
 
   readonly columnDefs: ColDef[] = [
@@ -74,13 +80,6 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
 
   private api!: GridApi;
 
-  constructor(
-    private readonly runDetailsService: RunDetailsService,
-    private modalService: NgbModal,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
-
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -95,7 +94,7 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
           if (fileId) {
             this.openLogFileModal(fileId);
           }
-        })
+        }),
       )
       .subscribe();
   }
@@ -140,7 +139,7 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
         distinctUntilChanged(),
         map((value) => (value ? value : '')),
         tap((value) => event.api.updateGridOptions({ quickFilterText: value })),
-        tap((value) => console.log(value))
+        tap((value) => console.log(value)),
       )
       .subscribe();
 
@@ -178,7 +177,7 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
         tap(() => {
           unsubscribe$.next();
           unsubscribe$.complete();
-        })
+        }),
       )
       .subscribe();
     modalRef.dismissed
@@ -189,7 +188,7 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
         tap(() => {
           unsubscribe$.next();
           unsubscribe$.complete();
-        })
+        }),
       )
       .subscribe();
 
@@ -198,7 +197,7 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
         takeUntil(this.destroy$),
         takeUntil(unsubscribe$),
         filter((event) => event instanceof NavigationStart && event.navigationTrigger === 'popstate'),
-        tap(() => modalRef.dismiss())
+        tap(() => modalRef.dismiss()),
       )
       .subscribe();
   }

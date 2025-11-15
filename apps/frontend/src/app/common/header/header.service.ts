@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ActivatedRoute, ActivationStart, Params, Router } from '@angular/router';
 import { BehaviorSubject, filter, interval, map, Observable, Subject, tap } from 'rxjs';
 
@@ -6,6 +6,9 @@ import { BehaviorSubject, filter, interval, map, Observable, Subject, tap } from
   providedIn: 'root',
 })
 export class HeaderService {
+  private router = inject(Router);
+  private activatedRoute = inject(ActivatedRoute);
+
   readonly refreshData$: Observable<number>;
 
   readonly _search = new BehaviorSubject<string>('');
@@ -14,7 +17,7 @@ export class HeaderService {
   readonly _searchEnabled = new Subject<boolean>();
   readonly searchEnable$ = this._searchEnabled.asObservable();
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {
+  constructor() {
     this.activatedRoute.queryParamMap
       .pipe(
         map((x) => {
@@ -24,7 +27,7 @@ export class HeaderService {
           }
           return '';
         }),
-        tap((x) => this._search.next(x))
+        tap((x) => this._search.next(x)),
       )
       .subscribe();
 

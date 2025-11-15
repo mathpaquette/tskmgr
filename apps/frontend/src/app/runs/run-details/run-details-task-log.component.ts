@@ -1,39 +1,43 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { AnsiUp } from 'ansi_up';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TaskLogFileService } from './task-log-file.service';
 import { catchError, map, Observable, of } from 'rxjs';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'tskmgr-run-details-task-log',
-  standalone: true,
   template: `
-		<div class="modal-header">
-			<h5 class="modal-title">Task execution log</h5>
-			<button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss()"></button>
-		</div>
+    <div class="modal-header">
+      <h5 class="modal-title">Task execution log</h5>
+      <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss()"></button>
+    </div>
 
     <div class="modal-body">
-			<div class="overflow-auto p-3 bg-dark text-light" *ngIf="taskLogHtml$ | async as taskLogHtml; else spinner" style="min-height: 100vh">
-        <div [innerHTML]="taskLogHtml"></div>
-      </div>
-      <ng-template #spinner>
+      @if (taskLogHtml$ | async; as taskLogHtml) {
+        <div class="overflow-auto p-3 bg-dark text-light" style="min-height: 100vh">
+          <div [innerHTML]="taskLogHtml"></div>
+        </div>
+      } @else {
         <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh">
           <div class="spinner-border" role="status" style="width: 4rem; height: 4rem;">
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>
-      </ng-template>
-		</div>
+      }
+    </div>
 
-		<div class="modal-footer"></div>
+    <div class="modal-footer"></div>
   `,
-  imports: [AsyncPipe, NgIf],
+  imports: [AsyncPipe],
   styles: [],
 })
 export class RunDetailsTaskLogComponent {
+  private sanitizer = inject(DomSanitizer);
+  private taskLogFileService = inject(TaskLogFileService);
+  activeModal = inject(NgbActiveModal);
+
   @Input() set logFileId(fileId: string) {
     this._logFileId = fileId;
     if (this._logFileId) {
@@ -46,8 +50,6 @@ export class RunDetailsTaskLogComponent {
   private _logFileId: string;
 
   taskLogHtml$: Observable<SafeHtml>;
-
-  constructor(private sanitizer: DomSanitizer, private taskLogFileService: TaskLogFileService, public activeModal: NgbActiveModal) {}
 
   private convertAnsiToHtml(ansiText: string): SafeHtml {
     const ansiConverter = new AnsiUp();
@@ -65,10 +67,10 @@ export class RunDetailsTaskLogComponent {
       catchError(() =>
         of(
           this.sanitizer.bypassSecurityTrustHtml(
-            '<div class="d-grid justify-content-center fs-2">Log file not found</div>'
-          )
-        )
-      )
+            '<div class="d-grid justify-content-center fs-2">Log file not found</div>',
+          ),
+        ),
+      ),
     );
   }
 }
