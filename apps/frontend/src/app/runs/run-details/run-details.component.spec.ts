@@ -15,9 +15,14 @@ describe('RunDetailsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RouterTestingModule, MockModule(TskmgrCommonModule)],
-      declarations: [RunDetailsComponent, MockComponents(AgGridAngular), MockComponent(RunStatusComponent)],
-      providers: [{ provide: API_URL_TOKEN, useValue: { getRunUrl: jest.fn() } }],
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule,
+        MockModule(TskmgrCommonModule),
+        MockComponent(AgGridAngular),
+      ],
+      declarations: [RunDetailsComponent, MockComponent(RunStatusComponent)],
+      providers: [{ provide: API_URL_TOKEN, useValue: { getRunUrl: vi.fn() } }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(RunDetailsComponent);

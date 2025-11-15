@@ -76,11 +76,10 @@
       "executor": "@nx/eslint:lint"
     },
     "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/frontend"],
+      "executor": "@nx/vite:test",
+      "outputs": ["{options.reportsDirectory}"],
       "options": {
-        "jestConfig": "apps/frontend/jest.config.ts",
-        "tsConfig": "apps/frontend/tsconfig.spec.json"
+        "reportsDirectory": "../../coverage/apps/frontend"
       }
     }
   }
