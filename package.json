@@ -1,7 +1,11 @@
 {
   "name": "tskmgr",
-  "version": "2.3.0",
+  "version": "0.0.0",
   "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "clean": "sh scripts/clean.sh",
     "start": "nx serve",
@@ -40,6 +44,7 @@
     "date-fns": "^4.1.0",
     "debug": "^4.4.3",
     "lodash-es": "^4.17.21",
+    "p-retry": "^7.1.0",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "7.8.2",
