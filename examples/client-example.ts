@@ -4,9 +4,6 @@
  */
 
 import { execSync } from 'node:child_process';
-import { tmpdir } from 'node:os';
-import { unlinkSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { CreateTaskDto, Run, Task, TaskPriority } from '@tskmgr/common';
 import { ClientOptions, ClientFactory } from '@tskmgr/client';
 import { v4 as uuid } from 'uuid';
@@ -83,11 +80,9 @@ async function main() {
 main();
 
 function getNxTasks(targets: string[]): NxGraphTask[] {
-  const tmpFile = join(tmpdir(), uuid()) + '.json';
-  const command = `npx nx run-many --all --graph=${tmpFile} --target=${targets.join(',')}`;
-  execSync(command);
-  const parsed = JSON.parse(readFileSync(tmpFile).toString());
-  unlinkSync(tmpFile);
+  const command = `npx nx run-many --all --graph=stdout --target=${targets.join(',')}`;
+  const output = execSync(command).toString();
+  const parsed = JSON.parse(output);
   return Object.entries<any>(parsed.tasks.tasks).map(([key, value]) => {
     return {
       id: key,
