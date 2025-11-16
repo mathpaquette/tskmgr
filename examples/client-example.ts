@@ -11,6 +11,7 @@ import { CreateTaskDto, Run, Task, TaskPriority } from '@tskmgr/common';
 import { ClientOptions, ClientFactory } from '@tskmgr/client';
 import { v4 as uuid } from 'uuid';
 import Debug from 'debug';
+
 const debug = Debug('tskmgr:client-example');
 
 async function main() {
@@ -30,6 +31,12 @@ async function main() {
       name: uuid(),
       type: '123',
       prioritization: [TaskPriority.Longest],
+      info: {
+        COMMIT_ID: '5544639e825f91cfc5c265c1cf11a230ff9c75ba',
+      },
+      parameters: {
+        JENKINS: 'example',
+      },
     });
     debug(run);
 
