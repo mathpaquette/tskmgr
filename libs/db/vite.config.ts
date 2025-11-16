@@ -22,5 +22,10 @@ export default defineConfig(() => ({
       reportsDirectory: '../../coverage/libs/db',
       provider: 'v8' as const,
     },
+    typecheck: {
+      enabled: true,
+      tsconfig: 'tsconfig.spec.json',
+      include: ['{src,tests}/**/*.{test,spec}.{ts,mts,tsx}'],
+    },
   },
 }));

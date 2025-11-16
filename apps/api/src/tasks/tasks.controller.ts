@@ -4,6 +4,7 @@ import { CompleteTaskDto, CreateFileRequestDto } from '@tskmgr/common';
 import { TaskEntity } from './task.entity';
 import { FileEntity } from '../files/file.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
+import 'multer';
 
 @Controller('tasks')
 export class TasksController {
@@ -24,7 +25,7 @@ export class TasksController {
   createFile(
     @Param('id') taskId: number,
     @Body() createFileRequestDto: CreateFileRequestDto,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<FileEntity> {
     return this.tasksService.createFile(taskId, file, createFileRequestDto);
   }
