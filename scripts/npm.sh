@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-set -e
+# Usage:
+# TSKMGR_VERSION=0.0.0 sh scripts/npm.sh
 
-TSKMGR_VERSION=$(node -p "require('./package.json').version")
+set -e
 
 npx nx release version "$TSKMGR_VERSION"
 

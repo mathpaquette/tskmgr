@@ -3,10 +3,12 @@
 set -e
 
 # Usage:
-# DOCKER_PUSH=true sh scripts/docker.sh
+# TSKMGR_VERSION=0.0.0 DOCKER_PUSH=true sh scripts/docker.sh
 
-export DOCKERHUB_USER=mathpaquette
-export TSKMGR_VERSION=$(node -p "require('./package.json').version")
+DOCKERHUB_USER=mathpaquette
+TSKMGR_VERSION=${TSKMGR_VERSION:-0.0.0}
+
+jq ".version = \"$TSKMGR_VERSION\"" package.json > package.json.tmp && mv package.json.tmp package.json
 
 echo "Building Docker images for tskmgr v${TSKMGR_VERSION}"
 sleep 3
