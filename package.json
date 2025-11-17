@@ -32,7 +32,7 @@
     "@nestjs/common": "11.1.9",
     "@nestjs/core": "11.1.9",
     "@nestjs/platform-express": "11.1.9",
-    "@nestjs/swagger": "11.2.1",
+    "@nestjs/swagger": "11.2.2",
     "@nestjs/typeorm": "^11.0.0",
     "@ng-bootstrap/ng-bootstrap": "^19.0.1",
     "@popperjs/core": "^2.11.8",
