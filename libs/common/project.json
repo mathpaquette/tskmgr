@@ -26,6 +26,12 @@
         "main": "libs/common/src/index.ts",
         "assets": ["libs/common/*.md", "LICENSE"]
       }
+    },
+    "nx-release-publish": {
+      "dependsOn": ["build"],
+      "options": {
+        "packageRoot": "dist/libs/common"
+      }
     }
   }
 }

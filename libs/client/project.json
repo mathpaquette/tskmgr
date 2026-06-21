@@ -26,6 +26,12 @@
         "main": "libs/client/src/index.ts",
         "assets": ["libs/client/*.md", "LICENSE"]
       }
+    },
+    "nx-release-publish": {
+      "dependsOn": ["build"],
+      "options": {
+        "packageRoot": "dist/libs/client"
+      }
     }
   }
 }
