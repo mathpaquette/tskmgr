@@ -1,15 +1,17 @@
 import { AppDataSource } from '@tskmgr/db';
-import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
+import type { DataSourceOptions } from 'typeorm';
+import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { version } from '../../../../package.json';
 
-const { type } = AppDataSource.options as PostgresConnectionOptions;
+type PostgresDataSourceOptions = Extract<DataSourceOptions, { type: 'postgres' }>;
+
+const { type } = AppDataSource.options as PostgresDataSourceOptions;
 
 export interface Environment {
   production: boolean;
   version: string;
-  datasource: TypeOrmModuleOptions & PostgresConnectionOptions;
+  datasource: TypeOrmModuleOptions & PostgresDataSourceOptions;
   multer: {
     dest: string;
   };

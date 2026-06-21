@@ -2,9 +2,10 @@ import { Component } from '@angular/core';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
 import { File } from '@tskmgr/common';
+import { RouterLink } from '@angular/router';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap/tooltip';
 
 @Component({
-  standalone: false,
   selector: 'tskmgr-files-cell-renderer',
   template: `
     @for (file of files; track file; let i = $index) {
@@ -13,6 +14,7 @@ import { File } from '@tskmgr/common';
       </a>
     }
   `,
+  imports: [RouterLink, NgbTooltip],
 })
 export class FilesCellRendererComponent implements ICellRendererAngularComp {
   files: File[];

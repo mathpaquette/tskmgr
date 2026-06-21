@@ -13,9 +13,9 @@ import { HeaderService } from '../common/header/header.service';
 import { RunIdCellRendererComponent } from './cell-renderers/run-id-cell-renderer.component';
 import { Subject, takeUntil } from 'rxjs';
 import { themeAlpine } from 'ag-grid-community';
+import { AgGridAngular } from 'ag-grid-angular';
 
 @Component({
-  standalone: false,
   selector: 'tskmgr-runs',
   template: `
     <div class="container-fs">
@@ -49,6 +49,7 @@ import { themeAlpine } from 'ag-grid-community';
       }
     `,
   ],
+  imports: [AgGridAngular],
 })
 export class RunsComponent implements OnInit, OnDestroy {
   private readonly runsService = inject(RunsService);

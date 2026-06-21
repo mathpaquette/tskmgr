@@ -1,9 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({
-  standalone: false,
-  name: 'camelCaseToWords',
-})
+@Pipe({ name: 'camelCaseToWords' })
 export class CamelCaseToWordsPipe implements PipeTransform {
   transform(str: string): string {
     return str

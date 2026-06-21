@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild, inject } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
 import { Subject, takeUntil } from 'rxjs';
-import TimelinesChart, { Line } from 'timelines-chart';
+import TimelinesChart, { Group, Line } from 'timelines-chart';
 import TimelinesChartInstance from 'timelines-chart';
 import { groupBy, orderBy } from 'lodash-es';
 import { scaleOrdinal } from 'd3-scale';
@@ -12,22 +12,38 @@ const valColorScale: (domain: string) => unknown = scaleOrdinal()
   .range(['blue', 'green', 'red', 'black']);
 
 @Component({
-  standalone: false,
   template: `
-    <div class="m-2">
-      <div #chart id="timelines-chart"></div>
+    <div class="m-2 timeline-container">
+      @if (!hasTimelineData) {
+        <div class="text-muted">No execution timeline available.</div>
+      }
+      <div #chart id="timelines-chart" [class.d-none]="!hasTimelineData"></div>
     </div>
   `,
-  styles: [``],
+  styles: [
+    `
+      :host {
+        display: flex;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .timeline-container {
+        flex: 1;
+        min-width: 0;
+      }
+    `,
+  ],
 })
 export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
   private readonly runDetailsService = inject(RunDetailsService);
-  private readonly el = inject(ElementRef);
+  private readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly destroy$ = new Subject<void>();
+  hasTimelineData = true;
 
-  @ViewChild('chart') private chart: ElementRef;
-  private timelinesChart: TimelinesChartInstance;
+  @ViewChild('chart') private chart: ElementRef<HTMLElement>;
+  private timelinesChart?: TimelinesChartInstance;
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -36,38 +52,74 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
-    this.timelinesChart.width(this.el.nativeElement.offsetWidth);
+    this.updateChartWidth();
   }
 
   ngAfterViewInit() {
-    this.timelinesChart = new TimelinesChart(this.chart.nativeElement);
-    this.timelinesChart.rightMargin(300);
-    this.timelinesChart.width(this.el.nativeElement.offsetWidth);
-    this.timelinesChart.zColorScale(valColorScale as never);
+    this.runDetailsService.tasks$.pipe(takeUntil(this.destroy$)).subscribe((tasks) => {
+      const orderedTasks = orderBy(
+        tasks.filter((x) => this.isValidDate(x.startedAt)),
+        (x) => new Date(x.startedAt as Date).getTime(),
+      );
 
-    this.runDetailsService.tasks$.pipe(takeUntil(this.destroy$)).subscribe(async (tasks) => {
-      const startedTasks = tasks.filter((x) => !!x.startedAt);
-      const orderedTasks = orderBy(startedTasks, (x) => x.startedAt);
+      if (orderedTasks.length === 0) {
+        this.hasTimelineData = false;
+        this.chart.nativeElement.replaceChildren();
+        this.timelinesChart = undefined;
+        return;
+      }
+
+      this.hasTimelineData = true;
+      this.ensureChart();
       const tasksByCommand = groupBy(orderedTasks, (x) => x.command);
 
-      this.timelinesChart.data([
+      const timelineData: Group[] = [
         {
           group: 'tasks',
           data: orderedTasks.map<Line>((x) => {
+            const endedAt = this.isValidDate(x.endedAt) ? x.endedAt : new Date();
+
             return {
               // if we found duplicated commands, just add id of the task
               label: tasksByCommand[x.command].length > 1 ? `${x.command} #${x.id}` : x.command,
               data: [
                 {
-                  timeRange: [new Date(x.startedAt as Date), new Date(x.endedAt || new Date())],
+                  timeRange: [new Date(x.startedAt as Date), new Date(endedAt as Date)],
                   val: x.status,
                 },
               ],
             };
           }),
         },
-      ]);
-      this.timelinesChart.refresh();
+      ];
+
+      this.updateChartWidth();
+      this.timelinesChart?.data(timelineData);
+      this.timelinesChart?.refresh();
     });
+  }
+
+  private ensureChart(): void {
+    if (this.timelinesChart) {
+      return;
+    }
+
+    this.timelinesChart = new TimelinesChart(this.chart.nativeElement);
+    this.timelinesChart.rightMargin(300);
+    this.timelinesChart.width(this.getChartWidth());
+    this.timelinesChart.zColorScale(valColorScale as never);
+  }
+
+  private updateChartWidth(): void {
+    this.timelinesChart?.width(this.getChartWidth());
+  }
+
+  private getChartWidth(): number {
+    const width = this.el.nativeElement.getBoundingClientRect().width || this.el.nativeElement.offsetWidth;
+    return Math.max(480, Math.floor(width));
+  }
+
+  private isValidDate(value: unknown): boolean {
+    return !!value && !Number.isNaN(new Date(value as Date).getTime());
   }
 }

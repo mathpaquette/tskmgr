@@ -2,9 +2,11 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Run } from '@tskmgr/common';
 import { RunDetailsService } from './run-details.service';
 import { Observable, Subject } from 'rxjs';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RunStatusComponent } from '../run-status/run-status.component';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
-  standalone: false,
   selector: 'tskmgr-run-details',
   template: `
     <div class="container-fluid mt-2 d-flex flex-column">
@@ -49,6 +51,7 @@ import { Observable, Subject } from 'rxjs';
     `,
   ],
   providers: [RunDetailsService],
+  imports: [RouterLink, RunStatusComponent, RouterLinkActive, RouterOutlet, AsyncPipe],
 })
 export class RunDetailsComponent implements OnInit {
   private runDetailsService = inject(RunDetailsService);

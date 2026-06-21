@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
+import { HeaderComponent } from './common/header/header.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-  standalone: false,
   selector: 'tskmgr-root',
   template: `
     <tskmgr-header></tskmgr-header>
@@ -16,6 +17,7 @@ import { Component } from '@angular/core';
       }
     `,
   ],
+  imports: [HeaderComponent, RouterOutlet],
 })
 export class AppComponent {
   title = 'frontend';

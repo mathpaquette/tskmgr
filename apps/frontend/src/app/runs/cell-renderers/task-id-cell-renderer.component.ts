@@ -4,7 +4,6 @@ import { ICellRendererParams } from 'ag-grid-community';
 import { Task } from '@tskmgr/common';
 
 @Component({
-  standalone: false,
   selector: 'tskmgr-task-id-cell-renderer',
   template: `
     @if (id) {

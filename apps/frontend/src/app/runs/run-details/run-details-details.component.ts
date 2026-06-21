@@ -4,9 +4,10 @@ import { RunDetailsService } from './run-details.service';
 import { Run } from '@tskmgr/common';
 import { formatDuration } from '../../common/time.utils';
 import { format } from 'date-fns';
+import { CamelCaseToWordsPipe } from '../../common/camel-case.pipe';
+import { UrlifyPipe } from '../../common/urlify.pipe';
 
 @Component({
-  standalone: false,
   template: `
     <div class="d-flex flex-column w-100 m-3">
       <div class="accordion" id="accordionRunDetails">
@@ -112,6 +113,7 @@ import { format } from 'date-fns';
       }
     `,
   ],
+  imports: [CamelCaseToWordsPipe, UrlifyPipe],
 })
 export class RunDetailsDetailsComponent implements OnInit, OnDestroy {
   private readonly runDetailsService = inject(RunDetailsService);

@@ -6,23 +6,22 @@ import { ApiUrl } from '@tskmgr/common';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { TskmgrCommonModule } from './common/tskmgr-common.module';
-import { SettingsComponent } from './common/settings/settings.component';
 
 @NgModule({
-  declarations: [AppComponent],
   imports: [
     BrowserAnimationsModule,
     NgbModule,
     HttpClientModule,
-    TskmgrCommonModule,
     RouterModule.forRoot(
       [
         { path: '', redirectTo: '/runs', pathMatch: 'full' },
         { path: 'runs', loadChildren: () => import('./runs/runs.module').then((m) => m.RunsModule) },
-        { path: 'settings', component: SettingsComponent },
+        {
+          path: 'settings',
+          loadComponent: () => import('./common/settings/settings.component').then((m) => m.SettingsComponent),
+        },
       ],
-      { initialNavigation: 'enabledBlocking' }
+      { initialNavigation: 'enabledBlocking' },
     ),
   ],
   providers: [

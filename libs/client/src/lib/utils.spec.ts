@@ -6,8 +6,14 @@ describe('Utils', () => {
     const dataHandler = vi.fn();
     const errorHandler = vi.fn();
     // act
-    const command = `node -e 'console.log("some data"); process.exit(0)'`;
-    await expect(spawnAsync(command, [], { shell: true }, { dataHandler, errorHandler })).resolves.toBeDefined();
+    await expect(
+      spawnAsync(
+        process.execPath,
+        ['-e', 'console.log("some data"); process.exit(0)'],
+        {},
+        { dataHandler, errorHandler },
+      ),
+    ).resolves.toBeDefined();
     // assert
     expect(dataHandler).toHaveBeenCalledWith('some data');
     expect(errorHandler).not.toHaveBeenCalled();
@@ -18,8 +24,14 @@ describe('Utils', () => {
     const dataHandler = vi.fn();
     const errorHandler = vi.fn();
     // act
-    const command = `node -e 'console.error("some error"); process.exit(1)'`;
-    await expect(spawnAsync(command, [], { shell: true }, { dataHandler, errorHandler })).rejects.toBeDefined();
+    await expect(
+      spawnAsync(
+        process.execPath,
+        ['-e', 'console.error("some error"); process.exit(1)'],
+        {},
+        { dataHandler, errorHandler },
+      ),
+    ).rejects.toBeDefined();
     // assert
     expect(dataHandler).not.toHaveBeenCalled();
     expect(errorHandler).toHaveBeenCalledWith('some error');

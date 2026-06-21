@@ -2,7 +2,6 @@ import { Component, Input } from '@angular/core';
 import { Run, RunStatus } from '@tskmgr/common';
 
 @Component({
-  standalone: false,
   selector: 'tskmgr-run-status',
   template: `
     @if (run?.status === statusEnum.Created) {

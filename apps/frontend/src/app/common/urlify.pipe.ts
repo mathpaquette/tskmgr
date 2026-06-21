@@ -1,9 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({
-  standalone: false,
-  name: 'urlify',
-})
+@Pipe({ name: 'urlify' })
 export class UrlifyPipe implements PipeTransform {
   transform(value: string): string {
     if (this.isValidURL(value)) {
