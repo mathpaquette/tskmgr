@@ -12,7 +12,7 @@ import { environment } from '../../../environments/environment';
       <div class="container-fluid">
         <div>
           <a class="navbar-brand" href="https://github.com/mathpaquette/tskmgr">
-            <img src="/assets/color-logo-no-background.svg" height="40px" title="{{ version }}"
+            <img src="/assets/color-logo-no-background.svg" height="40px" title="{{ version }}" alt="Tskmgr Logo"
           /></a>
         </div>
 
