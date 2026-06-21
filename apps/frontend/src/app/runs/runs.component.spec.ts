@@ -12,15 +12,19 @@ describe('RunsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule, MockComponent(AgGridAngular)],
+      imports: [RouterTestingModule, RunsComponent],
       providers: [
         {
           provide: RunsService,
           useValue: { findAll: vi.fn() },
         },
       ],
-      declarations: [RunsComponent],
-    }).compileComponents();
+    })
+      .overrideComponent(RunsComponent, {
+        remove: { imports: [AgGridAngular] },
+        add: { imports: [MockComponent(AgGridAngular)] },
+      })
+      .compileComponents();
   });
 
   beforeEach(() => {

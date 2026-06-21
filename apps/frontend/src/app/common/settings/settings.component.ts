@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  standalone: false,
   selector: 'tskmgr-settings',
   template: `
     <div class="container-fluid mt-2">
@@ -32,5 +33,6 @@ import { Component, OnInit } from '@angular/core';
     </div>
   `,
   styles: [],
+  imports: [RouterLink, FormsModule],
 })
 export class SettingsComponent {}

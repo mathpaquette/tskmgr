@@ -8,7 +8,7 @@ describe('RunStatusComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RunStatusComponent],
+      imports: [RunStatusComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(RunStatusComponent);

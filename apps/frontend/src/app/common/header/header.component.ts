@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { HeaderService } from './header.service';
 import { Observable } from 'rxjs';
-import { IsActiveMatchOptions } from '@angular/router';
+import { IsActiveMatchOptions, RouterLink, RouterLinkActive } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { FormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
-  standalone: false,
   selector: 'tskmgr-header',
   template: `
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
@@ -67,6 +68,7 @@ import { environment } from '../../../environments/environment';
       }
     `,
   ],
+  imports: [RouterLink, RouterLinkActive, FormsModule, AsyncPipe],
 })
 export class HeaderComponent {
   headerService = inject(HeaderService);

@@ -10,17 +10,18 @@ import {
 } from '../../common/ag-grid.utils';
 import { debounceTime, distinctUntilChanged, filter, first, map, Subject, takeUntil, tap } from 'rxjs';
 import { FilesCellRendererComponent } from '../cell-renderers/files-cell-renderer.component';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RunDetailsTaskLogComponent } from './run-details-task-log.component';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { themeAlpine } from 'ag-grid-community';
+import { AgGridAngular } from 'ag-grid-angular';
 
 @Component({
-  standalone: false,
   selector: 'tskmgr-run-details-tasks',
   templateUrl: 'run-details-tasks.component.html',
   styleUrls: ['run-details-tasks.component.scss'],
+  imports: [FormsModule, ReactiveFormsModule, AgGridAngular],
 })
 export class RunDetailsTasksComponent implements OnDestroy, OnInit {
   private readonly runDetailsService = inject(RunDetailsService);

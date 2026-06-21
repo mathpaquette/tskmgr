@@ -7,6 +7,7 @@ import swc from 'unplugin-swc';
 export default defineConfig(() => ({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/api',
+  oxc: false as const,
   plugins: [swc.vite(), nxViteTsPaths(), nxCopyAssetsPlugin(['*.md'])],
   // Uncomment this if you are using workers.
   // worker: {
@@ -22,6 +23,7 @@ export default defineConfig(() => ({
     coverage: {
       reportsDirectory: '../../coverage/apps/api',
       provider: 'v8' as const,
+      include: ['src/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     },
     typecheck: {
       enabled: true,

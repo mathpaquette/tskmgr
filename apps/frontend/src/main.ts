@@ -1,7 +1,13 @@
-import { enableProdMode } from '@angular/core';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { provideHttpClient } from '@angular/common/http';
+import { enableProdMode, provideZoneChangeDetection } from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router';
+import { ApiUrl } from '@tskmgr/common';
 
-import { AppModule } from './app/app.module';
+import { AppComponent } from './app/app.component';
+import { routes } from './app/app.routes';
+import { API_URL_TOKEN } from './app/common/api-url.token';
 import { environment } from './environments/environment';
 
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
@@ -11,6 +17,15 @@ if (environment.production) {
   enableProdMode();
 }
 
-platformBrowserDynamic()
-  .bootstrapModule(AppModule)
-  .catch((err) => console.error(err));
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideZoneChangeDetection(),
+    provideRouter(routes, withEnabledBlockingInitialNavigation()),
+    provideHttpClient(),
+    provideAnimations(),
+    {
+      provide: API_URL_TOKEN,
+      useFactory: () => ApiUrl.create(''),
+    },
+  ],
+}).catch((err) => console.error(err));

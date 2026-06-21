@@ -3,7 +3,6 @@ import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams } from 'ag-grid-community';
 
 @Component({
-  standalone: false,
   selector: 'tskmgr-file-id-cell-renderer',
   template: ` <a href="/api/files/{{ id }}" target="_blank">{{ id }}</a> `,
 })

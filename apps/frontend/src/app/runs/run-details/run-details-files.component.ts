@@ -6,9 +6,9 @@ import { Subject, takeUntil } from 'rxjs';
 import { File } from '@tskmgr/common';
 import { FileIdCellRendererComponent } from '../cell-renderers/file-id-cell-renderer.component';
 import { themeAlpine } from 'ag-grid-community';
+import { AgGridAngular } from 'ag-grid-angular';
 
 @Component({
-  standalone: false,
   template: `
     <div class="d-flex flex-column w-100">
       <div class="d-flex flex-row justify-content-end m-2">
@@ -33,6 +33,7 @@ import { themeAlpine } from 'ag-grid-community';
       }
     `,
   ],
+  imports: [AgGridAngular],
 })
 export class RunDetailsFilesComponent implements OnDestroy {
   private readonly runDetailsService = inject(RunDetailsService);
