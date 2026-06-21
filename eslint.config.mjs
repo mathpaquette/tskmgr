@@ -1,24 +1,22 @@
-import { FlatCompat } from '@eslint/eslintrc';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import js from '@eslint/js';
-import nxEslintPlugin from '@nx/eslint-plugin';
-
-const compat = new FlatCompat({
-  baseDirectory: dirname(fileURLToPath(import.meta.url)),
-  recommendedConfig: js.configs.recommended,
-});
+import nx from '@nx/eslint-plugin';
 
 export default [
+  ...nx.configs['flat/base'],
+  ...nx.configs['flat/typescript'],
+  ...nx.configs['flat/javascript'],
+
   {
-    ignores: ['**/dist', '**/vite.config.*.timestamp*', '**/vitest.config.*.timestamp*'],
+    ignores: ['**/dist', '**/vite.config.*.timestamp*', '**/vitest.config.*.timestamp*', 'docs/**'],
   },
-  { plugins: { '@nx': nxEslintPlugin } },
   {
     files: ['{package,project}.json'],
     rules: {
       '@nx/dependency-checks': 'error',
     },
+    ignoredFiles: [
+      '{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}',
+      '{projectRoot}/vitest.config.{js,ts,mjs,mts}',
+    ],
     languageOptions: {
       parser: await import('jsonc-eslint-parser'),
     },
@@ -41,26 +39,4 @@ export default [
       ],
     },
   },
-  ...compat
-    .config({
-      extends: ['plugin:@nx/typescript'],
-    })
-    .map((config) => ({
-      ...config,
-      files: ['**/*.ts', '**/*.tsx', '**/*.cts', '**/*.mts'],
-      rules: {
-        ...config.rules,
-      },
-    })),
-  ...compat
-    .config({
-      extends: ['plugin:@nx/javascript'],
-    })
-    .map((config) => ({
-      ...config,
-      files: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs'],
-      rules: {
-        ...config.rules,
-      },
-    })),
 ];
