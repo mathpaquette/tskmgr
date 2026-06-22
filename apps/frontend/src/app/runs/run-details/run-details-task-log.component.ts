@@ -1,10 +1,12 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, InjectionToken, inject } from '@angular/core';
 import { AnsiUp } from 'ansi_up';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TaskLogFileService } from './task-log-file.service';
 import { catchError, map, Observable, of } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
+export const TASK_LOG_FILE_ID = new InjectionToken<string | undefined>('TASK_LOG_FILE_ID');
 
 @Component({
   selector: 'tskmgr-run-details-task-log',
@@ -36,18 +38,14 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 export class RunDetailsTaskLogComponent {
   private sanitizer = inject(DomSanitizer);
   private taskLogFileService = inject(TaskLogFileService);
+  private logFileId = inject(TASK_LOG_FILE_ID, { optional: true });
   activeModal = inject(NgbActiveModal);
 
-  @Input() set logFileId(fileId: string) {
-    this._logFileId = fileId;
-    if (this._logFileId) {
-      this.getTaskLog(fileId);
+  constructor() {
+    if (this.logFileId) {
+      this.getTaskLog(this.logFileId);
     }
   }
-  get logFileId(): string {
-    return this._logFileId;
-  }
-  private _logFileId: string;
 
   taskLogHtml$: Observable<SafeHtml>;
 
