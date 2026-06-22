@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, inject, viewChild } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
 import { Subject, takeUntil } from 'rxjs';
 import TimelinesChart, { Group, Line } from 'timelines-chart';
@@ -42,7 +42,7 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
   readonly destroy$ = new Subject<void>();
   hasTimelineData = true;
 
-  @ViewChild('chart') private chart: ElementRef<HTMLElement>;
+  private readonly chart = viewChild.required<ElementRef<HTMLElement>>('chart');
   private timelinesChart?: TimelinesChartInstance;
 
   ngOnDestroy(): void {
@@ -64,7 +64,7 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
 
       if (orderedTasks.length === 0) {
         this.hasTimelineData = false;
-        this.chart.nativeElement.replaceChildren();
+        this.chart().nativeElement.replaceChildren();
         this.timelinesChart = undefined;
         return;
       }
@@ -104,7 +104,7 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
       return;
     }
 
-    this.timelinesChart = new TimelinesChart(this.chart.nativeElement);
+    this.timelinesChart = new TimelinesChart(this.chart().nativeElement);
     this.timelinesChart.rightMargin(300);
     this.timelinesChart.width(this.getChartWidth());
     this.timelinesChart.zColorScale(valColorScale as never);
