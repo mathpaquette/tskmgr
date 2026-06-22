@@ -24,7 +24,7 @@ export class TaskIdCellRendererComponent implements ICellRendererAngularComp {
     this.id = task.files.find((x) => x.type === 'log')?.id;
   }
 
-  refresh(params: ICellRendererParams): boolean {
+  refresh(): boolean {
     return false;
   }
 }

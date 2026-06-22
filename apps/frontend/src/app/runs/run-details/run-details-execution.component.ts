@@ -50,8 +50,8 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
     this.destroy$.complete();
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
+  @HostListener('window:resize')
+  onResize() {
     this.updateChartWidth();
   }
 

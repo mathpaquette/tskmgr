@@ -13,7 +13,7 @@ export class FileIdCellRendererComponent implements ICellRendererAngularComp {
     this.id = params.value;
   }
 
-  refresh(params: ICellRendererParams): boolean {
+  refresh(): boolean {
     return false;
   }
 }

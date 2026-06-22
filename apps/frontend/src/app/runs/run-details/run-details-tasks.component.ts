@@ -101,8 +101,8 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
       .subscribe();
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
+  @HostListener('window:resize')
+  onResize() {
     this.api?.sizeColumnsToFit();
   }
 

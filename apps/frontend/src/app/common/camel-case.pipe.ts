@@ -6,6 +6,6 @@ export class CamelCaseToWordsPipe implements PipeTransform {
     return str
       .replace(/^[a-z]/g, (char) => ` ${char.toUpperCase()}`)
       .replace(/[A-Z]|[0-9]+/g, ' $&')
-      .replace(/(?:\s+)/, (char) => '');
+      .replace(/(?:\s+)/, () => '');
   }
 }
