@@ -1,4 +1,13 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, inject, viewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { RunDetailsService } from './run-details.service';
 import { Subject, takeUntil } from 'rxjs';
 import TimelinesChart, { Group, Line } from 'timelines-chart';
@@ -12,12 +21,13 @@ const valColorScale: (domain: string) => unknown = scaleOrdinal()
   .range(['blue', 'green', 'red', 'black']);
 
 @Component({
+  selector: 'tskmgr-run-details-execution',
   template: `
     <div class="m-2 timeline-container">
-      @if (!hasTimelineData) {
+      @if (!hasTimelineData()) {
         <div class="text-muted">No execution timeline available.</div>
       }
-      <div #chart id="timelines-chart" [class.d-none]="!hasTimelineData"></div>
+      <div #chart id="timelines-chart" [class.d-none]="!hasTimelineData()"></div>
     </div>
   `,
   styles: [
@@ -40,7 +50,7 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
   private readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly destroy$ = new Subject<void>();
-  hasTimelineData = true;
+  readonly hasTimelineData = signal(true);
 
   private readonly chart = viewChild.required<ElementRef<HTMLElement>>('chart');
   private timelinesChart?: TimelinesChartInstance;
@@ -63,13 +73,13 @@ export class RunDetailsExecutionComponent implements OnDestroy, AfterViewInit {
       );
 
       if (orderedTasks.length === 0) {
-        this.hasTimelineData = false;
+        this.hasTimelineData.set(false);
         this.chart().nativeElement.replaceChildren();
         this.timelinesChart = undefined;
         return;
       }
 
-      this.hasTimelineData = true;
+      this.hasTimelineData.set(true);
       this.ensureChart();
       const tasksByCommand = groupBy(orderedTasks, (x) => x.command);
 

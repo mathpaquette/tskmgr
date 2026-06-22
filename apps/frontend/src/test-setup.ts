@@ -1,7 +1,6 @@
 import '@angular/compiler';
-import '@analogjs/vitest-angular/setup-zone';
+import '@analogjs/vitest-angular/setup-snapshots';
 
-import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
-import { getTestBed } from '@angular/core/testing';
+import { setupTestBed } from '@analogjs/vitest-angular/setup-testbed';
 
-getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowserTesting());
+setupTestBed({ zoneless: true });

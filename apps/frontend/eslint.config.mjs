@@ -38,6 +38,7 @@ export default [
       '@angular-eslint/template/prefer-control-flow': 'error',
       '@angular-eslint/template/no-negated-async': 'error',
       '@angular-eslint/template/prefer-self-closing-tags': 'error',
+      '@angular-eslint/template/no-any': 'error',
     },
     languageOptions: {
       parser: (await import('@angular-eslint/template-parser')).default,
@@ -50,6 +51,7 @@ export default [
       '@angular-eslint/prefer-inject': 'error',
       '@angular-eslint/prefer-output-readonly': 'error',
       '@angular-eslint/no-attribute-decorator': 'error',
+      '@angular-eslint/use-component-selector': 'error',
     },
   },
 ];

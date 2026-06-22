@@ -7,7 +7,7 @@
     "useDefineForClassFields": false,
     "moduleResolution": "bundler"
   },
-  "files": ["src/main.ts"],
+  "files": ["src/app.config.ts"],
   "include": ["src/**/*.d.ts", "src/environments/environment.prod.ts"],
   "exclude": [
     "**/*.test.ts",

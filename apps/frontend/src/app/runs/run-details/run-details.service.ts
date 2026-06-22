@@ -37,11 +37,13 @@ export class RunDetailsService implements OnDestroy {
     this.tasks$ = this.pollingInterval$.pipe(
       switchMap(() => this.runsService.findTasksById(this.runId)),
       takeWhile(() => this.running, true),
+      shareReplay({ bufferSize: 1, refCount: true }),
     );
 
     this.files$ = this.pollingInterval$.pipe(
       switchMap(() => this.runsService.findFilesById(this.runId)),
       takeWhile(() => this.running, true),
+      shareReplay({ bufferSize: 1, refCount: true }),
     );
   }
 

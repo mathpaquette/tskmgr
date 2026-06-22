@@ -8,6 +8,7 @@ import { CamelCaseToWordsPipe } from '../../common/camel-case.pipe';
 import { UrlifyPipe } from '../../common/urlify.pipe';
 
 @Component({
+  selector: 'tskmgr-run-details-details',
   template: `
     <div class="d-flex flex-column w-100 m-3">
       <div class="accordion" id="accordionRunDetails">
