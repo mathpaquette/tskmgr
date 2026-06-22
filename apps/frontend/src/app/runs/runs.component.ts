@@ -91,8 +91,8 @@ export class RunsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
+  @HostListener('window:resize')
+  onResize() {
     this.api?.sizeColumnsToFit();
   }
 

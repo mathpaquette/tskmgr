@@ -13,7 +13,7 @@ export class UrlifyPipe implements PipeTransform {
   isValidURL(value: string) {
     try {
       new URL(value);
-    } catch (_) {
+    } catch {
       return false;
     }
     return true;

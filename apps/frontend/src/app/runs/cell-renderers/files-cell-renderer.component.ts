@@ -23,7 +23,7 @@ export class FilesCellRendererComponent implements ICellRendererAngularComp {
     this.files = params.value;
   }
 
-  refresh(params: ICellRendererParams): boolean {
+  refresh(): boolean {
     return false;
   }
 }
