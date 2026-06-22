@@ -9,7 +9,7 @@ import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap/tooltip';
   selector: 'tskmgr-files-cell-renderer',
   template: `
     @for (file of files; track file; let i = $index) {
-      <a routerLink="." [queryParams]="{ fileId: file.id }">
+      <a routerLink="." [queryParams]="{ fileId: file.id }" [replaceUrl]="true">
         <i class="bi bi-file-text" placement="top" ngbTooltip="{{ file.originName }}" container="body"></i>
       </a>
     }
