@@ -4,6 +4,7 @@ import { RunDetailsService } from './run-details.service';
 import { RunStatus, Task, TaskStatus } from '@tskmgr/common';
 import { AgGridEvent, ColDef, GetRowIdParams, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import {
+  arrayValueFormatter,
   checkboxCellRenderer,
   defaultGridOptions,
   durationValueFormatter,
@@ -38,9 +39,9 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
     { field: 'name', filter: true },
     { field: 'type', filter: true },
     { field: 'command', filter: true },
-    { field: 'files', cellRenderer: FilesCellRendererComponent },
+    { field: 'files', cellRenderer: FilesCellRendererComponent, valueFormatter: arrayValueFormatter },
     // { field: 'options' },
-    { field: 'arguments', filter: true },
+    { field: 'arguments', filter: true, valueFormatter: arrayValueFormatter },
     // { field: 'runnerInfo' },
     { field: 'runnerId', filter: true },
     { field: 'status', filter: true },

@@ -3,6 +3,7 @@ import { RunsService } from './runs.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ColDef, GridApi, GridOptions, GridReadyEvent, RowDoubleClickedEvent } from 'ag-grid-community';
 import {
+  arrayValueFormatter,
   checkboxCellRenderer,
   defaultGridOptions,
   durationValueFormatter,
@@ -63,14 +64,14 @@ export class RunsComponent implements OnInit, OnDestroy {
     ...defaultGridOptions,
     onGridReady: this.onGridReady.bind(this),
     onRowDoubleClicked: this.onRowDoubleClicked.bind(this),
-    getRowId: (params) => params.data.id,
+    getRowId: (params) => params.data.id.toString(),
   };
 
   readonly columnDefs: ColDef[] = [
     { field: 'id', width: 100, suppressSizeToFit: true, cellRenderer: RunIdCellRendererComponent },
     { field: 'type', filter: true },
     { field: 'status', filter: true },
-    { field: 'prioritization', filter: true },
+    { field: 'prioritization', filter: true, valueFormatter: arrayValueFormatter },
     { field: 'failFast', cellRenderer: checkboxCellRenderer },
     { field: 'closed', cellRenderer: checkboxCellRenderer },
     { field: 'duration', valueFormatter: durationValueFormatter },
