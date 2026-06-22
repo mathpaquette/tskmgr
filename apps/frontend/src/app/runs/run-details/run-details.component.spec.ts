@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RunDetailsComponent } from './run-details.component';
 import { MockComponent } from 'ng-mocks';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideRouter } from '@angular/router';
 import { RunStatusComponent } from '../run-status/run-status.component';
 import { RunDetailsService } from './run-details.service';
 import { of } from 'rxjs';
@@ -13,7 +13,8 @@ describe('RunDetailsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule, RunDetailsComponent],
+      imports: [RunDetailsComponent],
+      providers: [provideRouter([])],
     })
       .overrideComponent(RunDetailsComponent, {
         remove: {

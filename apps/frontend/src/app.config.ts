@@ -1,7 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { enableProdMode, provideZonelessChangeDetection } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router';
 import { ApiUrl } from '@tskmgr/common';
 
@@ -22,7 +21,6 @@ bootstrapApplication(AppComponent, {
     provideZonelessChangeDetection(),
     provideRouter(routes, withEnabledBlockingInitialNavigation()),
     provideHttpClient(),
-    provideAnimations(),
     {
       provide: API_URL_TOKEN,
       useFactory: () => ApiUrl.create(''),

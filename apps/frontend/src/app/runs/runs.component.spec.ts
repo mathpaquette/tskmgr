@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RunsComponent } from './runs.component';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideRouter } from '@angular/router';
 import { RunsService } from './runs.service';
 import { MockComponent } from 'ng-mocks';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -12,12 +12,13 @@ describe('RunsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule, RunsComponent],
+      imports: [RunsComponent],
       providers: [
         {
           provide: RunsService,
           useValue: { findAll: vi.fn() },
         },
+        provideRouter([]),
       ],
     })
       .overrideComponent(RunsComponent, {

@@ -39,4 +39,10 @@ export default [
       ],
     },
   },
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    rules: {
+      '@typescript-eslint/no-deprecated': 'error',
+    },
+  },
 ];
