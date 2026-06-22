@@ -20,7 +20,7 @@ import { AgGridAngular } from 'ag-grid-angular';
   template: `
     <div class="container-fs">
       <div class="second-row">
-        <ag-grid-angular [columnDefs]="columnDefs" [gridOptions]="gridOptions" [theme]="theme"></ag-grid-angular>
+        <ag-grid-angular [columnDefs]="columnDefs" [gridOptions]="gridOptions" [theme]="theme" />
       </div>
     </div>
   `,

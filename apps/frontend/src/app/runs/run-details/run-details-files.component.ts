@@ -16,7 +16,7 @@ import { AgGridAngular } from 'ag-grid-angular';
       </div>
 
       <div class="d-flex h-100">
-        <ag-grid-angular [columnDefs]="columnDefs" [gridOptions]="gridOptions" [theme]="theme"></ag-grid-angular>
+        <ag-grid-angular [columnDefs]="columnDefs" [gridOptions]="gridOptions" [theme]="theme" />
       </div>
     </div>
   `,

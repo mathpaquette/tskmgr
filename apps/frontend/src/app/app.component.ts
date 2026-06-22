@@ -5,8 +5,8 @@ import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'tskmgr-root',
   template: `
-    <tskmgr-header></tskmgr-header>
-    <router-outlet></router-outlet>
+    <tskmgr-header />
+    <router-outlet />
   `,
   styles: [
     `
