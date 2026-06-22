@@ -14,6 +14,27 @@ export const durationValueFormatter = (params: ValueFormatterParams) => {
   return formatDuration(params.value);
 };
 
+export const arrayValueFormatter = (params: ValueFormatterParams): string => {
+  if (!Array.isArray(params.value)) return objectValueFormatter(params);
+
+  return params.value
+    .map((value) => {
+      if (value && typeof value === 'object') {
+        return 'originName' in value ? String(value.originName) : JSON.stringify(value);
+      }
+
+      return String(value);
+    })
+    .join(', ');
+};
+
+export const objectValueFormatter = (params: ValueFormatterParams): string => {
+  if (params.value === null || params.value === undefined) return '';
+  if (typeof params.value !== 'object') return String(params.value);
+
+  return JSON.stringify(params.value);
+};
+
 export const updatedAtValueFormatter = (params: ValueFormatterParams) => {
   if (!params.value) return '';
   return formatDistanceToNow(params.value, { addSuffix: true });
