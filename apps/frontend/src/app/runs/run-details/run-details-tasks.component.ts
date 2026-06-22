@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, HostListener, Injector, OnDestroy, OnInit, inject } from '@angular/core';
 import { RunDetailsService } from './run-details.service';
 import { RunStatus, Task, TaskStatus } from '@tskmgr/common';
 import { AgGridEvent, ColDef, GetRowIdParams, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
@@ -12,7 +12,7 @@ import { debounceTime, distinctUntilChanged, filter, first, map, Subject, takeUn
 import { FilesCellRendererComponent } from '../cell-renderers/files-cell-renderer.component';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { RunDetailsTaskLogComponent } from './run-details-task-log.component';
+import { RunDetailsTaskLogComponent, TASK_LOG_FILE_ID } from './run-details-task-log.component';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import { themeAlpine } from 'ag-grid-community';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -28,6 +28,7 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
   private modalService = inject(NgbModal);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private injector = inject(Injector);
 
   readonly theme = themeAlpine;
 
@@ -166,10 +167,13 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
   private openLogFileModal(fileId: string): void {
     const unsubscribe$ = new Subject<void>();
     const modalRef = this.modalService.open(RunDetailsTaskLogComponent, {
+      injector: Injector.create({
+        providers: [{ provide: TASK_LOG_FILE_ID, useValue: fileId }],
+        parent: this.injector,
+      }),
       scrollable: true,
       size: 'xl',
     });
-    modalRef.componentInstance.logFileId = fileId;
     modalRef.closed
       .pipe(
         takeUntil(this.destroy$),
