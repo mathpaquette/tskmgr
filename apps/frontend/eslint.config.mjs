@@ -34,7 +34,11 @@ export default [
   // Angular template files
   {
     files: ['**/*.html'],
-    rules: {},
+    rules: {
+      '@angular-eslint/template/prefer-control-flow': 'error',
+      '@angular-eslint/template/no-negated-async': 'error',
+      '@angular-eslint/template/prefer-self-closing-tags': 'error',
+    },
     languageOptions: {
       parser: (await import('@angular-eslint/template-parser')).default,
     },
@@ -42,7 +46,10 @@ export default [
   {
     files: ['**/*.ts'],
     rules: {
-      '@angular-eslint/prefer-standalone': 'off',
+      '@angular-eslint/prefer-standalone': 'error',
+      '@angular-eslint/prefer-inject': 'error',
+      '@angular-eslint/prefer-output-readonly': 'error',
+      '@angular-eslint/no-attribute-decorator': 'error',
     },
   },
 ];
