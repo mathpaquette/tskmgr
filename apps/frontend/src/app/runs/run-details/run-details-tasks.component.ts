@@ -170,6 +170,12 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
     this.quickFilter.reset();
   }
 
+  exportVisibleColumns(): void {
+    this.api?.exportDataAsCsv({
+      fileName: `run_${this.runDetailsService.runId}_details_export.csv`,
+    });
+  }
+
   private openLogFileModal(fileId: string): void {
     const unsubscribe$ = new Subject<void>();
     const modalRef = this.modalService.open(RunDetailsTaskLogComponent, {
