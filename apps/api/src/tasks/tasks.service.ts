@@ -49,6 +49,7 @@ export class TasksService {
         arguments: dto.arguments,
         options: dto.options,
         priority: dto.priority,
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- Keep accepting legacy clients that send dependsOn.
         dependencies: dto.dependencies ?? dto.dependsOn,
       });
       task.hash = this.getHashForTask(task);
