@@ -20,10 +20,12 @@
           name="inlineRadioOptions"
           id="inlineRadio{{ i }}"
           value="option{{ i }}"
-          [checked]="taskFilter.checked"
+          [checked]="isTaskFilterChecked(taskFilter)"
           (change)="onCheckboxChange(taskFilter)"
         />
-        <label class="form-check-label" for="inlineRadio{{ i }}">{{ taskFilter.name }} ({{ taskFilter.count }})</label>
+        <label class="form-check-label" for="inlineRadio{{ i }}">
+          {{ taskFilter.name }} ({{ getTaskFilterCount(taskFilter) }})
+        </label>
       </div>
     }
   </div>

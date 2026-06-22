@@ -1,4 +1,5 @@
-import { Component, HostListener, Injector, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, HostListener, Injector, OnDestroy, OnInit, afterNextRender, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RunDetailsService } from './run-details.service';
 import { RunStatus, Task, TaskStatus } from '@tskmgr/common';
 import { AgGridEvent, ColDef, GetRowIdParams, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
@@ -67,18 +68,22 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
   private readonly taskFilterFailed: TaskFilter = {
     name: 'Failed',
     filter: TaskStatus.Failed,
-    count: 0,
-    checked: false,
   };
 
   readonly taskFilters: TaskFilter[] = [
-    { name: 'All', count: 0, checked: false },
-    { name: 'Pending', filter: TaskStatus.Pending, count: 0, checked: false },
-    { name: 'Running', filter: TaskStatus.Running, count: 0, checked: false },
-    { name: 'Aborted', filter: TaskStatus.Aborted, count: 0, checked: false },
-    { name: 'Completed', filter: TaskStatus.Completed, count: 0, checked: false },
+    { name: 'All' },
+    { name: 'Pending', filter: TaskStatus.Pending },
+    { name: 'Running', filter: TaskStatus.Running },
+    { name: 'Aborted', filter: TaskStatus.Aborted },
+    { name: 'Completed', filter: TaskStatus.Completed },
     this.taskFilterFailed,
   ];
+
+  readonly selectedTaskFilter = signal<TaskStatus | undefined>(undefined);
+  private readonly taskCounts = toSignal(
+    this.runDetailsService.tasks$.pipe(map((tasks) => this.createTaskCounts(tasks))),
+    { initialValue: this.createTaskCounts([]) },
+  );
 
   private api!: GridApi;
 
@@ -110,19 +115,21 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
     event.api.updateGridOptions({ rowData: tasks });
   }
 
-  updateCounts(tasks: Task[]): void {
-    for (const taskFilter of this.taskFilters) {
-      if (!taskFilter.filter) {
-        taskFilter.count = tasks.length;
-        continue;
-      }
-
-      taskFilter.count = tasks.filter((x) => x.status === taskFilter.filter).length;
-    }
-  }
-
   onGridReady(event: GridReadyEvent): void {
     this.api = event.api;
+    afterNextRender(() => this.bindGrid(event), { injector: this.injector });
+  }
+
+  getTaskFilterCount(taskFilter: TaskFilter): number {
+    const counts = this.taskCounts();
+    return taskFilter.filter ? counts[taskFilter.filter] : counts.all;
+  }
+
+  isTaskFilterChecked(taskFilter: TaskFilter): boolean {
+    return !!taskFilter.filter && this.selectedTaskFilter() === taskFilter.filter;
+  }
+
+  private bindGrid(event: GridReadyEvent): void {
     this.runDetailsService.run$.pipe(first()).subscribe((x) => {
       if (x.status === RunStatus.Failed) {
         this.onCheckboxChange(this.taskFilterFailed);
@@ -131,7 +138,6 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
 
     this.runDetailsService.tasks$.pipe(takeUntil(this.destroy$)).subscribe((x) => {
       this.refreshData(x, event);
-      this.updateCounts(x);
     });
 
     this.quickFilter.valueChanges
@@ -149,7 +155,7 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
   }
 
   onCheckboxChange(taskFilter: TaskFilter): void {
-    this.taskFilters.forEach((x) => (x.checked = false));
+    this.selectedTaskFilter.set(taskFilter.filter);
 
     if (!taskFilter.filter) {
       this.api?.setFilterModel({});
@@ -157,7 +163,6 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
     }
 
     this.api?.setFilterModel({ status: { filterType: 'text', type: 'equals', filter: taskFilter.filter } });
-    taskFilter.checked = true;
   }
 
   onQuickFilterClear(): void {
@@ -206,11 +211,32 @@ export class RunDetailsTasksComponent implements OnDestroy, OnInit {
       )
       .subscribe();
   }
+
+  private createTaskCounts(tasks: Task[]): TaskCounts {
+    const counts: TaskCounts = {
+      all: tasks.length,
+      [TaskStatus.Pending]: 0,
+      [TaskStatus.Running]: 0,
+      [TaskStatus.Aborted]: 0,
+      [TaskStatus.Completed]: 0,
+      [TaskStatus.Failed]: 0,
+    };
+
+    for (const task of tasks) {
+      if (task.status in counts) {
+        counts[task.status as TaskStatus]++;
+      }
+    }
+
+    return counts;
+  }
 }
 
 interface TaskFilter {
   name: string;
   filter?: TaskStatus;
-  count: number;
-  checked: boolean;
 }
+
+type TaskCounts = Record<TaskStatus, number> & {
+  all: number;
+};

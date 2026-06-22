@@ -12,8 +12,7 @@
       "options": {
         "outputPath": "dist/apps/frontend",
         "index": "apps/frontend/src/index.html",
-        "browser": "apps/frontend/src/main.ts",
-        "polyfills": ["zone.js"],
+        "browser": "apps/frontend/src/app.config.ts",
         "tsConfig": "apps/frontend/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": ["apps/frontend/src/favicon.png", "apps/frontend/src/assets"],
