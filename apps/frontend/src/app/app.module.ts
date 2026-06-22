@@ -15,7 +15,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     RouterModule.forRoot(
       [
         { path: '', redirectTo: '/runs', pathMatch: 'full' },
-        { path: 'runs', loadChildren: () => import('./runs/runs.module').then((m) => m.RunsModule) },
+        { path: 'runs', loadChildren: () => import('./runs/runs-routing').then((m) => m.routes) },
         {
           path: 'settings',
           loadComponent: () => import('./common/settings/settings.component').then((m) => m.SettingsComponent),

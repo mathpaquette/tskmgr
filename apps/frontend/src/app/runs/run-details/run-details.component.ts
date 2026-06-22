@@ -17,7 +17,7 @@ import { AsyncPipe } from '@angular/common';
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a routerLink="/runs">Runs</a></li>
           <li class="breadcrumb-item active" aria-current="page">
-            {{ (run$ | async)?.name }} <tskmgr-run-status [run]="run$ | async"></tskmgr-run-status>
+            {{ (run$ | async)?.name }} <tskmgr-run-status [run]="run$ | async" />
           </li>
         </ol>
       </nav>
@@ -39,7 +39,7 @@ import { AsyncPipe } from '@angular/common';
           <a class="nav-link" routerLink="details" routerLinkActive="active">Details</a>
         </li>
       </ul>
-      <router-outlet></router-outlet>
+      <router-outlet />
     </div>
   `,
   styles: [
