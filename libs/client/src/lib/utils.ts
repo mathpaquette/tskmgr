@@ -55,17 +55,26 @@ export function getTaskLogFilename(taskId: number): string {
   return join(tmpdir(), `task-${taskId}.log`);
 }
 
-export async function fetchWithRetry<T>(input: string | URL | Request, init?: RequestInit): Promise<T> {
+export async function fetchWithRetry<T>(
+  input: string | URL | Request,
+  init?: RequestInit | (() => Promise<RequestInit>),
+): Promise<T> {
+  let failureStage: string;
   const run = async () => {
-    const response = await fetch(input, init);
+    failureStage = 'preparing request options';
+    const requestInit = typeof init === 'function' ? await init() : init;
+    failureStage = 'sending request';
+    const response = await fetch(input, requestInit);
     if (!response.ok) {
+      failureStage = `HTTP ${response.status}`;
       throw new Error(`HTTP ${response.status} ${response.statusText}: ${input}`);
     }
+    failureStage = 'parsing response JSON';
     return response.json();
   };
 
   return pRetry(run, {
     retries: 3,
-    onFailedAttempt: (error) => debug('Retry attempt failed:', error),
+    onFailedAttempt: ({ attemptNumber }) => debug('Attempt %d failed: %s', attemptNumber, failureStage),
   });
 }

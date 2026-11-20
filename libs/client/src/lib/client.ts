@@ -23,7 +23,6 @@ import { readFile } from 'node:fs/promises';
 import { SpawnOptionsWithoutStdio } from 'node:child_process';
 
 const debug = Debug('tskmgr:client');
-const headers = { 'Content-Type': 'application/json' };
 
 export class Client {
   public static readonly DefaultOptions: ClientOptions = {
@@ -46,54 +45,47 @@ export class Client {
   ) {}
 
   public async createRun(params: CreateRunRequestDto): Promise<Run> {
-    return fetchWithRetry(this.apiUrl.createRunUrl(), {
-      headers,
+    return this.request(this.apiUrl.createRunUrl(), {
       method: 'POST',
       body: JSON.stringify(params),
     });
   }
 
   public async closeRun(runId: number): Promise<Run> {
-    return fetchWithRetry(this.apiUrl.closeRunUrl(runId), {
-      headers,
+    return this.request(this.apiUrl.closeRunUrl(runId), {
       method: 'PUT',
     });
   }
 
   public async abortRun(runId: number): Promise<Run> {
-    return fetchWithRetry(this.apiUrl.abortRunUrl(runId), {
-      headers,
+    return this.request(this.apiUrl.abortRunUrl(runId), {
       method: 'PUT',
     });
   }
 
   public async failRun(runId: number): Promise<Run> {
-    return fetchWithRetry(this.apiUrl.failRunUrl(runId), {
-      headers,
+    return this.request(this.apiUrl.failRunUrl(runId), {
       method: 'PUT',
     });
   }
 
   public async setLeader(runId: number): Promise<SetLeaderResponseDto> {
     const params: SetLeaderRequestDto = { runnerId: this.runnerId };
-    return fetchWithRetry(this.apiUrl.setLeaderUrl(runId), {
-      headers,
+    return this.request(this.apiUrl.setLeaderUrl(runId), {
       method: 'PUT',
       body: JSON.stringify(params),
     });
   }
 
   public async createTasks(runId: number, params: CreateTasksDto): Promise<Task[]> {
-    return fetchWithRetry(this.apiUrl.createTasksUrl(runId), {
-      headers,
+    return this.request(this.apiUrl.createTasksUrl(runId), {
       method: 'POST',
       body: JSON.stringify(params),
     });
   }
 
   public async startTask(runId: number, params: StartTaskDto): Promise<StartTaskResponseDto> {
-    return fetchWithRetry(this.apiUrl.startTaskUrl(runId), {
-      headers,
+    return this.request(this.apiUrl.startTaskUrl(runId), {
       method: 'PUT',
       body: JSON.stringify(params),
     });
@@ -111,16 +103,14 @@ export class Client {
   }
 
   public async completeTask(taskId: number, params: CompleteTaskDto): Promise<Task> {
-    return fetchWithRetry(this.apiUrl.completeTaskUrl(taskId), {
-      headers,
+    return this.request(this.apiUrl.completeTaskUrl(taskId), {
       method: 'PUT',
       body: JSON.stringify(params),
     });
   }
 
   public async failTask(taskId: number): Promise<Task> {
-    return fetchWithRetry(this.apiUrl.failTaskUrl(taskId), {
-      headers,
+    return this.request(this.apiUrl.failTaskUrl(taskId), {
       method: 'PUT',
     });
   }
@@ -147,9 +137,28 @@ export class Client {
       formData.append('description', params.description);
     }
 
-    return fetchWithRetry(url, {
+    return this.request(url, {
       method: 'POST',
       body: formData,
+    });
+  }
+
+  private request<T>(url: string, init: RequestInit): Promise<T> {
+    const { headers: customHeaders } = this.clientOptions;
+    return fetchWithRetry<T>(url, async () => {
+      const headers = new Headers(typeof customHeaders === 'function' ? await customHeaders() : customHeaders);
+
+      if (init.body instanceof FormData) {
+        headers.delete('Content-Type');
+      } else if (!headers.has('Content-Type')) {
+        headers.set('Content-Type', 'application/json');
+      }
+
+      return {
+        ...init,
+        headers,
+        redirect: customHeaders === undefined ? init.redirect : 'error',
+      };
     });
   }
 
